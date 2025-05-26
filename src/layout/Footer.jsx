@@ -1,17 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import fb from "../assets/fb.png";
-// Replace the direct YouTube icon import with a Font Awesome icon
-// import yt from "../assets/yt.png";
 import git from "../assets/git.png";
 import linkedin from "../assets/linkedin.png";
 
 const Footer = () => {
   return (
     <footer className="bg-gradient-to-r from-blue-800 to-indigo-800 text-white pt-20 pb-8 px-5 relative overflow-hidden">
-      {/* Animated gradient bar */}
       <div className="absolute top-0 left-0 w-full h-2.5 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-[length:200%_100%] animate-gradient"></div>
-
       <div className="max-w-7xl mx-auto flex justify-between items-start flex-wrap gap-10">
         <div className="flex-[0_0_300px]">
           <h2 className="text-2xl font-bold mb-4">AI Chat Moderation</h2>

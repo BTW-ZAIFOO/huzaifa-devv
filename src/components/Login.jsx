@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -8,6 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 const Login = () => {
   const { setIsAuthenticated, setUser } = useContext(Context);
   const navigateTo = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
@@ -16,93 +17,119 @@ const Login = () => {
   } = useForm();
 
   const handleLogin = async (data) => {
-    await axios
-      .post("http://localhost:4000/api/v1/user/login", data, {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then((res) => {
-        toast.success(res.data.message);
-        setIsAuthenticated(true);
-        setUser(res.data.user);
-        navigateTo("/");
-      })
-      .catch((error) => {
-        toast.error(error.response.data.message);
-      });
+    setIsLoading(true);
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/v1/user/login",
+        data,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      // Check if user is admin and redirect accordingly
+      const isUserAdmin = response.data.user?.role === "admin";
+
+      setUser(response.data.user);
+      setIsAuthenticated(true);
+      toast.success("Login successful!");
+
+      // Direct redirect based on role
+      if (isUserAdmin) {
+        navigateTo("/admin");
+      } else {
+        navigateTo("/chat");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Login failed");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="py-2.5">
-      <form className="w-full" onSubmit={handleSubmit((data) => handleLogin(data))}>
-        <h2 className="text-2xl font-semibold mb-2.5 text-slate-800">Welcome Back</h2>
-        <p className="text-gray-500 mb-8 text-base">Sign in to continue to your account</p>
-
-        <div className="mb-5 text-left">
-          <label htmlFor="email" className="block mb-2 font-medium text-slate-700 text-sm">Email Address</label>
-          <div className="relative">
-            <i className="far fa-envelope absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
-            <input
-              id="email"
-              type="email"
-              placeholder="Enter your email"
-              required
-              {...register("email")}
-              className="pl-12 pr-4 py-3 h-[50px] w-full border border-gray-300 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none focus:bg-white"
-            />
+      <form className="w-full" onSubmit={handleSubmit(handleLogin)}>
+        <div className="space-y-6">
+          <div className="space-y-1.5">
+            <label htmlFor="email" className="block text-sm font-medium text-white">
+              Email Address
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i className="far fa-envelope text-indigo-300"></i>
+              </div>
+              <input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                required
+                {...register("email")}
+                className="pl-10 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white/20 focus:outline-none"
+              />
+            </div>
           </div>
-        </div>
 
-        <div className="mb-5 text-left">
-          <label htmlFor="password" className="block mb-2 font-medium text-slate-700 text-sm">Password</label>
-          <div className="relative">
-            <i className="fas fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
-            <input
-              id="password"
-              type="password"
-              placeholder="Enter your password"
-              required
-              {...register("password")}
-              className="pl-12 pr-4 py-3 h-[50px] w-full border border-gray-300 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none focus:bg-white"
-            />
+          <div className="space-y-1.5">
+            <label htmlFor="password" className="block text-sm font-medium text-white">
+              Password
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i className="fas fa-lock text-indigo-300"></i>
+              </div>
+              <input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                required
+                {...register("password")}
+                className="pl-10 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white/20 focus:outline-none"
+              />
+            </div>
           </div>
+
+          <div className="text-right text-sm">
+            <Link
+              to="/password/forgot"
+              className="text-indigo-300 hover:text-white transition-colors"
+            >
+              Forgot your password?
+            </Link>
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white border-none rounded-xl text-base font-medium cursor-pointer transition-all duration-300 shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center"
+          >
+            {isLoading ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Signing in...
+              </>
+            ) : (
+              <>
+                Sign In
+                <i className="fas fa-arrow-right text-sm ml-2"></i>
+              </>
+            )}
+          </button>
         </div>
 
-        <div className="text-right mb-5 text-sm">
-          <Link to={"/password/forgot"} className="text-blue-600 font-medium hover:underline transition-colors hover:text-blue-700">
-            Forgot your password?
-          </Link>
-        </div>
-
-        <button
-          type="submit"
-          className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-none rounded-lg text-base cursor-pointer transition-all duration-300 flex justify-center items-center gap-2.5 font-medium mt-2.5 shadow-md hover:shadow-lg hover:-translate-y-0.5"
-        >
-          <span>Sign In</span>
-          <i className="fas fa-arrow-right text-sm"></i>
-        </button>
-
-        <div className="mt-6 text-center">
-          <p className="relative text-gray-500 my-4 before:content-[''] before:absolute before:top-1/2 before:left-0 before:w-[35%] before:h-px before:bg-gray-300 after:content-[''] after:absolute after:top-1/2 after:right-0 after:w-[35%] after:h-px after:bg-gray-300">
-            Or continue with
+        <div className="mt-8 text-white/70 text-center">
+          <p>
+            Don't have an account?{" "}
+            <span className="toggle-signup text-indigo-300 font-medium cursor-pointer hover:text-white transition-colors">
+              Sign up
+            </span>
           </p>
-          <div className="flex justify-center gap-4 mt-4">
-            <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-100 transition-all hover:bg-gray-200 hover:-translate-y-1 cursor-pointer">
-              <i className="fab fa-google text-xl text-slate-700"></i>
-            </div>
-            <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-100 transition-all hover:bg-gray-200 hover:-translate-y-1 cursor-pointer">
-              <i className="fab fa-facebook-f text-xl text-slate-700"></i>
-            </div>
-            <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-100 transition-all hover:bg-gray-200 hover:-translate-y-1 cursor-pointer">
-              <i className="fab fa-github text-xl text-slate-700"></i>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-6 pt-5 border-t border-gray-300 text-gray-500 text-[0.95rem]">
-          <p>Don't have an account? <span className="toggle-signup text-blue-600 font-medium cursor-pointer hover:underline">Sign up</span></p>
         </div>
       </form>
     </div>

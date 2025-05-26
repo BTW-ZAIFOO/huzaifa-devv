@@ -31,7 +31,7 @@ const Technologies = () => {
   return (
     <div id="technologies" className="py-20 px-5 text-center bg-white">
       <div className="mb-12">
-        <h2 className="text-4xl font-bold mb-6 relative inline-block text-slate-800 after:content-[''] after:absolute after:bottom-[-10px] after:left-1/2 after:transform after:translate-x-[-50%] after:w-20 after:h-1 after:bg-gradient-to-r after:from-blue-600 after:to-indigo-600 after:rounded">
+        <h2 className="text-4xl font-bold mb-6 relative inline-block text-slate-800">
           Technologies We Use
         </h2>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto mt-6">
@@ -39,7 +39,6 @@ const Technologies = () => {
           scalability, and a great developer experience.
         </p>
       </div>
-
       <div className="flex flex-wrap justify-center gap-8 max-w-7xl mx-auto">
         {techData.map((tech, index) => (
           <div

@@ -15,19 +15,18 @@ const Register = () => {
   } = useForm();
 
   const handleRegister = async (data) => {
-    data.phone = `+92${data.phone}`;
-    await axios
-      .post("http://localhost:4000/api/v1/user/register", data, {
+    try {
+      const response = await axios.post("http://localhost:4000/api/v1/user/register", data, {
         withCredentials: true,
         headers: { "Content-Type": "application/json" },
-      })
-      .then((res) => {
-        toast.success(res.data.message);
-        navigateTo(`/otp-verification/${data.email}/${data.phone}`);
-      })
-      .catch((error) => {
-        toast.error(error.response.data.message);
       });
+
+      toast.success(response.data.message);
+      // Pass role in query params for proper redirection after verification
+      navigateTo(`/otp-verification/${data.email}?role=user`);
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
   };
 
   return (
@@ -36,129 +35,94 @@ const Register = () => {
         className="w-full"
         onSubmit={handleSubmit((data) => handleRegister(data))}
       >
-        <h2 className="text-2xl font-semibold mb-2.5 text-slate-800">
-          Create Account
-        </h2>
-        <p className="text-gray-500 mb-8 text-base">Sign up to get started</p>
-
-        <div className="mb-5 text-left">
-          <label
-            htmlFor="name"
-            className="block mb-2 font-medium text-slate-700 text-sm"
-          >
-            Full Name
-          </label>
-          <div className="relative">
-            <i className="far fa-user absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
-            <input
-              id="name"
-              type="text"
-              placeholder="Enter your name"
-              required
-              {...register("name")}
-              className="pl-12 pr-4 py-3 h-[50px] w-full border border-gray-300 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none focus:bg-white"
-            />
-          </div>
-        </div>
-
-        <div className="mb-5 text-left">
-          <label
-            htmlFor="register-email"
-            className="block mb-2 font-medium text-slate-700 text-sm"
-          >
-            Email Address
-          </label>
-          <div className="relative">
-            <i className="far fa-envelope absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
-            <input
-              id="register-email"
-              type="email"
-              placeholder="Enter your email"
-              required
-              {...register("email")}
-              className="pl-12 pr-4 py-3 h-[50px] w-full border border-gray-300 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none focus:bg-white"
-            />
-          </div>
-        </div>
-
-        <div className="mb-5 text-left">
-          <label
-            htmlFor="phone"
-            className="block mb-2 font-medium text-slate-700 text-sm"
-          >
-            Phone Number
-          </label>
-          <div className="relative">
-            <span className="absolute left-0 top-0 h-[47px] w-[50px] border-r border-gray-300 text-gray-500 flex justify-center items-center font-medium bg-gray-50/80 rounded-l-lg">
-              +92
-            </span>
-            <input
-              id="phone"
-              type="number"
-              placeholder="Phone number"
-              required
-              {...register("phone")}
-              className="pl-16 pr-4 py-3 h-[50px] w-full border border-gray-300 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none focus:bg-white"
-            />
-          </div>
-        </div>
-
-        <div className="mb-5 text-left">
-          <label
-            htmlFor="register-password"
-            className="block mb-2 font-medium text-slate-700 text-sm"
-          >
-            Password
-          </label>
-          <div className="relative">
-            <i className="fas fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
-            <input
-              id="register-password"
-              type="password"
-              placeholder="Create a password"
-              required
-              {...register("password")}
-              className="pl-12 pr-4 py-3 h-[50px] w-full border border-gray-300 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none focus:bg-white"
-            />
-          </div>
-        </div>
-
-        <div className="mb-5">
-          <p className="font-medium text-slate-700 text-left mb-2.5">
-            Select Verification Method
-          </p>
-          <div className="flex gap-8">
-            <label className="flex items-center gap-2.5 cursor-pointer my-4 font-medium text-gray-500">
-              <input
-                type="radio"
-                name="verificationMethod"
-                value="email"
-                {...register("verificationMethod")}
-                required
-                className="w-[18px] h-[18px] accent-blue-600 mb-0"
-              />
-              Email
+        <div className="space-y-6">
+          <div className="space-y-1.5">
+            <label htmlFor="name" className="block text-sm font-medium text-white">
+              Full Name
             </label>
-            <label className="flex items-center gap-2.5 cursor-pointer my-4 font-medium text-gray-500">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i className="far fa-user text-indigo-300"></i>
+              </div>
               <input
-                type="radio"
-                name="verificationMethod"
-                value="phone"
-                {...register("verificationMethod")}
+                id="name"
+                type="text"
+                placeholder="Enter your name"
                 required
-                className="w-[18px] h-[18px] accent-blue-600 mb-0"
+                {...register("name")}
+                className="pl-10 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white/20 focus:outline-none"
               />
-              Phone
-            </label>
+            </div>
           </div>
-        </div>
 
-        <button
-          type="submit"
-          className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-none rounded-lg text-base cursor-pointer transition-all duration-300 font-medium shadow-md hover:shadow-lg hover:-translate-y-0.5"
-        >
-          Create Account
-        </button>
+          <div className="space-y-1.5">
+            <label htmlFor="register-email" className="block text-sm font-medium text-white">
+              Email Address
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i className="far fa-envelope text-indigo-300"></i>
+              </div>
+              <input
+                id="register-email"
+                type="email"
+                placeholder="Enter your email"
+                required
+                {...register("email")}
+                className="pl-10 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white/20 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label htmlFor="register-password" className="block text-sm font-medium text-white">
+              Password
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i className="fas fa-lock text-indigo-300"></i>
+              </div>
+              <input
+                id="register-password"
+                type="password"
+                placeholder="Create a password"
+                required
+                {...register("password")}
+                className="pl-10 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white/20 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <p className="text-sm font-medium text-white">
+              Select Verification Method
+            </p>
+            <div className="mt-2 bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="radio"
+                  name="verificationMethod"
+                  value="email"
+                  {...register("verificationMethod")}
+                  required
+                  className="h-5 w-5 accent-indigo-500"
+                />
+                <div>
+                  <span className="text-white">Email Verification</span>
+                  <p className="text-white/70 text-xs mt-0.5">We'll send a verification code to your email</p>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white border-none rounded-xl text-base font-medium cursor-pointer transition-all duration-300 shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 flex items-center justify-center"
+          >
+            <i className="fas fa-user-plus mr-2"></i>
+            Create Account
+          </button>
+        </div>
       </form>
     </div>
   );

@@ -30,6 +30,13 @@ const ResetPassword = () => {
         toast.success(res.data.message);
         setIsAuthenticated(true);
         setUser(res.data.user);
+
+        // Redirect based on user role
+        if (res.data.user.role === "admin") {
+          window.location.href = "/admin";
+        } else {
+          window.location.href = "/chat";
+        }
       })
       .catch((error) => {
         toast.error(error.response.data.message);
@@ -40,7 +47,12 @@ const ResetPassword = () => {
   };
 
   if (isAuthenticated) {
-    return <Navigate to={"/"} />;
+    // Get user role from context to determine where to redirect
+    const { user } = useContext(Context);
+    if (user?.role === "admin") {
+      return <Navigate to="/admin" />;
+    }
+    return <Navigate to="/chat" />;
   }
 
   return (
@@ -53,7 +65,6 @@ const ResetPassword = () => {
           <p className="text-base text-gray-500 mb-8">
             Enter your new password below.
           </p>
-
           <form onSubmit={handleResetPassword}>
             <div className="relative mb-5">
               <i className="fas fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
@@ -66,7 +77,6 @@ const ResetPassword = () => {
                 className="pl-12 pr-4 py-3 w-full border border-gray-300 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none focus:bg-white"
               />
             </div>
-
             <div className="relative mb-6">
               <i className="fas fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
               <input
@@ -78,7 +88,6 @@ const ResetPassword = () => {
                 className="pl-12 pr-4 py-3 w-full border border-gray-300 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none focus:bg-white"
               />
             </div>
-
             <button
               type="submit"
               disabled={isLoading}

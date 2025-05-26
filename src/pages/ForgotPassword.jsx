@@ -43,7 +43,6 @@ const ForgotPassword = () => {
             Enter your email address and we'll send you a link to reset your
             password.
           </p>
-
           <form onSubmit={handleForgotPassword}>
             <div className="relative mb-6">
               <i className="far fa-envelope absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
@@ -56,7 +55,6 @@ const ForgotPassword = () => {
                 className="pl-12 pr-4 py-3.5 w-full border border-gray-300 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none focus:bg-white"
               />
             </div>
-
             <button
               type="submit"
               disabled={isLoading}
@@ -71,7 +69,6 @@ const ForgotPassword = () => {
               )}
             </button>
           </form>
-
           <div className="mt-6 text-gray-500 text-[0.95rem]">
             <p>
               Remembered your password?{" "}
