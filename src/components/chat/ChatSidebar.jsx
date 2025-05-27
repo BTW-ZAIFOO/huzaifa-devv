@@ -7,7 +7,6 @@ const ChatSidebar = ({
     users,
     selectedUser,
     onSelectUser,
-    activeTab,
     isAdmin,
     onBlockUser,
     onReportUser,
@@ -25,6 +24,7 @@ const ChatSidebar = ({
             setSearchResults([]);
             return;
         }
+
         const fetchSearch = async () => {
             try {
                 const res = await axios.get(
@@ -32,12 +32,11 @@ const ChatSidebar = ({
                     { withCredentials: true }
                 );
 
-                const filtered = res.data.users.filter(u =>
+                setSearchResults(res.data.users.filter(u =>
                     u.accountVerified &&
                     u.name &&
                     u.name.toLowerCase().includes(searchTerm.trim().toLowerCase())
-                );
-                setSearchResults(filtered);
+                ));
             } catch {
                 setSearchResults([]);
             }
@@ -45,48 +44,30 @@ const ChatSidebar = ({
         fetchSearch();
     }, [searchTerm]);
 
-    const baseUsers = searchTerm.trim()
-        ? searchResults
-        : users.filter(u => u.accountVerified);
-
-    const filteredUsers = baseUsers.filter(user => {
-        if (isAdmin) {
-            const matchesOnline = showOnlineOnly ? user.status === "online" : true;
-            return matchesOnline;
-        } else {
+    const filterUsers = (users) => {
+        return users.filter(user => {
             const userId = user._id?.toString() || user.id?.toString();
             const currentId = currentUser?._id?.toString() || currentUser?.id?.toString();
-            if (userId === currentId) return false;
             const matchesOnline = showOnlineOnly ? user.status === "online" : true;
-            return matchesOnline;
-        }
-    });
 
-    const usersToDisplay = isAdmin
-        ? filteredUsers
-        : filteredUsers.filter(user => {
-            const userId = user._id?.toString() || user.id?.toString();
-            const currentId = currentUser?._id?.toString() || currentUser?.id?.toString();
-            return userId !== currentId;
+            if (isAdmin) return matchesOnline;
+            return userId !== currentId && matchesOnline;
         });
+    };
 
-    let displayUsers = [...usersToDisplay];
+    const baseUsers = searchTerm.trim() ? searchResults : users.filter(u => u.accountVerified);
+    let displayUsers = filterUsers(baseUsers);
+
     if (showAdminChat) {
-        const adminChat = {
+        displayUsers = [{
             _id: 'admin',
             name: "Admin Support",
             avatar: null,
             status: "online",
             role: "admin",
             lastSeen: "Always Available",
-        };
-        displayUsers = [adminChat, ...displayUsers];
+        }, ...displayUsers];
     }
-
-    const handleShowAllUsers = () => {
-        setSearchTerm("");
-        setShowOnlineOnly(false);
-    };
 
     return (
         <>
@@ -118,7 +99,7 @@ const ChatSidebar = ({
                         </label>
                         <button
                             type="button"
-                            onClick={handleShowAllUsers}
+                            onClick={() => { setSearchTerm(""); setShowOnlineOnly(false); }}
                             className="ml-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-xs font-medium"
                         >
                             View Users
@@ -149,29 +130,20 @@ const ChatSidebar = ({
                                     {displayUsers.map((user) => {
                                         const userId = user._id?.toString() || user.id?.toString();
                                         const selectedId = selectedUser?._id?.toString() || selectedUser?.id?.toString();
+                                        const userNotifications = notifications.filter(n => n.sender?._id === userId);
+                                        const avatarUrl = user.role === "admin" ? generateAdminAvatar(user) : generateAvatar(user);
+                                        const isSelected = selectedId === userId;
 
-                                        const userNotifications = notifications.filter(
-                                            n => n.sender?._id === userId
-                                        );
-
-                                        const avatarUrl = user.role === "admin" ?
-                                            generateAdminAvatar(user) :
-                                            generateAvatar(user);
+                                        let borderClass = "";
+                                        if (user.isReported) borderClass = "border-l-4 border-yellow-500";
+                                        else if (user.status === "blocked") borderClass = "border-l-4 border-red-400";
+                                        else if (user.status === "banned") borderClass = "border-l-4 border-black";
 
                                         return (
                                             <li key={userId} className="mb-1">
                                                 <button
-                                                    className={`w-full flex items-center px-3 py-2.5 rounded-xl ${selectedId === userId
-                                                        ? "bg-gradient-to-r from-blue-50 to-blue-100 shadow-sm"
-                                                        : "hover:bg-gray-50"
-                                                        } transition-all ${user.isReported
-                                                            ? "border-l-4 border-yellow-500"
-                                                            : user.status === "blocked"
-                                                                ? "border-l-4 border-red-400"
-                                                                : user.status === "banned"
-                                                                    ? "border-l-4 border-black"
-                                                                    : ""
-                                                        }`}
+                                                    className={`w-full flex items-center px-3 py-2.5 rounded-xl ${isSelected ? "bg-gradient-to-r from-blue-50 to-blue-100 shadow-sm" : "hover:bg-gray-50"
+                                                        } transition-all ${borderClass}`}
                                                     onClick={() => onSelectUser(user)}
                                                 >
                                                     <div className="relative">
@@ -179,7 +151,7 @@ const ChatSidebar = ({
                                                             src={avatarUrl}
                                                             alt={user.name || "User"}
                                                             className={`w-12 h-12 rounded-full object-cover border border-gray-200 shadow-sm ${user.status === "blocked" ? "opacity-75" :
-                                                                user.status === "banned" ? "opacity-60 grayscale" : ""
+                                                                    user.status === "banned" ? "opacity-60 grayscale" : ""
                                                                 }`}
                                                             onError={(e) => {
                                                                 e.target.onerror = null;
@@ -192,13 +164,9 @@ const ChatSidebar = ({
                                                             </span>
                                                         )}
                                                         <span
-                                                            className={`absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full ${user.status === "online"
-                                                                ? "bg-green-500"
-                                                                : user.status === "blocked"
-                                                                    ? "bg-red-500"
-                                                                    : user.status === "banned"
-                                                                        ? "bg-black"
-                                                                        : "bg-gray-400"
+                                                            className={`absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full ${user.status === "online" ? "bg-green-500" :
+                                                                    user.status === "blocked" ? "bg-red-500" :
+                                                                        user.status === "banned" ? "bg-black" : "bg-gray-400"
                                                                 } border-2 border-white`}
                                                         ></span>
                                                     </div>

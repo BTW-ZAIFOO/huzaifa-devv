@@ -7,15 +7,14 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
     const [sortBy, setSortBy] = useState('name');
     const [sortDirection, setSortDirection] = useState('asc');
 
-    const totalUsers = users ? users.filter(user => user.role !== 'admin').length : 0;
-    const onlineUsers = users ? users.filter(user => user.status === 'online' && user.role !== 'admin').length : 0;
-    const blockedUsers = users ? users.filter(user => user.status === 'blocked').length : 0;
-    const bannedUsers = users ? users.filter(user => user.status === 'banned').length : 0;
-    const reportedUsers = users ? users.filter(user => user.isReported).length : 0;
-    const flaggedContent = users ? users.filter(user =>
-        (user.flaggedWords && user.flaggedWords.length > 0) ||
-        (flaggedUsers[user._id || user.id])
-    ).length : 0;
+    const getUserCount = (condition) => users ? users.filter(condition).length : 0;
+    const totalUsers = getUserCount(user => user.role !== 'admin');
+    const onlineUsers = getUserCount(user => user.status === 'online' && user.role !== 'admin');
+    const blockedUsers = getUserCount(user => user.status === 'blocked');
+    const bannedUsers = getUserCount(user => user.status === 'banned');
+    const reportedUsers = getUserCount(user => user.isReported);
+    const flaggedContent = getUserCount(user =>
+        (user.flaggedWords && user.flaggedWords.length > 0) || flaggedUsers[user._id || user.id]);
 
     if (!users || users.length === 0) {
         return (
@@ -35,14 +34,18 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
 
     let filteredUsers = [...users].filter(user => {
         if (user.role === 'admin') return false;
-        if (filter === 'online' && user.status !== 'online') return false;
-        if (filter === 'offline' && user.status !== 'offline') return false;
-        if (filter === 'blocked' && user.status !== 'blocked') return false;
-        if (filter === 'banned' && user.status !== 'banned') return false;
-        if (filter === 'reported' && !user.isReported) return false;
-        if (filter === 'flagged' &&
-            !((user.flaggedWords && user.flaggedWords.length > 0) || flaggedUsers[user._id || user.id])
-        ) return false;
+
+        const filterConditions = {
+            'online': user.status === 'online',
+            'offline': user.status === 'offline',
+            'blocked': user.status === 'blocked',
+            'banned': user.status === 'banned',
+            'reported': user.isReported,
+            'flagged': (user.flaggedWords && user.flaggedWords.length > 0) || flaggedUsers[user._id || user.id],
+            'all': true
+        };
+
+        if (!filterConditions[filter]) return false;
 
         if (searchTerm) {
             const term = searchTerm.toLowerCase();
@@ -82,16 +85,11 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
                 compareB = b.name || '';
         }
 
-        if (sortDirection === 'asc') {
-            return compareA > compareB ? 1 : -1;
-        } else {
-            return compareA < compareB ? 1 : -1;
-        }
+        return sortDirection === 'asc' ? (compareA > compareB ? 1 : -1) : (compareA < compareB ? 1 : -1);
     });
 
     const handleSortClick = (column) => {
         if (sortBy === column) {
-            lumn
             setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
         } else {
             setSortBy(column);
@@ -118,7 +116,6 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
             const reason = prompt("Please provide a detailed reason for reporting this user:");
             if (reason && reason.trim() !== "") {
                 onReportUser(userId, reason.trim());
-
                 toast.success(`Report submitted for ${user.name} with reason: "${reason}"`, {
                     autoClose: 5000
                 });
@@ -136,54 +133,60 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
                     <p className="text-gray-600">Manage users, moderate content, and monitor chat activities</p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                    <StatCard
-                        title="Total Users"
-                        value={totalUsers}
-                        icon="fa-users"
-                        color="blue"
-                        onClick={() => setFilter('all')}
-                        active={filter === 'all'}
-                    />
-                    <StatCard
-                        title="Online Users"
-                        value={onlineUsers}
-                        icon="fa-circle"
-                        color="green"
-                        onClick={() => setFilter('online')}
-                        active={filter === 'online'}
-                    />
-                    <StatCard
-                        title="Blocked Users"
-                        value={blockedUsers}
-                        icon="fa-ban"
-                        color="red"
-                        onClick={() => setFilter('blocked')}
-                        active={filter === 'blocked'}
-                    />
-                    <StatCard
-                        title="Banned Users"
-                        value={bannedUsers}
-                        icon="fa-user-slash"
-                        color="gray"
-                        onClick={() => setFilter('banned')}
-                        active={filter === 'banned'}
-                    />
-                    <StatCard
-                        title="Reported Users"
-                        value={reportedUsers}
-                        icon="fa-flag"
-                        color="yellow"
-                        onClick={() => setFilter('reported')}
-                        active={filter === 'reported'}
-                    />
-                    <StatCard
-                        title="Flagged Content"
-                        value={flaggedContent}
-                        icon="fa-exclamation-triangle"
-                        color="orange"
-                        onClick={() => setFilter('flagged')}
-                        active={filter === 'flagged'}
-                    />
+                    {[
+                        {
+                            title: "Total Users",
+                            value: totalUsers,
+                            icon: "fa-users",
+                            color: "blue",
+                            filterName: "all"
+                        },
+                        {
+                            title: "Online Users",
+                            value: onlineUsers,
+                            icon: "fa-circle",
+                            color: "green",
+                            filterName: "online"
+                        },
+                        {
+                            title: "Blocked Users",
+                            value: blockedUsers,
+                            icon: "fa-ban",
+                            color: "red",
+                            filterName: "blocked"
+                        },
+                        {
+                            title: "Banned Users",
+                            value: bannedUsers,
+                            icon: "fa-user-slash",
+                            color: "gray",
+                            filterName: "banned"
+                        },
+                        {
+                            title: "Reported Users",
+                            value: reportedUsers,
+                            icon: "fa-flag",
+                            color: "yellow",
+                            filterName: "reported"
+                        },
+                        {
+                            title: "Flagged Content",
+                            value: flaggedContent,
+                            icon: "fa-exclamation-triangle",
+                            color: "orange",
+                            filterName: "flagged"
+                        }
+                    ].map((stat) => (
+                        <StatCard
+                            key={stat.title}
+                            title={stat.title}
+                            value={stat.value}
+                            icon={stat.icon}
+                            color={stat.color}
+                            onClick={() => setFilter(stat.filterName)}
+                            active={filter === stat.filterName}
+                        />
+                    ))}
                 </div>
                 <div className="bg-white rounded-lg shadow-sm p-6">
                     <div className="flex justify-between items-center mb-6">
@@ -203,42 +206,20 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                                        onClick={() => handleSortClick('name')}
-                                    >
-                                        User
-                                        {sortBy === 'name' && (
-                                            <i className={`fas fa-sort-${sortDirection === 'asc' ? 'up' : 'down'} ml-1`}></i>
-                                        )}
-                                    </th>
-                                    <th
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                                        onClick={() => handleSortClick('status')}
-                                    >
-                                        Status
-                                        {sortBy === 'status' && (
-                                            <i className={`fas fa-sort-${sortDirection === 'asc' ? 'up' : 'down'} ml-1`}></i>
-                                        )}
-                                    </th>
-                                    <th
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                                        onClick={() => handleSortClick('activity')}
-                                    >
-                                        Last Activity
-                                        {sortBy === 'activity' && (
-                                            <i className={`fas fa-sort-${sortDirection === 'asc' ? 'up' : 'down'} ml-1`}></i>
-                                        )}
-                                    </th>
-                                    <th
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                                        onClick={() => handleSortClick('flags')}
-                                    >
-                                        Flags
-                                        {sortBy === 'flags' && (
-                                            <i className={`fas fa-sort-${sortDirection === 'asc' ? 'up' : 'down'} ml-1`}></i>
-                                        )}
-                                    </th>
+                                    {['name', 'status', 'activity', 'flags'].map((column) => (
+                                        <th
+                                            key={column}
+                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                                            onClick={() => handleSortClick(column)}
+                                        >
+                                            {column === 'name' ? 'User' :
+                                                column === 'activity' ? 'Last Activity' :
+                                                    column.charAt(0).toUpperCase() + column.slice(1)}
+                                            {sortBy === column && (
+                                                <i className={`fas fa-sort-${sortDirection === 'asc' ? 'up' : 'down'} ml-1`}></i>
+                                            )}
+                                        </th>
+                                    ))}
                                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
@@ -251,13 +232,28 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
                                             ...(flaggedUsers[userId] || [])
                                         ];
 
+                                        // Define border style based on user status
+                                        const getBorderStyle = () => {
+                                            if (user.isReported) return "border-l-4 border-yellow-500 ";
+                                            if (user.status === 'banned') return "border-l-4 border-black ";
+                                            if (user.status === 'blocked') return "border-l-4 border-red-500 ";
+                                            if (userFlaggedWords.length > 0) return "bg-red-50 ";
+                                            return "";
+                                        };
+
+                                        // Define status badge style
+                                        const getStatusStyle = () => {
+                                            const styles = {
+                                                'online': 'bg-green-100 text-green-800',
+                                                'offline': 'bg-gray-100 text-gray-800',
+                                                'blocked': 'bg-red-100 text-red-800',
+                                                'banned': 'bg-black text-white'
+                                            };
+                                            return styles[user.status] || styles.offline;
+                                        };
+
                                         return (
-                                            <tr key={userId} className={`hover:bg-gray-50 ${user.isReported ? "border-l-4 border-yellow-500 " :
-                                                user.status === 'banned' ? "border-l-4 border-black " :
-                                                    user.status === 'blocked' ? "border-l-4 border-red-500 " :
-                                                        userFlaggedWords.length > 0 ? "bg-red-50 " :
-                                                            ""
-                                                }`}>
+                                            <tr key={userId} className={`hover:bg-gray-50 ${getBorderStyle()}`}>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="flex items-center">
                                                         <div className="flex-shrink-0 h-10 w-10 relative">
@@ -267,8 +263,8 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
                                                                 alt={user.name}
                                                             />
                                                             <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white ${user.status === 'online' ? 'bg-green-500' :
-                                                                user.status === 'blocked' ? 'bg-red-500' :
-                                                                    user.status === 'banned' ? 'bg-black' : 'bg-gray-400'
+                                                                    user.status === 'blocked' ? 'bg-red-500' :
+                                                                        user.status === 'banned' ? 'bg-black' : 'bg-gray-400'
                                                                 }`}></span>
                                                         </div>
                                                         <div className="ml-4">
@@ -297,20 +293,15 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.status === 'online' ? 'bg-green-100 text-green-800' :
-                                                        user.status === 'offline' ? 'bg-gray-100 text-gray-800' :
-                                                            user.status === 'blocked' ? 'bg-red-100 text-red-800' :
-                                                                'bg-black text-white'
-                                                        }`}>
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusStyle()}`}>
                                                         {user.status === 'online' ? 'Online' :
                                                             user.status === 'offline' ? 'Offline' :
                                                                 user.status === 'blocked' ? 'Blocked' : 'Banned'}
                                                     </span>
-                                                    {user.blockedBy && (
-                                                        <div className="text-xs text-gray-500 mt-1">by {user.blockedBy}</div>
-                                                    )}
-                                                    {user.bannedBy && (
-                                                        <div className="text-xs text-gray-500 mt-1">by {user.bannedBy}</div>
+                                                    {(user.blockedBy || user.bannedBy) && (
+                                                        <div className="text-xs text-gray-500 mt-1">
+                                                            by {user.blockedBy || user.bannedBy}
+                                                        </div>
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
@@ -464,20 +455,18 @@ const StatCard = ({ title, value, icon, color, onClick, active }) => {
     const classes = colorClasses[color] || colorClasses.blue;
 
     return (
-        <>
-            <button
-                onClick={onClick}
-                className={`${classes.bg} ${classes.border} p-6 rounded-lg shadow-sm transition-all duration-200 hover:shadow flex items-center justify-between`}
-            >
-                <div>
-                    <div className={`text-sm font-medium mb-1 ${classes.text}`}>{title}</div>
-                    <div className={`text-2xl font-bold ${classes.value}`}>{value}</div>
-                </div>
-                <div className={`w-12 h-12 rounded-lg ${classes.icon} flex items-center justify-center ${classes.text}`}>
-                    <i className={`fas ${icon} text-lg`}></i>
-                </div>
-            </button>
-        </>
+        <button
+            onClick={onClick}
+            className={`${classes.bg} ${classes.border} p-6 rounded-lg shadow-sm transition-all duration-200 hover:shadow flex items-center justify-between`}
+        >
+            <div>
+                <div className={`text-sm font-medium mb-1 ${classes.text}`}>{title}</div>
+                <div className={`text-2xl font-bold ${classes.value}`}>{value}</div>
+            </div>
+            <div className={`w-12 h-12 rounded-lg ${classes.icon} flex items-center justify-center ${classes.text}`}>
+                <i className={`fas ${icon} text-lg`}></i>
+            </div>
+        </button>
     );
 };
 

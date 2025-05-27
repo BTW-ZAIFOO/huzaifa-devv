@@ -5,36 +5,27 @@ import Technologies from "../components/Technologies";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { Context } from "../main";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import Footer from "../layout/Footer";
 
 const Home = () => {
   const { isAuthenticated, setIsAuthenticated, setUser, user, isAdmin } = useContext(Context);
-  const navigate = useNavigate();
 
   const logout = async () => {
-    await axios
-      .get("http://localhost:4000/api/v1/user/logout", {
+    try {
+      const res = await axios.get("http://localhost:4000/api/v1/user/logout", {
         withCredentials: true,
-      })
-      .then((res) => {
-        toast.success(res.data.message);
-        setUser(null);
-        setIsAuthenticated(false);
-      })
-      .catch((err) => {
-        toast.error(err.response.data.message);
-        console.error(err);
       });
+      toast.success(res.data.message);
+      setUser(null);
+      setIsAuthenticated(false);
+    } catch (err) {
+      toast.error(err.response.data.message);
+      console.error(err);
+    }
   };
 
-  const navigateToAdmin = () => {
-    window.location.href = "/admin";
-  };
-
-  if (!isAuthenticated) {
-    return <Navigate to={"/auth"} />;
-  }
+  if (!isAuthenticated) return <Navigate to="/auth" />;
 
   return (
     <>
@@ -50,12 +41,9 @@ const Home = () => {
               </Link>
 
               {isAdmin && (
-                <button
-                  onClick={navigateToAdmin}
-                  className="text-purple-600 font-medium hover:text-purple-700 transition-colors flex items-center bg-purple-50 py-1 px-2 rounded-md border border-purple-200"
-                >
+                <Link to="/admin" className="text-purple-600 font-medium hover:text-purple-700 transition-colors flex items-center bg-purple-50 py-1 px-2 rounded-md border border-purple-200">
                   <i className="fas fa-shield-alt mr-1.5"></i> <span className="md:inline">Admin</span>
-                </button>
+                </Link>
               )}
               <Link to="/profile" className="text-slate-700 font-medium hover:text-blue-600 transition-colors flex items-center">
                 <i className="fas fa-user-circle mr-1.5"></i> <span className="hidden md:inline">Profile</span>

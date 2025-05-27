@@ -24,89 +24,56 @@ const AdminRoute = ({ children }) => {
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useContext(Context);
-
-  if (!isAuthenticated) return <Navigate to="/auth" />;
-
-  return children;
+  return isAuthenticated ? children : <Navigate to="/auth" />;
 };
 
 const App = () => {
   const { setIsAuthenticated, setUser, isAdmin } = useContext(Context);
 
   useEffect(() => {
-    loadFontAwesome();
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css';
+    document.head.appendChild(link);
 
-    authenticateUser();
+    (async () => {
+      try {
+        const res = await axios.get("http://localhost:4000/api/v1/user/me", { withCredentials: true });
+        setUser(res.data.user);
+        setIsAuthenticated(true);
+
+        if (window.location.pathname === "/") {
+          window.location.href = res.data.user.role === "admin" ? "/admin" : "/chat";
+        }
+      } catch (err) {
+        setUser(null);
+        setIsAuthenticated(false);
+      }
+    })();
 
     return () => {
       const link = document.querySelector('link[href*="font-awesome"]');
       if (link) document.head.removeChild(link);
     };
-  }, []);
-
-  const loadFontAwesome = () => {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css';
-    document.head.appendChild(link);
-  };
-
-  const authenticateUser = async () => {
-    try {
-      const res = await axios.get(
-        "http://localhost:4000/api/v1/user/me",
-        { withCredentials: true }
-      );
-
-      setUser(res.data.user);
-      setIsAuthenticated(true);
-
-      if (res.data.user.role === "admin" && window.location.pathname === "/") {
-        window.location.href = "/admin";
-      } else if (res.data.user.role !== "admin" && window.location.pathname === "/") {
-        window.location.href = "/chat";
-      }
-    } catch (err) {
-      setUser(null);
-      setIsAuthenticated(false);
-    }
-  };
+  }, [setIsAuthenticated, setUser]);
 
   return (
-    <>
-      <Router>
-        <div className="max-h-screen overflow-y-scroll bg-gray-100">
-          <Routes>
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/admin/auth" element={<AdminAuth />} />
-            <Route path="/password/forgot" element={<ForgotPassword />} />
-            <Route path="/password/reset/:token" element={<ResetPassword />} />
-            <Route path="/otp-verification/:email" element={<OtpVerification />} />
-            <Route path="/" element={
-              <Navigate to={isAdmin ? "/admin" : "/chat"} />
-            } />
-
-            <Route path="/chat" element={
-              <ProtectedRoute>
-                <ChatInterface adminMode={false} />
-              </ProtectedRoute>
-            } />
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <UserProfile />
-              </ProtectedRoute>
-            } />
-
-            <Route path="/admin" element={
-              <AdminRoute>
-                <ChatInterface adminMode={true} />
-              </AdminRoute>
-            } />
-          </Routes>
-          <ToastContainer theme="colored" />
-        </div>
-      </Router>
-    </>
+    <Router>
+      <div className="bg-gray-100">
+        <Routes>
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/admin/auth" element={<AdminAuth />} />
+          <Route path="/password/forgot" element={<ForgotPassword />} />
+          <Route path="/password/reset/:token" element={<ResetPassword />} />
+          <Route path="/otp-verification/:email" element={<OtpVerification />} />
+          <Route path="/" element={<Navigate to={isAdmin ? "/admin" : "/chat"} />} />
+          <Route path="/chat" element={<ProtectedRoute><ChatInterface adminMode={false} /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
+          <Route path="/admin" element={<AdminRoute><ChatInterface adminMode={true} /></AdminRoute>} />
+        </Routes>
+        <ToastContainer theme="colored" />
+      </div>
+    </Router>
   );
 };
 

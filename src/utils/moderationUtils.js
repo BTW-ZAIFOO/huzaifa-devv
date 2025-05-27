@@ -5,25 +5,24 @@ export const INAPPROPRIATE_WORDS = [
     "racist", "nigger", "chink", "spic", "kike", "fag", "nigga"
 ];
 
+const createWordRegex = (word) => new RegExp(`\\b${word}\\b`, 'i');
+
 export const containsInappropriateContent = (text, additionalWords = []) => {
     if (!text || typeof text !== 'string') return false;
 
     const wordsToCheck = [...INAPPROPRIATE_WORDS, ...additionalWords];
     const textLower = text.toLowerCase();
 
-    return wordsToCheck.some(word => {
-        const regex = new RegExp(`\\b${word}\\b`, 'i');
-        return regex.test(textLower);
-    });
+    return wordsToCheck.some(word => createWordRegex(word).test(textLower));
 };
 
 export const highlightInappropriateContent = (text, additionalWords = []) => {
     if (!text || typeof text !== 'string') return '';
 
-    const wordsToHighlight = [...INAPPROPRIATE_WORDS, ...additionalWords];
+    const wordsToCheck = [...INAPPROPRIATE_WORDS, ...additionalWords];
     let highlighted = text;
 
-    wordsToHighlight.forEach(word => {
+    wordsToCheck.forEach(word => {
         const regex = new RegExp(`\\b${word}\\b`, 'gi');
         highlighted = highlighted.replace(regex, match =>
             `<span class="bg-red-100 text-red-800 rounded px-1">${match}</span>`
@@ -39,10 +38,7 @@ export const extractInappropriateWords = (text, additionalWords = []) => {
     const wordsToCheck = [...INAPPROPRIATE_WORDS, ...additionalWords];
     const textLower = text.toLowerCase();
 
-    return wordsToCheck.filter(word => {
-        const regex = new RegExp(`\\b${word}\\b`, 'i');
-        return regex.test(textLower);
-    });
+    return wordsToCheck.filter(word => createWordRegex(word).test(textLower));
 };
 
 export const logDeletedMessage = (message, admin, reason = "Content moderation") => {
@@ -63,7 +59,6 @@ export const logDeletedMessage = (message, admin, reason = "Content moderation")
 
     return logData;
 };
-
 
 export const getUserModerationHistory = (userId) => {
     const deletedMessages = JSON.parse(localStorage.getItem('deletedMessages') || '[]');

@@ -5,31 +5,36 @@ const DebugConsole = () => {
     const [logs, setLogs] = useState([]);
 
     useEffect(() => {
-        const originalConsoleLog = console.log;
-        const originalConsoleError = console.error;
-        const originalConsoleWarn = console.warn;
-
-        console.log = (...args) => {
-            setLogs(prev => [...prev, { type: 'log', content: args.map(arg => JSON.stringify(arg)).join(' '), timestamp: new Date() }]);
-            originalConsoleLog(...args);
+        const originalConsole = {
+            log: console.log,
+            error: console.error,
+            warn: console.warn
         };
 
-        console.error = (...args) => {
-            setLogs(prev => [...prev, { type: 'error', content: args.map(arg => JSON.stringify(arg)).join(' '), timestamp: new Date() }]);
-            originalConsoleError(...args);
+        const interceptConsole = (type) => (...args) => {
+            setLogs(prev => [...prev, {
+                type,
+                content: args.map(arg => JSON.stringify(arg)).join(' '),
+                timestamp: new Date()
+            }]);
+            originalConsole[type](...args);
         };
 
-        console.warn = (...args) => {
-            setLogs(prev => [...prev, { type: 'warn', content: args.map(arg => JSON.stringify(arg)).join(' '), timestamp: new Date() }]);
-            originalConsoleWarn(...args);
-        };
+        console.log = interceptConsole('log');
+        console.error = interceptConsole('error');
+        console.warn = interceptConsole('warn');
 
         return () => {
-            console.log = originalConsoleLog;
-            console.error = originalConsoleError;
-            console.warn = originalConsoleWarn;
+            console.log = originalConsole.log;
+            console.error = originalConsole.error;
+            console.warn = originalConsole.warn;
         };
     }, []);
+
+    const getLogColor = (type) => {
+        return type === 'error' ? 'text-red-400' :
+            type === 'warn' ? 'text-yellow-400' : 'text-green-400';
+    };
 
     return (
         <>
@@ -45,18 +50,8 @@ const DebugConsole = () => {
                     <div className="p-2 border-b border-gray-700 flex justify-between items-center">
                         <h3 className="text-sm font-mono">Debug Console</h3>
                         <div>
-                            <button
-                                onClick={() => setLogs([])}
-                                className="text-xs bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded mr-2"
-                            >
-                                Clear
-                            </button>
-                            <button
-                                onClick={() => setIsOpen(false)}
-                                className="text-xs bg-red-700 hover:bg-red-600 px-2 py-1 rounded"
-                            >
-                                Close
-                            </button>
+                            <button onClick={() => setLogs([])} className="text-xs bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded mr-2">Clear</button>
+                            <button onClick={() => setIsOpen(false)} className="text-xs bg-red-700 hover:bg-red-600 px-2 py-1 rounded">Close</button>
                         </div>
                     </div>
                     <div className="flex-1 overflow-y-auto p-2 font-mono text-xs">
@@ -64,12 +59,7 @@ const DebugConsole = () => {
                             <p className="text-gray-500">No logs yet</p>
                         ) : (
                             logs.map((log, idx) => (
-                                <div
-                                    key={idx}
-                                    className={`mb-1 ${log.type === 'error' ? 'text-red-400' :
-                                            log.type === 'warn' ? 'text-yellow-400' : 'text-green-400'
-                                        }`}
-                                >
+                                <div key={idx} className={`mb-1 ${getLogColor(log.type)}`}>
                                     <span className="text-gray-500">[{log.timestamp.toLocaleTimeString()}]</span> {log.content}
                                 </div>
                             ))

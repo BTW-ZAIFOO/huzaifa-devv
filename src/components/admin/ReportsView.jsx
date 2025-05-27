@@ -14,10 +14,7 @@ const ReportsView = ({
 
     const filteredReports = reports.filter(report => {
         if (filter === 'all') return true;
-        if (filter === 'pending') return report.status === 'pending';
-        if (filter === 'resolved') return report.status === 'resolved';
-        if (filter === 'ignored') return report.status === 'ignored';
-        return true;
+        return report.status === filter;
     });
 
     const handleResolveAction = (reportId, action) => {
@@ -26,7 +23,7 @@ const ReportsView = ({
         if (action === 'ban' || action === 'block') {
             reason = prompt(`Enter reason for ${action === 'ban' ? 'banning' : 'blocking'} this user:`);
             if (!reason) {
-                toast.error('Action canceled: A reason is required');
+                toast.error(`Action canceled: A reason is required`);
                 return;
             }
         } else if (action === 'warning') {
@@ -129,8 +126,8 @@ const ReportsView = ({
                                 >
                                     <div className="flex justify-between">
                                         <span className={`text-xs font-medium px-2 py-1 rounded-full ${report.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                                report.status === 'resolved' ? 'bg-green-100 text-green-800' :
-                                                    'bg-gray-100 text-gray-800'
+                                            report.status === 'resolved' ? 'bg-green-100 text-green-800' :
+                                                'bg-gray-100 text-gray-800'
                                             }`}>
                                             {report.status === 'pending' ? 'Pending' :
                                                 report.status === 'resolved' ? 'Resolved' :
@@ -162,9 +159,9 @@ const ReportsView = ({
                                             <div className="mt-2 text-xs">
                                                 <span className="text-gray-500">Resolved with: </span>
                                                 <span className={`font-medium ${report.resolution === 'ban' ? 'text-red-600' :
-                                                        report.resolution === 'block' ? 'text-orange-600' :
-                                                            report.resolution === 'warning' ? 'text-yellow-600' :
-                                                                'text-green-600'
+                                                    report.resolution === 'block' ? 'text-orange-600' :
+                                                        report.resolution === 'warning' ? 'text-yellow-600' :
+                                                            'text-green-600'
                                                     }`}>
                                                     {report.resolution}
                                                 </span>
@@ -182,8 +179,8 @@ const ReportsView = ({
                                 <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex justify-between">
                                     <h3 className="font-medium text-gray-700">Report Details</h3>
                                     <span className={`text-xs font-medium px-2 py-1 rounded-full ${selectedReport.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                            selectedReport.status === 'resolved' ? 'bg-green-100 text-green-800' :
-                                                'bg-gray-100 text-gray-800'
+                                        selectedReport.status === 'resolved' ? 'bg-green-100 text-green-800' :
+                                            'bg-gray-100 text-gray-800'
                                         }`}>
                                         {selectedReport.status === 'pending' ? 'Pending' :
                                             selectedReport.status === 'resolved' ? 'Resolved' :

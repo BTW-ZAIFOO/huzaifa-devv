@@ -132,10 +132,10 @@ const ChatHeader = ({ user, toggleSidebar, sidebarOpen, notifications = [] }) =>
                                             >
                                                 <div className="flex items-start">
                                                     <div className={`mt-1 mr-3 flex-shrink-0 ${notification.type === 'report' ? 'text-yellow-500' :
-                                                            notification.type === 'ban' ? 'text-red-500' :
-                                                                notification.type === 'block' ? 'text-orange-500' :
-                                                                    notification.type === 'message_deleted' ? 'text-purple-500' :
-                                                                        'text-blue-500'
+                                                        notification.type === 'ban' ? 'text-red-500' :
+                                                            notification.type === 'block' ? 'text-orange-500' :
+                                                                notification.type === 'message_deleted' ? 'text-purple-500' :
+                                                                    'text-blue-500'
                                                         }`}>
                                                         <i className={`fas ${iconName} text-lg`}></i>
                                                     </div>
@@ -147,13 +147,11 @@ const ChatHeader = ({ user, toggleSidebar, sidebarOpen, notifications = [] }) =>
                                                             </span>
                                                         </div>
                                                         <p className="text-sm text-gray-600 mt-0.5">{notification.message}</p>
-
                                                         {notification.adminAction && (
                                                             <div className="mt-1 text-xs text-gray-500 italic">
                                                                 Action by: {notification.adminName || "Administrator"}
                                                             </div>
                                                         )}
-
                                                         {!notification.read && (
                                                             <div className="mt-1.5">
                                                                 <span className="bg-blue-100 text-blue-800 text-xs px-1.5 py-0.5 rounded-full">New</span>

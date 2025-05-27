@@ -9,9 +9,8 @@ import { Context } from "../../main";
 import { extractInappropriateWords, containsInappropriateContent } from "../../utils/moderationUtils";
 import io from "socket.io-client";
 
-const AdminPanel = ({ users: initialUsers, onBlockUser, onReportUser }) => {
+const AdminPanel = ({ users: initialUsers }) => {
     const [selectedUser, setSelectedUser] = useState(null);
-    const [adminView, setAdminView] = useState("dashboard");
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [messages, setMessages] = useState([]);
     const [adminActivity, setAdminActivity] = useState([]);
@@ -26,6 +25,13 @@ const AdminPanel = ({ users: initialUsers, onBlockUser, onReportUser }) => {
     const { user: adminUser } = useContext(Context);
     const socketRef = useRef(null);
     const SOCKET_URL = "http://localhost:4000";
+
+    const [adminSettings, setAdminSettings] = useState({
+        autoDeleteFlaggedContent: false,
+        notifyUsersOnAction: true,
+        monitorAllChats: true,
+        moderationLevel: 'medium',
+    });
 
     useEffect(() => {
         if (!adminUser?.role === "admin") return;
@@ -42,7 +48,6 @@ const AdminPanel = ({ users: initialUsers, onBlockUser, onReportUser }) => {
         });
 
         socketRef.current.on("admin-message-monitor", (message) => {
-
             setMessageQueue(prev => [message, ...prev].slice(0, 50));
 
             if (containsInappropriateContent(message.content)) {
@@ -78,14 +83,7 @@ const AdminPanel = ({ users: initialUsers, onBlockUser, onReportUser }) => {
                 socketRef.current = null;
             }
         };
-    }, [adminUser]);
-
-    const [adminSettings, setAdminSettings] = useState({
-        autoDeleteFlaggedContent: false,
-        notifyUsersOnAction: true,
-        monitorAllChats: true,
-        moderationLevel: 'medium',
-    });
+    }, [adminUser, adminSettings.autoDeleteFlaggedContent]);
 
     useEffect(() => {
         if (selectedUser) {
@@ -93,7 +91,11 @@ const AdminPanel = ({ users: initialUsers, onBlockUser, onReportUser }) => {
         } else {
             setMessages([]);
         }
-    }, [selectedUser, adminView]);
+    }, [selectedUser, activeView]);
+
+    useEffect(() => {
+        fetchUsers();
+    }, []);
 
     const loadUserMessages = async () => {
         try {
@@ -104,6 +106,7 @@ const AdminPanel = ({ users: initialUsers, onBlockUser, onReportUser }) => {
                 ...prev
             ]);
 
+            // Simulated messages for UI demonstration
             const simulatedMessages = [
                 {
                     _id: "msg1",
@@ -175,7 +178,6 @@ const AdminPanel = ({ users: initialUsers, onBlockUser, onReportUser }) => {
 
             const messageUser = users.find(u => u._id === messageToDelete.sender._id);
             if (messageUser) {
-
                 if (!messageUser.notifications) {
                     messageUser.notifications = [];
                 }
@@ -207,19 +209,6 @@ const AdminPanel = ({ users: initialUsers, onBlockUser, onReportUser }) => {
 
             logAdminActivity(actionMsg, isAutoDelete ? 'warning' : 'standard');
 
-            const deletedMessageLog = {
-                messageId,
-                content: messageToDelete.content,
-                sender: messageToDelete.sender.name,
-                senderId: messageToDelete.sender._id,
-                timestamp: messageToDelete.createdAt,
-                deletedAt: new Date(),
-                reason: isAutoDelete ? "Automated content moderation" : "Admin moderation",
-                adminName: isAutoDelete ? "System" : adminUser.name,
-                adminId: isAutoDelete ? "system" : adminUser._id,
-                flaggedWords: isAutoDelete ? extractInappropriateWords(messageToDelete.content) : []
-            };
-
             if (isAutoDelete) {
                 addNewReport({
                     type: 'message',
@@ -233,8 +222,6 @@ const AdminPanel = ({ users: initialUsers, onBlockUser, onReportUser }) => {
                     actionedBy: 'system'
                 });
             }
-
-            console.log("Message deleted:", deletedMessageLog);
 
             if (!isAutoDelete) {
                 toast.success("Message deleted and logged");
@@ -259,8 +246,6 @@ const AdminPanel = ({ users: initialUsers, onBlockUser, onReportUser }) => {
 
         user.lastActivity = activity;
         user.lastActivityTime = new Date().toLocaleTimeString();
-
-        console.log(`Tracked activity for ${user.name}: ${activity}`);
     };
 
     const handleBanUser = async (userId, reason, evidence = null) => {
@@ -288,7 +273,7 @@ const AdminPanel = ({ users: initialUsers, onBlockUser, onReportUser }) => {
                 userToBan.notifications = [];
             }
 
-            const banNotification = {
+            userToBan.notifications.unshift({
                 id: `ban-${Date.now()}`,
                 type: 'ban',
                 title: 'Account Banned',
@@ -299,9 +284,7 @@ const AdminPanel = ({ users: initialUsers, onBlockUser, onReportUser }) => {
                 adminName: adminUser.name,
                 adminAction: true,
                 actionTimestamp: new Date().toISOString()
-            };
-
-            userToBan.notifications.unshift(banNotification);
+            });
 
             toast.success(`User ${userToBan.name} has been banned for ${reason}`);
             logAdminActivity(`Banned user ${userToBan.name} for: ${reason}`, 'alert');
@@ -335,7 +318,7 @@ const AdminPanel = ({ users: initialUsers, onBlockUser, onReportUser }) => {
             }
 
             if (selectedUser && selectedUser._id === userId) {
-                setAdminView("dashboard");
+                setActiveView("dashboard");
                 setSelectedUser(null);
             }
         } catch (error) {
@@ -550,7 +533,7 @@ const AdminPanel = ({ users: initialUsers, onBlockUser, onReportUser }) => {
             user.notifications = [];
         }
 
-        const reportNotification = {
+        user.notifications.unshift({
             id: `report-${Date.now()}`,
             type: 'report',
             title: 'Account Reported by Administrator',
@@ -562,9 +545,7 @@ const AdminPanel = ({ users: initialUsers, onBlockUser, onReportUser }) => {
             adminName: adminUser.name,
             adminAction: true,
             actionTimestamp: new Date().toISOString()
-        };
-
-        user.notifications.unshift(reportNotification);
+        });
 
         addNewReport({
             type: 'user',
@@ -583,7 +564,6 @@ const AdminPanel = ({ users: initialUsers, onBlockUser, onReportUser }) => {
         });
 
         logAdminActivity(`Reported user ${user.name} for: ${customReason}`, 'warning');
-
         toast.success(`User ${user.name} has been reported for "${customReason}"`);
     };
 
@@ -771,10 +751,6 @@ const AdminPanel = ({ users: initialUsers, onBlockUser, onReportUser }) => {
         logAdminActivity(`Viewed ${selectedUser.name}'s profile`);
     };
 
-    useEffect(() => {
-        fetchUsers();
-    }, []);
-
     const fetchUsers = async () => {
         setLoading(true);
         setError(null);
@@ -794,9 +770,7 @@ const AdminPanel = ({ users: initialUsers, onBlockUser, onReportUser }) => {
             }));
 
             setUsers(enhancedUsers);
-
             logAdminActivity(`Loaded ${enhancedUsers.length} users`);
-
             processUsersForModeration(enhancedUsers);
         } catch (err) {
             console.error("Error fetching users:", err);

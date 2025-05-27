@@ -35,13 +35,10 @@ const AppWrapper = () => {
   );
 };
 
-const rootElement = document.getElementById("root");
-if (rootElement) {
-  createRoot(rootElement).render(
-    <StrictMode>
-      <AppWrapper />
-    </StrictMode>
-  );
-} else {
-  console.error("Root element not found! Make sure you have a div with id 'root' in your HTML file.");
-}
+createRoot(document.getElementById("root") || (() => {
+  throw new Error("Root element not found! Make sure you have a div with id 'root' in your HTML file.");
+})()).render(
+  <StrictMode>
+    <AppWrapper />
+  </StrictMode>
+);
