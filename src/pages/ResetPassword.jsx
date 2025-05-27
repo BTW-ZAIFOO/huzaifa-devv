@@ -31,7 +31,6 @@ const ResetPassword = () => {
         setIsAuthenticated(true);
         setUser(res.data.user);
 
-        // Redirect based on user role
         if (res.data.user.role === "admin") {
           window.location.href = "/admin";
         } else {
@@ -47,7 +46,6 @@ const ResetPassword = () => {
   };
 
   if (isAuthenticated) {
-    // Get user role from context to determine where to redirect
     const { user } = useContext(Context);
     if (user?.role === "admin") {
       return <Navigate to="/admin" />;
@@ -56,55 +54,57 @@ const ResetPassword = () => {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-blue-600 to-indigo-600 p-5">
-      <div className="bg-white/95 p-10 rounded-2xl shadow-xl max-w-md w-full text-center relative overflow-hidden">
-        <div className="before:absolute before:top-0 before:left-0 before:w-full before:h-[5px] before:bg-gradient-to-r before:from-blue-600 before:to-purple-600">
-          <h2 className="text-2xl font-semibold mb-4 text-slate-800">
-            Reset Password
-          </h2>
-          <p className="text-base text-gray-500 mb-8">
-            Enter your new password below.
-          </p>
-          <form onSubmit={handleResetPassword}>
-            <div className="relative mb-5">
-              <i className="fas fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
-              <input
-                type="password"
-                placeholder="New Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="pl-12 pr-4 py-3 w-full border border-gray-300 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none focus:bg-white"
-              />
-            </div>
-            <div className="relative mb-6">
-              <i className="fas fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
-              <input
-                type="password"
-                placeholder="Confirm New Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                className="pl-12 pr-4 py-3 w-full border border-gray-300 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none focus:bg-white"
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-none rounded-lg text-base cursor-pointer transition-all duration-300 font-medium shadow-md hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <i className="fas fa-spinner animate-spin"></i> Resetting...
-                </span>
-              ) : (
-                "Reset Password"
-              )}
-            </button>
-          </form>
+    <>
+      <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-blue-600 to-indigo-600 p-5">
+        <div className="bg-white/95 p-10 rounded-2xl shadow-xl max-w-md w-full text-center relative overflow-hidden">
+          <div className="before:absolute before:top-0 before:left-0 before:w-full before:h-[5px] before:bg-gradient-to-r before:from-blue-600 before:to-purple-600">
+            <h2 className="text-2xl font-semibold mb-4 text-slate-800">
+              Reset Password
+            </h2>
+            <p className="text-base text-gray-500 mb-8">
+              Enter your new password below.
+            </p>
+            <form onSubmit={handleResetPassword}>
+              <div className="relative mb-5">
+                <i className="fas fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                <input
+                  type="password"
+                  placeholder="New Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="pl-12 pr-4 py-3 w-full border border-gray-300 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none focus:bg-white"
+                />
+              </div>
+              <div className="relative mb-6">
+                <i className="fas fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                <input
+                  type="password"
+                  placeholder="Confirm New Password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  className="pl-12 pr-4 py-3 w-full border border-gray-300 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none focus:bg-white"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-none rounded-lg text-base cursor-pointer transition-all duration-300 font-medium shadow-md hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <i className="fas fa-spinner animate-spin"></i> Resetting...
+                  </span>
+                ) : (
+                  "Reset Password"
+                )}
+              </button>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

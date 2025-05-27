@@ -3,9 +3,6 @@ import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
 import ErrorBoundary from "./components/ErrorBoundary";
 
-/**
- * Application Context for global state management
- */
 export const Context = createContext({
   isAuthenticated: false,
   setIsAuthenticated: () => { },
@@ -14,15 +11,11 @@ export const Context = createContext({
   isAdmin: false,
 });
 
-/**
- * Main App wrapper with context provider
- */
 const AppWrapper = () => {
-  // Authentication state
+
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
 
-  // Derive admin status from user role
   const isAdmin = useMemo(() => user?.role === "admin", [user]);
 
   return (
@@ -42,7 +35,6 @@ const AppWrapper = () => {
   );
 };
 
-// Render the application
 const rootElement = document.getElementById("root");
 if (rootElement) {
   createRoot(rootElement).render(

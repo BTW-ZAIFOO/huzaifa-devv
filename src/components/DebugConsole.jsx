@@ -40,7 +40,6 @@ const DebugConsole = () => {
             >
                 <i className="fas fa-bug"></i>
             </button>
-
             {isOpen && (
                 <div className="fixed bottom-16 left-4 w-96 h-96 bg-gray-900 bg-opacity-90 text-white rounded-lg shadow-2xl z-50 flex flex-col">
                     <div className="p-2 border-b border-gray-700 flex justify-between items-center">

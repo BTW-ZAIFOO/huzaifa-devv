@@ -31,7 +31,6 @@ const OtpVerification = () => {
     }
   };
 
-  // Countdown for resending OTP
   useEffect(() => {
     if (countdown > 0) {
       const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
@@ -76,7 +75,6 @@ const OtpVerification = () => {
         setIsAuthenticated(true);
         setUser(res.data.user);
 
-        // Redirect based on role
         if (role === 'admin' || res.data.user.role === 'admin') {
           window.location.href = '/admin';
         } else {
@@ -94,7 +92,7 @@ const OtpVerification = () => {
   };
 
   if (isAuthenticated) {
-    // Redirect based on role if already authenticated
+
     if (role === 'admin') {
       return <Navigate to="/admin" />;
     }
@@ -103,23 +101,18 @@ const OtpVerification = () => {
 
   return (
     <div className="min-h-screen w-full flex justify-center items-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-5 relative overflow-hidden">
-      {/* Animated background elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
         <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-float"></div>
         <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-float" style={{ animationDelay: "2s" }}></div>
         <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-pink-300 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-float" style={{ animationDelay: "4s" }}></div>
       </div>
-
-      {/* Verification container */}
       <div className="glass-effect w-full max-w-md rounded-3xl shadow-xl z-10 overflow-hidden">
         <div className="p-8 md:p-10">
-          {/* Email verification icon */}
           <div className="flex justify-center mb-6">
             <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center">
               <i className="fas fa-envelope-open-text text-3xl text-white"></i>
             </div>
           </div>
-
           <h1 className="text-2xl font-bold mb-2 text-white text-center">
             OTP Verification
           </h1>
@@ -127,9 +120,7 @@ const OtpVerification = () => {
             We've sent a 5-digit code to{" "}
             <span className="font-medium text-white">{email}</span>
           </p>
-
           <form onSubmit={handleOtpVerification} className="space-y-8">
-            {/* OTP input field group */}
             <div className="flex justify-between gap-2">
               {otp.map((digit, index) => (
                 <input
@@ -144,8 +135,6 @@ const OtpVerification = () => {
                 />
               ))}
             </div>
-
-            {/* Resend OTP timer/button */}
             <div className="text-center">
               {canResend ? (
                 <button
@@ -161,8 +150,6 @@ const OtpVerification = () => {
                 </p>
               )}
             </div>
-
-            {/* Verify button */}
             <button
               type="submit"
               disabled={isLoading}
