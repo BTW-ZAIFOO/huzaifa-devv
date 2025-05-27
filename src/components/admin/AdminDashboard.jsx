@@ -1,28 +1,132 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 
-const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat }) => {
+const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBanUser, flaggedUsers = {}, userActivities = {} }) => {
     const [filter, setFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
+    const [sortBy, setSortBy] = useState('name');
+    const [sortDirection, setSortDirection] = useState('asc');
 
-    const totalUsers = users.filter(user => user.role !== 'admin').length;
-    const onlineUsers = users.filter(user => user.status === 'online' && user.role !== 'admin').length;
-    const blockedUsers = users.filter(user => user.status === 'blocked').length;
-    const bannedUsers = users.filter(user => user.status === 'banned').length;
-    const reportedUsers = users.filter(user => user.isReported).length;
-    const flaggedUsers = users.filter(user => user.flaggedWords && user.flaggedWords.length > 0).length;
-    const filteredUsers = users.filter(user => {
+    const totalUsers = users ? users.filter(user => user.role !== 'admin').length : 0;
+    const onlineUsers = users ? users.filter(user => user.status === 'online' && user.role !== 'admin').length : 0;
+    const blockedUsers = users ? users.filter(user => user.status === 'blocked').length : 0;
+    const bannedUsers = users ? users.filter(user => user.status === 'banned').length : 0;
+    const reportedUsers = users ? users.filter(user => user.isReported).length : 0;
+    const flaggedContent = users ? users.filter(user =>
+        (user.flaggedWords && user.flaggedWords.length > 0) ||
+        (flaggedUsers[user._id || user.id])
+    ).length : 0;
 
+    if (!users || users.length === 0) {
+        return (
+            <div className="flex-1 p-6 bg-gray-50 flex flex-col items-center justify-center">
+                <div className="bg-white rounded-lg p-8 shadow text-center max-w-md">
+                    <div className="text-5xl text-gray-300 mb-4">
+                        <i className="fas fa-users-slash"></i>
+                    </div>
+                    <h2 className="text-xl font-bold text-gray-700 mb-2">No Users Found</h2>
+                    <p className="text-gray-500 mb-4">
+                        There are currently no users in the system or the user data could not be loaded.
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    let filteredUsers = [...users].filter(user => {
         if (user.role === 'admin') return false;
         if (filter === 'online' && user.status !== 'online') return false;
         if (filter === 'offline' && user.status !== 'offline') return false;
         if (filter === 'blocked' && user.status !== 'blocked') return false;
         if (filter === 'banned' && user.status !== 'banned') return false;
         if (filter === 'reported' && !user.isReported) return false;
-        if (filter === 'flagged' && (!user.flaggedWords || user.flaggedWords.length === 0)) return false;
-        if (searchTerm && !user.name.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+        if (filter === 'flagged' &&
+            !((user.flaggedWords && user.flaggedWords.length > 0) || flaggedUsers[user._id || user.id])
+        ) return false;
+
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase();
+            return (
+                (user.name && user.name.toLowerCase().includes(term)) ||
+                (user.email && user.email.toLowerCase().includes(term))
+            );
+        }
 
         return true;
     });
+
+    filteredUsers.sort((a, b) => {
+        let compareA, compareB;
+
+        switch (sortBy) {
+            case 'name':
+                compareA = a.name || '';
+                compareB = b.name || '';
+                break;
+            case 'status':
+                compareA = a.status || '';
+                compareB = b.status || '';
+                break;
+            case 'activity':
+                compareA = a.lastActivityTime || '';
+                compareB = b.lastActivityTime || '';
+                break;
+            case 'flags':
+                const aFlags = (a.flaggedWords?.length || 0) + (flaggedUsers[a._id || a.id]?.length || 0);
+                const bFlags = (b.flaggedWords?.length || 0) + (flaggedUsers[b._id || b.id]?.length || 0);
+                compareA = aFlags;
+                compareB = bFlags;
+                break;
+            default:
+                compareA = a.name || '';
+                compareB = b.name || '';
+        }
+
+        if (sortDirection === 'asc') {
+            return compareA > compareB ? 1 : -1;
+        } else {
+            return compareA < compareB ? 1 : -1;
+        }
+    });
+
+    const handleSortClick = (column) => {
+        if (sortBy === column) {
+            lumn
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortBy(column);
+            setSortDirection('asc');
+        }
+    };
+
+    const handleBanUserClick = (userId) => {
+        onBanUser(userId, "Banned by admin via dashboard");
+    };
+
+    const handleReportUserClick = (userId) => {
+        const user = users.find(u => u._id === userId || u.id === userId);
+        if (!user) {
+            toast.error("User not found");
+            return;
+        }
+
+        if (user.isReported) {
+            if (window.confirm(`Remove report from ${user.name}?`)) {
+                onReportUser(userId);
+            }
+        } else {
+            const reason = prompt("Please provide a detailed reason for reporting this user:");
+            if (reason && reason.trim() !== "") {
+                onReportUser(userId, reason.trim());
+
+                toast.success(`Report submitted for ${user.name} with reason: "${reason}"`, {
+                    autoClose: 5000
+                });
+            } else {
+                toast.error("Report cancelled: A reason is required");
+            }
+        }
+    };
 
     return (
         <>
@@ -74,7 +178,7 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat }) =>
                     />
                     <StatCard
                         title="Flagged Content"
-                        value={flaggedUsers}
+                        value={flaggedContent}
                         icon="fa-exclamation-triangle"
                         color="orange"
                         onClick={() => setFilter('flagged')}
@@ -99,102 +203,212 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat }) =>
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Activity</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Flags</th>
+                                    <th
+                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                                        onClick={() => handleSortClick('name')}
+                                    >
+                                        User
+                                        {sortBy === 'name' && (
+                                            <i className={`fas fa-sort-${sortDirection === 'asc' ? 'up' : 'down'} ml-1`}></i>
+                                        )}
+                                    </th>
+                                    <th
+                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                                        onClick={() => handleSortClick('status')}
+                                    >
+                                        Status
+                                        {sortBy === 'status' && (
+                                            <i className={`fas fa-sort-${sortDirection === 'asc' ? 'up' : 'down'} ml-1`}></i>
+                                        )}
+                                    </th>
+                                    <th
+                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                                        onClick={() => handleSortClick('activity')}
+                                    >
+                                        Last Activity
+                                        {sortBy === 'activity' && (
+                                            <i className={`fas fa-sort-${sortDirection === 'asc' ? 'up' : 'down'} ml-1`}></i>
+                                        )}
+                                    </th>
+                                    <th
+                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                                        onClick={() => handleSortClick('flags')}
+                                    >
+                                        Flags
+                                        {sortBy === 'flags' && (
+                                            <i className={`fas fa-sort-${sortDirection === 'asc' ? 'up' : 'down'} ml-1`}></i>
+                                        )}
+                                    </th>
                                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {filteredUsers.length > 0 ? (
-                                    filteredUsers.map((user) => (
-                                        <tr key={user.id} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="flex items-center">
-                                                    <div className="flex-shrink-0 h-10 w-10 relative">
-                                                        <img
-                                                            className="h-10 w-10 rounded-full object-cover border border-gray-200"
-                                                            src={user.avatar}
-                                                            alt={user.name}
-                                                        />
-                                                        <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white ${user.status === 'online' ? 'bg-green-500' :
-                                                            user.status === 'blocked' ? 'bg-red-500' :
-                                                                user.status === 'banned' ? 'bg-black' : 'bg-gray-400'
-                                                            }`}></span>
+                                    filteredUsers.map((user) => {
+                                        const userId = user._id || user.id;
+                                        const userFlaggedWords = [
+                                            ...(user.flaggedWords || []),
+                                            ...(flaggedUsers[userId] || [])
+                                        ];
+
+                                        return (
+                                            <tr key={userId} className={`hover:bg-gray-50 ${user.isReported ? "border-l-4 border-yellow-500 " :
+                                                user.status === 'banned' ? "border-l-4 border-black " :
+                                                    user.status === 'blocked' ? "border-l-4 border-red-500 " :
+                                                        userFlaggedWords.length > 0 ? "bg-red-50 " :
+                                                            ""
+                                                }`}>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="flex items-center">
+                                                        <div className="flex-shrink-0 h-10 w-10 relative">
+                                                            <img
+                                                                className="h-10 w-10 rounded-full object-cover border border-gray-200"
+                                                                src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`}
+                                                                alt={user.name}
+                                                            />
+                                                            <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white ${user.status === 'online' ? 'bg-green-500' :
+                                                                user.status === 'blocked' ? 'bg-red-500' :
+                                                                    user.status === 'banned' ? 'bg-black' : 'bg-gray-400'
+                                                                }`}></span>
+                                                        </div>
+                                                        <div className="ml-4">
+                                                            <div className="text-sm font-medium text-gray-900 flex items-center">
+                                                                {user.name}
+                                                                {user.reportedBy && (
+                                                                    <span className="ml-2 bg-yellow-100 text-yellow-800 text-xs px-1.5 py-0.5 rounded-full inline-flex items-center">
+                                                                        <i className="fas fa-flag text-xs mr-1"></i> Reported
+                                                                    </span>
+                                                                )}
+                                                                {user.bannedBy && (
+                                                                    <span className="ml-2 bg-black text-white text-xs px-1.5 py-0.5 rounded-full inline-flex items-center">
+                                                                        <i className="fas fa-gavel text-xs mr-1"></i> Banned
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            <div className="text-xs text-gray-500">{user.email}</div>
+                                                            {user.notifications && user.notifications.length > 0 && (
+                                                                <div className="mt-1">
+                                                                    <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded-full">
+                                                                        {user.notifications.length} notifications
+                                                                    </span>
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </div>
-                                                    <div className="ml-4">
-                                                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                                                        <div className="text-xs text-gray-500">{user.email}</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.status === 'online' ? 'bg-green-100 text-green-800' :
-                                                    user.status === 'offline' ? 'bg-gray-100 text-gray-800' :
-                                                        user.status === 'blocked' ? 'bg-red-100 text-red-800' :
-                                                            'bg-black text-white'
-                                                    }`}>
-                                                    {user.status === 'online' ? 'Online' :
-                                                        user.status === 'offline' ? 'Offline' :
-                                                            user.status === 'blocked' ? 'Blocked' : 'Banned'}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">{user.lastActivity || 'No activity'}</div>
-                                                <div className="text-xs text-gray-500">{user.lastActivityTime || ''}</div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                {user.flaggedWords && user.flaggedWords.length > 0 ? (
-                                                    <span className="bg-red-100 text-red-800 text-xs px-2.5 py-0.5 rounded-full">
-                                                        {user.flaggedWords.length} flagged terms
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.status === 'online' ? 'bg-green-100 text-green-800' :
+                                                        user.status === 'offline' ? 'bg-gray-100 text-gray-800' :
+                                                            user.status === 'blocked' ? 'bg-red-100 text-red-800' :
+                                                                'bg-black text-white'
+                                                        }`}>
+                                                        {user.status === 'online' ? 'Online' :
+                                                            user.status === 'offline' ? 'Offline' :
+                                                                user.status === 'blocked' ? 'Blocked' : 'Banned'}
                                                     </span>
-                                                ) : (
-                                                    <span className="text-gray-500 text-xs">No flags</span>
-                                                )}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                                <button
-                                                    onClick={() => onViewUserChat(user)}
-                                                    className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 p-1 rounded"
-                                                    title="View Chat"
-                                                >
-                                                    <i className="fas fa-comments"></i>
-                                                </button>
-                                                <button
-                                                    onClick={() => onBlockUser(user.id, 'block')}
-                                                    className={`${user.status === 'blocked' ? 'text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100' : 'text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100'} p-1 rounded`}
-                                                    title={user.status === 'blocked' ? 'Unblock User' : 'Block User'}
-                                                >
-                                                    <i className={`fas ${user.status === 'blocked' ? 'fa-unlock' : 'fa-ban'}`}></i>
-                                                </button>
-                                                <button
-                                                    onClick={() => onBlockUser(user.id, 'ban')}
-                                                    className={`${user.status === 'banned' ? 'text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100' : 'text-gray-700 hover:text-black bg-gray-50 hover:bg-gray-100'} p-1 rounded`}
-                                                    title={user.status === 'banned' ? 'Unban User' : 'Ban User'}
-                                                >
-                                                    <i className={`fas ${user.status === 'banned' ? 'fa-user-check' : 'fa-user-slash'}`}></i>
-                                                </button>
-                                                <button
-                                                    onClick={() => onReportUser(user.id)}
-                                                    className={`${user.isReported ? 'text-purple-600 hover:text-purple-900 bg-purple-50 hover:bg-purple-100' : 'text-yellow-600 hover:text-yellow-900 bg-yellow-50 hover:bg-yellow-100'} p-1 rounded`}
-                                                    title={user.isReported ? 'Remove Report' : 'Report User'}
-                                                >
-                                                    <i className={`fas ${user.isReported ? 'fa-flag-checkered' : 'fa-flag'}`}></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
+                                                    {user.blockedBy && (
+                                                        <div className="text-xs text-gray-500 mt-1">by {user.blockedBy}</div>
+                                                    )}
+                                                    {user.bannedBy && (
+                                                        <div className="text-xs text-gray-500 mt-1">by {user.bannedBy}</div>
+                                                    )}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="text-sm text-gray-900">{user.lastActivity || 'No activity'}</div>
+                                                    <div className="text-xs text-gray-500">{user.lastActivityTime || ''}</div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    {userFlaggedWords.length > 0 ? (
+                                                        <div>
+                                                            <span className="bg-red-100 text-red-800 text-xs px-2.5 py-0.5 rounded-full">
+                                                                {userFlaggedWords.length} flagged terms
+                                                            </span>
+                                                            <div className="mt-1 text-xs text-gray-600">
+                                                                {userFlaggedWords.slice(0, 3).map((word, idx) => (
+                                                                    <span key={idx} className="bg-red-50 text-red-700 px-1 py-0.5 rounded mr-1">
+                                                                        {word}
+                                                                    </span>
+                                                                ))}
+                                                                {userFlaggedWords.length > 3 && (
+                                                                    <span className="text-xs text-gray-500">+{userFlaggedWords.length - 3} more</span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-gray-500 text-xs">No flags</span>
+                                                    )}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                                                    <button
+                                                        onClick={() => onViewUserChat(user)}
+                                                        className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 p-1 rounded"
+                                                        title="View Chat"
+                                                    >
+                                                        <i className="fas fa-comments"></i>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => onBlockUser(userId, 'block')}
+                                                        className={`${user.status === 'blocked' ? 'text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100' : 'text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100'} p-1 rounded`}
+                                                        title={user.status === 'blocked' ? 'Unblock User' : 'Block User'}
+                                                    >
+                                                        <i className={`fas ${user.status === 'blocked' ? 'fa-unlock' : 'fa-ban'}`}></i>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleBanUserClick(userId)}
+                                                        className={`${user.status === 'banned' ? 'text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100' : 'text-gray-700 hover:text-black bg-gray-50 hover:bg-gray-100'} p-1 rounded`}
+                                                        title={user.status === 'banned' ? 'Unban User' : 'Ban User'}
+                                                    >
+                                                        <i className={`fas ${user.status === 'banned' ? 'fa-user-check' : 'fa-user-slash'}`}></i>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleReportUserClick(userId)}
+                                                        className={`${user.isReported ? 'text-purple-600 hover:text-purple-900 bg-purple-50 hover:bg-purple-100' : 'text-yellow-600 hover:text-yellow-900 bg-yellow-50 hover:bg-yellow-100'} p-1 rounded`}
+                                                        title={user.isReported ? `Remove report: "${user.reportReason || 'No reason provided'}"` : 'Report User'}
+                                                    >
+                                                        <i className={`fas ${user.isReported ? 'fa-flag-checkered' : 'fa-flag'}`}></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
                                 ) : (
                                     <tr>
-                                        <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
-                                            No users found matching the current filter
+                                        <td colSpan="5" className="px-6 py-10 text-center text-gray-500">
+                                            <div className="flex flex-col items-center">
+                                                <i className="fas fa-search text-3xl text-gray-300 mb-2"></i>
+                                                <span>No users found matching the current filter</span>
+                                                {filter !== 'all' && (
+                                                    <button
+                                                        onClick={() => setFilter('all')}
+                                                        className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+                                                    >
+                                                        Clear filters
+                                                    </button>
+                                                )}
+                                            </div>
                                         </td>
                                     </tr>
                                 )}
                             </tbody>
                         </table>
                     </div>
+
+                    {filteredUsers.length > 0 && filteredUsers.length > 10 && (
+                        <div className="flex justify-between items-center mt-4">
+                            <div className="text-sm text-gray-500">
+                                Showing {filteredUsers.length} of {totalUsers} users
+                            </div>
+                            <div className="space-x-1">
+                                <button className="px-3 py-1 bg-white border border-gray-300 rounded text-gray-700 hover:bg-gray-50">
+                                    <i className="fas fa-chevron-left"></i>
+                                </button>
+                                <button className="px-3 py-1.5 bg-blue-50 border border-blue-200 rounded text-blue-700">1</button>
+                                <button className="px-3 py-1 bg-white border border-gray-300 rounded text-gray-700 hover:bg-gray-50">
+                                    <i className="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </>

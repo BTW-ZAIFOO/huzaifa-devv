@@ -29,7 +29,7 @@ const AdminLogin = () => {
                 setUser(response.data.user);
                 setIsAuthenticated(true);
                 toast.success("Admin login successful!");
-                navigateTo("/admin"); // Direct redirect to admin dashboard
+                navigateTo("/admin"); 
             } else {
                 toast.error("This account doesn't have admin privileges");
             }
@@ -134,9 +134,10 @@ const AdminLogin = () => {
                     </div>
                     <div className="mt-8 text-white/70 text-center">
                         <p>
-                            Don't have an admin account?{" "}
-                            <span className="toggle-signup text-pink-300 font-medium cursor-pointer hover:text-white transition-colors">
-                                Create one
+                            Admin access only. For moderation and system management.
+                            <br />
+                            <span className="text-xs text-white/50 mt-1 block">
+                                With full message moderation and user ban capabilities
                             </span>
                         </p>
                     </div>

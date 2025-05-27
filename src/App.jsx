@@ -75,7 +75,7 @@ const App = () => {
   return (
     <>
       <Router>
-        <div className="h-screen bg-gray-100">
+        <div className="max-h-screen overflow-y-scroll bg-gray-100">
           <Routes>
             <Route path="/auth" element={<Auth />} />
             <Route path="/admin/auth" element={<AdminAuth />} />

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useContext } from "react";
 import { toast } from "react-toastify";
 import { Context } from "../../main";
 import { generateAvatar, getAvatarByRole } from "../../utils/avatarUtils";
+import { highlightInappropriateContent, containsInappropriateContent } from "../../utils/moderationUtils";
 
 const ChatWindow = ({
     selectedUser,
@@ -128,26 +129,25 @@ const ChatWindow = ({
         }
     };
 
-    const highlightInappropriate = (text) => {
-        if (!text || typeof text !== 'string') return '';
-
-        const wordsToHighlight = flaggedWords?.length > 0
-            ? flaggedWords
-            : ['stupid', 'idiot', 'damn', 'hate', 'hell'];
-
-        let highlighted = text;
-
-        wordsToHighlight.forEach(word => {
-            const regex = new RegExp(`\\b${word}\\b`, 'gi');
-            highlighted = highlighted.replace(regex, match =>
-                `<span class="bg-red-100 text-red-800">${match}</span>`
-            );
-        });
-
-        return highlighted;
+    const handleDeleteMessage = (messageId) => {
+        if (onDeleteMessage && isAdmin) {
+            onDeleteMessage(messageId);
+            toast.success("Message deleted successfully");
+        }
     };
 
-    const renderMessageStatus = (message) => {
+    const getInputPlaceholder = () => {
+        if (isBannedUser && !isAdmin) return "This user has been banned";
+        if (isBlockedUser && !isAdmin) return "This user has been blocked";
+        if (isRecording) return "Listening...";
+        return "Type a message...";
+    };
+
+    function highlightInappropriate(text) {
+        return highlightInappropriateContent(text, flaggedWords);
+    }
+
+    function renderMessageStatus(message) {
         if (message.from !== "me") return null;
 
         return (
@@ -163,14 +163,7 @@ const ChatWindow = ({
                 )}
             </span>
         );
-    };
-
-    const getInputPlaceholder = () => {
-        if (isBannedUser && !isAdmin) return "This user has been banned";
-        if (isBlockedUser && !isAdmin) return "This user has been blocked";
-        if (isRecording) return "Listening...";
-        return "Type a message...";
-    };
+    }
 
     function renderUserStatusBadge() {
         if (isAdminChat) {
@@ -267,15 +260,15 @@ const ChatWindow = ({
 
         const messageText = message.content || message.text || "";
         const isMessageFlagged = message.flagged ||
-            flaggedWords.some(word =>
-                messageText.toLowerCase().includes(word.toLowerCase())
-            );
+            containsInappropriateContent(messageText, flaggedWords);
+
+        const isDeleted = message.isDeleted;
 
         return (
             <>
                 <div
                     key={message._id || message.id}
-                    className={`flex ${isMe ? "justify-end" : "justify-start"} group`}
+                    className={`flex ${isMe ? "justify-end" : "justify-start"} group relative`}
                 >
                     <div className={`max-w-[75%] flex ${isMe ? "flex-row-reverse" : ""}`}>
                         {!isMe && (
@@ -287,24 +280,35 @@ const ChatWindow = ({
                         )}
 
                         <div
-                            className={`relative rounded-2xl px-5 py-3 shadow-sm ${isMe
-                                ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-tr-none"
-                                : isMessageFlagged
-                                    ? "bg-red-50 text-gray-800 rounded-tl-none border border-red-200"
-                                    : "bg-gray-100 text-gray-800 rounded-tl-none shadow"
+                            className={`relative rounded-2xl px-5 py-3 shadow-sm ${isDeleted
+                                    ? "bg-gray-200 text-gray-500 italic"
+                                    : isMe
+                                        ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-tr-none"
+                                        : isMessageFlagged
+                                            ? "bg-red-50 text-gray-800 rounded-tl-none border border-red-200"
+                                            : "bg-gray-100 text-gray-800 rounded-tl-none shadow"
                                 }`}
                         >
-                            {isMessageFlagged && isAdmin && (
+                            {isMessageFlagged && !isDeleted && (
                                 <div className="absolute -top-6 right-0 bg-red-100 text-red-800 text-xs px-2 py-1 rounded-md shadow-sm">
                                     <i className="fas fa-flag mr-1"></i> Flagged content
                                 </div>
                             )}
-                            {message.isVoice && (
+
+                            {message.isVoice && !isDeleted && (
                                 <span className="absolute -top-6 left-0 text-xs text-gray-500 bg-white px-2 py-1 rounded-md shadow-sm">
                                     <i className="fas fa-microphone mr-1"></i> Voice message
                                 </span>
                             )}
-                            {isAdmin ? (
+
+                            {isDeleted && (
+                                <div className="flex items-center text-gray-500">
+                                    <i className="fas fa-ban mr-2"></i>
+                                    <span className="italic">{messageText}</span>
+                                </div>
+                            )}
+
+                            {!isDeleted && (isAdmin ? (
                                 <div
                                     className={isMe ? "text-white break-words" : "text-gray-800 break-words"}
                                     style={{ wordBreak: "break-word", whiteSpace: "pre-wrap" }}
@@ -317,19 +321,33 @@ const ChatWindow = ({
                                 >
                                     {messageText}
                                 </div>
-                            )}
+                            ))}
+
                             <div className={`text-xs mt-1.5 flex items-center gap-1.5 ${isMe ? "text-blue-100" : "text-gray-500"}`}>
                                 {message.time || (message.createdAt && new Date(message.createdAt).toLocaleTimeString())}
                                 {isMe && renderMessageStatus(message)}
+                                {isDeleted && <span className="ml-1 italic">(deleted by admin)</span>}
                             </div>
-                            {isAdmin && onDeleteMessage && (
-                                <button
-                                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-all shadow"
-                                    onClick={() => onDeleteMessage(message._id || message.id)}
-                                    title="Delete message"
-                                >
-                                    <i className="fas fa-times text-xs"></i>
-                                </button>
+
+                            {isAdmin && onDeleteMessage && !isDeleted && (
+                                <div className="absolute -top-2 -right-2 flex gap-1">
+                                    <button
+                                        className="bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-all shadow"
+                                        onClick={() => handleDeleteMessage(message._id || message.id)}
+                                        title="Delete message"
+                                    >
+                                        <i className="fas fa-times text-xs"></i>
+                                    </button>
+                                    {!isMe && isMessageFlagged && (
+                                        <button
+                                            className="bg-black text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-gray-800 transition-all shadow"
+                                            onClick={() => onBanUser && onBanUser(senderId, "Inappropriate content")}
+                                            title="Ban user for this message"
+                                        >
+                                            <i className="fas fa-user-slash text-xs"></i>
+                                        </button>
+                                    )}
+                                </div>
                             )}
                         </div>
                     </div>

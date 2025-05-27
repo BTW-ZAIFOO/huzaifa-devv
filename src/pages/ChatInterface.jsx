@@ -11,6 +11,7 @@ import AdminPanel from "../components/admin/AdminPanel";
 import ChatHeader from "../components/chat/ChatHeader";
 import ConnectionStatus from "../components/chat/ConnectionStatus";
 import { generateAvatar, getAvatarByRole } from "../utils/avatarUtils";
+import { containsInappropriateContent, extractInappropriateWords } from "../utils/moderationUtils";
 
 const ChatInterface = ({ adminMode }) => {
     const { isAuthenticated, user, isAdmin } = useContext(Context);
@@ -172,9 +173,80 @@ const ChatInterface = ({ adminMode }) => {
             .then(res => {
                 setAllUsers(res.data.users);
                 setLoading(false);
+
+                const currentUserFromApi = res.data.users.find(u => u._id === user._id);
+                if (currentUserFromApi) {
+                    if (currentUserFromApi.isReported &&
+                        !currentUserFromApi.notifications?.some(n => n.type === 'report')) {
+
+                        const reason = currentUserFromApi.reportReason || "Content policy violation";
+                        addUserNotification({
+                            type: 'report',
+                            title: 'Your Account Has Been Reported',
+                            message: `An admin has reported your account: "${reason}"`,
+                            severity: 'high'
+                        });
+                    }
+
+                    if (currentUserFromApi.status === 'banned' &&
+                        !currentUserFromApi.notifications?.some(n => n.type === 'ban')) {
+
+                        const reason = currentUserFromApi.bannedReason || "Multiple violations";
+                        addUserNotification({
+                            type: 'ban',
+                            title: 'Your Account Has Been Banned',
+                            message: `Your account has been banned: "${reason}"`,
+                            severity: 'critical'
+                        });
+                    }
+
+                    if (currentUserFromApi.status === 'blocked' &&
+                        !currentUserFromApi.notifications?.some(n => n.type === 'block')) {
+
+                        const reason = currentUserFromApi.blockReason || "Temporary suspension";
+                        addUserNotification({
+                            type: 'block',
+                            title: 'Your Account Has Been Blocked',
+                            message: `Your account has been temporarily blocked: "${reason}"`,
+                            severity: 'high'
+                        });
+                    }
+                }
             })
             .catch(() => setLoading(false));
     }, [user]);
+
+    const addUserNotification = (notification) => {
+        if (!user || !user.notifications) {
+            if (!user) {
+                user = {};
+            }
+            user.notifications = [];
+        }
+
+        const newNotification = {
+            id: `notification-${Date.now()}`,
+            createdAt: new Date().toISOString(),
+            read: false,
+            ...notification
+        };
+
+        user.notifications.unshift(newNotification);
+
+        const toastType = notification.severity === 'critical' ? toast.error :
+            notification.severity === 'high' ? toast.warning :
+                notification.severity === 'medium' ? toast.info :
+                    toast.info;
+
+        const icon = notification.type === 'report' ? '🚩' :
+            notification.type === 'ban' ? '⛔' :
+                notification.type === 'block' ? '🚫' : 'ℹ️';
+
+        toastType(notification.message, {
+            icon,
+            autoClose: notification.severity === 'critical' ? 10000 : 5000
+        });
+    };
 
     const handleUserSelect = async (otherUser) => {
         try {
@@ -209,6 +281,14 @@ const ChatInterface = ({ adminMode }) => {
     const handleSendMessage = async (messageText, isVoice = false) => {
         if (!messageText.trim() || !selectedChat) return;
 
+        if (containsInappropriateContent(messageText)) {
+            const flaggedWords = extractInappropriateWords(messageText);
+            if (flaggedWords.length > 0 && !isAdmin) {
+                toast.warn("Your message contains words that may be inappropriate. Please revise your message.");
+                return;
+            }
+        }
+
         if (!socketConnected || !socketRef.current) {
             toast.error("You are currently disconnected. Please wait while we reconnect.");
             return;
@@ -225,7 +305,8 @@ const ChatInterface = ({ adminMode }) => {
                 },
                 createdAt: new Date().toISOString(),
                 chat: selectedChat.chat._id,
-                isOptimistic: true
+                isOptimistic: true,
+                isVoice
             };
 
             setMessages(prev => [...prev, optimisticMessage]);
@@ -234,7 +315,8 @@ const ChatInterface = ({ adminMode }) => {
                 "http://localhost:4000/api/v1/message/send",
                 {
                     chatId: selectedChat.chat._id,
-                    content: messageText
+                    content: messageText,
+                    isVoice
                 },
                 { withCredentials: true }
             );
@@ -247,7 +329,7 @@ const ChatInterface = ({ adminMode }) => {
             console.error("Error sending message:", err);
             toast.error("Failed to send message");
 
-            setMessages(prev => prev.filter(msg => !msg.isOptimistic));
+            setMessages(prev => prev.filter((msg) => !msg.isOptimistic));
         }
     };
 
@@ -274,6 +356,96 @@ const ChatInterface = ({ adminMode }) => {
         }
     };
 
+    const handleDeleteMessage = async (messageId) => {
+        if (!isAdmin) return;
+
+        try {
+            setMessages(prev => prev.map(msg =>
+                msg._id === messageId ? { ...msg, isDeleted: true, content: "This message was deleted by an admin" } : msg
+            ));
+
+            toast.success("Message deleted successfully");
+
+            try {
+                const targetMessage = messages.find(msg => msg._id === messageId);
+                if (targetMessage) {
+                    console.log("Admin deleted message:", targetMessage.content);
+                    const senderUser = allUsers.find(u => u._id === targetMessage.sender._id);
+                    if (senderUser) {
+                        senderUser.moderationHistory = [
+                            ...(senderUser.moderationHistory || []),
+                            {
+                                action: "message_deleted",
+                                timestamp: new Date(),
+                                content: targetMessage.content,
+                                admin: user.name
+                            }
+                        ];
+                    }
+                }
+            } catch (apiError) {
+                console.error("API error when deleting message:", apiError);
+            }
+        } catch (error) {
+            console.error("Error handling message deletion:", error);
+            toast.error("Failed to delete message");
+        }
+    };
+
+    const handleBanUser = async (userId, reason) => {
+        if (!isAdmin) return;
+
+        try {
+            const userToBan = allUsers.find(u => u._id === userId);
+            if (!userToBan) {
+                toast.error("User not found");
+                return;
+            }
+
+            const userMessages = messages
+                .filter((msg) => msg.sender._id === userId)
+                .map((msg) => ({
+                    content: msg.content,
+                    timestamp: msg.createdAt,
+                    messageId: msg._id
+                }));
+
+            console.log(`Admin is banning user ${userToBan.name}`, {
+                reason,
+                messages: userMessages
+            });
+
+            userToBan.status = "banned";
+            userToBan.bannedReason = reason;
+            userToBan.bannedAt = new Date();
+            userToBan.bannedBy = user.name;
+
+            toast.success(`User ${userToBan.name} has been banned for ${reason}`);
+
+            const systemMessage = {
+                _id: `system-${Date.now()}`,
+                isSystemMessage: true,
+                content: `${userToBan.name} has been banned by an administrator.`,
+                text: `${userToBan.name} has been banned by an administrator.`,
+                createdAt: new Date().toISOString()
+            };
+
+            setMessages(prev => [...prev, systemMessage]);
+
+            if (selectedUser && selectedUser._id === userId) {
+                setTimeout(() => {
+                    setSelectedChat(null);
+                    setSelectedUser(null);
+                    setMessages([]);
+                }, 3000);
+            }
+
+        } catch (error) {
+            console.error("Error banning user:", error);
+            toast.error("Failed to ban user");
+        }
+    };
+
     const toggleUserProfile = () => setShowUserProfile(!showUserProfile);
 
     if (!isAuthenticated) {
@@ -291,8 +463,23 @@ const ChatInterface = ({ adminMode }) => {
                 <AdminHeader user={user} />
                 <AdminPanel
                     users={allUsers}
-                    onBlockUser={() => { }}
-                    onReportUser={() => { }}
+                    onBlockUser={(userId, action, reason) => {
+                        if (action === "block") {
+                            const targetUser = allUsers.find(u => u._id === userId);
+                            toast.success(`${action === "block" ? "Blocked" : "Unblocked"} user ${targetUser?.name || userId}`);
+                        } else if (action === "ban") {
+                            const targetUser = allUsers.find(u => u._id === userId);
+                            toast.success(`${action === "ban" ? "Banned" : "Unbanned"} user ${targetUser?.name || userId}`);
+                        }
+                        fetchUsers();
+                    }}
+                    onReportUser={(userId, reason) => {
+                        const targetUser = allUsers.find(u => u._id === userId);
+                        if (targetUser) {
+                            toast.info(`Reported user ${targetUser.name} for ${reason || 'policy violation'}`);
+                        }
+                        fetchUsers();
+                    }}
                 />
             </div>
         );
@@ -335,8 +522,9 @@ const ChatInterface = ({ adminMode }) => {
                                         messages={messages}
                                         onSendMessage={handleSendMessage}
                                         onViewProfile={toggleUserProfile}
-                                        isAdmin={false}
-                                        onDeleteMessage={null}
+                                        isAdmin={isAdmin}
+                                        onDeleteMessage={isAdmin ? handleDeleteMessage : null}
+                                        onBanUser={isAdmin ? handleBanUser : null}
                                     />
                                 ) : (
                                     <EmptyState setSidebarOpen={setSidebarOpen} />

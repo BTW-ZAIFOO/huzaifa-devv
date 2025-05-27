@@ -19,7 +19,7 @@ const UserProfile = () => {
         avatar: null
     });
     const [avatarPreview, setAvatarPreview] = useState(null);
-    const [activeTab, setActiveTab] = useState("profile"); // profile, security
+    const [activeTab, setActiveTab] = useState("profile");
 
     useEffect(() => {
         if (user) {
@@ -195,6 +195,47 @@ const UserProfile = () => {
                         <div className="pt-20 px-8 pb-8">
                             <h1 className="text-2xl font-semibold text-gray-900">{user?.name}</h1>
                             <p className="text-gray-500">{user?.email} {user?.role === "admin" && <span className="bg-purple-100 text-purple-800 text-xs px-2 py-0.5 rounded-full ml-2">Admin</span>}</p>
+
+                            {/* Status badges */}
+                            {user?.status === 'banned' && (
+                                <div className="mt-2">
+                                    <span className="bg-black text-white text-xs px-2 py-1 rounded-md">
+                                        Account Banned
+                                    </span>
+                                    {user?.bannedReason && (
+                                        <p className="mt-1 text-sm text-red-600">
+                                            Reason: {user.bannedReason}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+
+                            {user?.status === 'blocked' && (
+                                <div className="mt-2">
+                                    <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-md">
+                                        Account Blocked
+                                    </span>
+                                    {user?.blockReason && (
+                                        <p className="mt-1 text-sm text-red-600">
+                                            Reason: {user.blockReason}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+
+                            {user?.isReported && (
+                                <div className="mt-2">
+                                    <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-md">
+                                        Account Reported
+                                    </span>
+                                    {user?.reportReason && (
+                                        <p className="mt-1 text-sm text-yellow-600">
+                                            Reason: {user.reportReason}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+
                             <div className="mt-8 border-b border-gray-200">
                                 <div className="flex">
                                     <button
@@ -215,8 +256,23 @@ const UserProfile = () => {
                                     >
                                         <i className="fas fa-lock mr-2"></i> Security
                                     </button>
+                                    <button
+                                        className={`py-4 px-6 border-b-2 font-medium ${activeTab === "notifications"
+                                            ? "border-blue-600 text-blue-600"
+                                            : "border-transparent text-gray-500 hover:border-gray-300"
+                                            } transition-colors relative`}
+                                        onClick={() => setActiveTab("notifications")}
+                                    >
+                                        <i className="fas fa-bell mr-2"></i> Notifications
+                                        {user?.notifications && user?.notifications.filter(n => !n.read).length > 0 && (
+                                            <span className="absolute top-3 right-3 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                                                {user.notifications.filter(n => !n.read).length}
+                                            </span>
+                                        )}
+                                    </button>
                                 </div>
                             </div>
+
                             {activeTab === "profile" && (
                                 <form onSubmit={handleProfileUpdate} className="mt-8">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -387,6 +443,84 @@ const UserProfile = () => {
                                         </div>
                                     </div>
                                 </form>
+                            )}
+
+                            {activeTab === "notifications" && (
+                                <div className="mt-8">
+                                    <h3 className="text-lg font-medium text-gray-900 mb-4">System Notifications</h3>
+
+                                    {(!user?.notifications || user.notifications.length === 0) ? (
+                                        <div className="text-center p-8 bg-gray-50 rounded-lg">
+                                            <div className="text-gray-400 text-4xl mb-3">
+                                                <i className="fas fa-bell-slash"></i>
+                                            </div>
+                                            <p className="text-gray-600">You don't have any notifications</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-4">
+                                            {user.notifications.map((notification, index) => (
+                                                <div
+                                                    key={notification.id || index}
+                                                    className={`p-4 rounded-lg border ${notification.type === 'report' ? 'border-yellow-200 bg-yellow-50' :
+                                                            notification.type === 'ban' ? 'border-red-200 bg-red-50' :
+                                                                notification.type === 'block' ? 'border-orange-200 bg-orange-50' :
+                                                                    notification.type === 'message_deleted' ? 'border-purple-200 bg-purple-50' :
+                                                                        'border-blue-200 bg-blue-50'
+                                                        } ${!notification.read ? 'ring-2 ring-blue-300' : ''}`}
+                                                >
+                                                    <div className="flex items-start">
+                                                        <div className={`p-2 rounded-full ${notification.type === 'report' ? 'bg-yellow-200 text-yellow-700' :
+                                                                notification.type === 'ban' ? 'bg-red-200 text-red-700' :
+                                                                    notification.type === 'block' ? 'bg-orange-200 text-orange-700' :
+                                                                        notification.type === 'message_deleted' ? 'bg-purple-200 text-purple-700' :
+                                                                            'bg-blue-200 text-blue-700'
+                                                            } mr-4`}>
+                                                            <i className={`fas ${notification.type === 'report' ? 'fa-flag' :
+                                                                    notification.type === 'ban' ? 'fa-user-slash' :
+                                                                        notification.type === 'block' ? 'fa-ban' :
+                                                                            notification.type === 'message_deleted' ? 'fa-trash-alt' :
+                                                                                'fa-bell'
+                                                                } text-lg`}></i>
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <h4 className="font-medium text-gray-900">{notification.title}</h4>
+                                                            <p className="text-gray-700 mt-1">{notification.message}</p>
+
+                                                            <div className="flex justify-between items-center mt-2 text-sm">
+                                                                <span className="text-gray-500">
+                                                                    {new Date(notification.createdAt).toLocaleString()}
+                                                                </span>
+
+                                                                {notification.adminName && (
+                                                                    <span className="text-gray-500">
+                                                                        Action by: {notification.adminName}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+
+                                                            {!notification.read && (
+                                                                <button
+                                                                    className="mt-2 text-blue-600 text-sm hover:underline"
+                                                                    onClick={() => {
+                                                                        // Mark as read
+                                                                        if (user.notifications) {
+                                                                            user.notifications = user.notifications.map(n =>
+                                                                                n.id === notification.id ? { ...n, read: true } : n
+                                                                            );
+                                                                            setUser({ ...user });
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    Mark as read
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             )}
                         </div>
                     </div>
