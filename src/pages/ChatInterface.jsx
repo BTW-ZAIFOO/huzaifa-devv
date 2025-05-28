@@ -13,7 +13,7 @@ import { getAvatarByRole } from "../utils/avatarUtils";
 import { containsInappropriateContent, extractInappropriateWords } from "../utils/moderationUtils";
 
 const ChatInterface = ({ adminMode }) => {
-    const { isAuthenticated, user, isAdmin } = useContext(Context);
+    const { isAuthenticated, user, isAdmin, setUser } = useContext(Context);
     const [selectedUser, setSelectedUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -212,13 +212,6 @@ const ChatInterface = ({ adminMode }) => {
     }, [user]);
 
     const addUserNotification = (notification) => {
-        if (!user || !user.notifications) {
-            if (!user) {
-                user = {};
-            }
-            user.notifications = [];
-        }
-
         const newNotification = {
             id: `notification-${Date.now()}`,
             createdAt: new Date().toISOString(),
@@ -226,7 +219,15 @@ const ChatInterface = ({ adminMode }) => {
             ...notification
         };
 
-        user.notifications.unshift(newNotification);
+        const updatedUser = { ...user };
+
+        if (!updatedUser.notifications) {
+            updatedUser.notifications = [];
+        }
+
+        updatedUser.notifications = [newNotification, ...(updatedUser.notifications || [])];
+
+        setUser(updatedUser);
 
         const toastType = notification.severity === 'critical' ? toast.error :
             notification.severity === 'high' ? toast.warning :
