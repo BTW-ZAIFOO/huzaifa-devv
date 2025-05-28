@@ -38,15 +38,15 @@ const AdminRegister = () => {
     };
 
     return (
-        <div className="py-2.5">
+        <div className="py-4 font-sans">
             <form className="w-full" onSubmit={handleSubmit(handleAdminRegister)}>
                 <div className="space-y-6">
-                    <div className="space-y-1.5">
+                    <div className="space-y-2">
                         <label htmlFor="name" className="block text-sm font-medium text-white">
                             Full Name
                         </label>
                         <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                                 <i className="far fa-user text-purple-300"></i>
                             </div>
                             <input
@@ -54,16 +54,16 @@ const AdminRegister = () => {
                                 type="text"
                                 placeholder="Enter your name"
                                 {...register("name", { required: true })}
-                                className="pl-10 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:bg-white/20 focus:outline-none"
+                                className="pl-11 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:bg-white/20 focus:outline-none font-normal text-base shadow-sm"
                             />
                         </div>
                     </div>
-                    <div className="space-y-1.5">
+                    <div className="space-y-2">
                         <label htmlFor="email" className="block text-sm font-medium text-white">
                             Email Address
                         </label>
                         <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                                 <i className="far fa-envelope text-purple-300"></i>
                             </div>
                             <input
@@ -71,16 +71,16 @@ const AdminRegister = () => {
                                 type="email"
                                 placeholder="Enter your email"
                                 {...register("email", { required: true })}
-                                className="pl-10 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:bg-white/20 focus:outline-none"
+                                className="pl-11 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:bg-white/20 focus:outline-none font-normal text-base shadow-sm"
                             />
                         </div>
                     </div>
-                    <div className="space-y-1.5">
+                    <div className="space-y-2">
                         <label htmlFor="password" className="block text-sm font-medium text-white">
                             Password
                         </label>
                         <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                                 <i className="fas fa-lock text-purple-300"></i>
                             </div>
                             <input
@@ -88,17 +88,17 @@ const AdminRegister = () => {
                                 type="password"
                                 placeholder="Create a password"
                                 {...register("password", { required: true })}
-                                className="pl-10 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:bg-white/20 focus:outline-none"
+                                className="pl-11 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:bg-white/20 focus:outline-none font-normal text-base shadow-sm"
                             />
                         </div>
                     </div>
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white border-none rounded-xl text-base font-medium cursor-pointer transition-all duration-300 shadow-lg hover:shadow-pink-500/30 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center"
+                        className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white border-none rounded-xl text-base font-medium cursor-pointer transition-all duration-300 shadow-lg hover:shadow-pink-500/30 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center"
                     >
                         {isLoading ? (
-                            <span className="flex items-center justify-center gap-2">
+                            <span className="flex items-center justify-center gap-2.5">
                                 <svg
                                     className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
                                     xmlns="http://www.w3.org/2000/svg"
@@ -123,7 +123,7 @@ const AdminRegister = () => {
                             </span>
                         ) : (
                             <>
-                                <i className="fas fa-user-shield mr-2"></i>
+                                <i className="fas fa-user-shield mr-2.5"></i>
                                 Create Admin Account
                             </>
                         )}

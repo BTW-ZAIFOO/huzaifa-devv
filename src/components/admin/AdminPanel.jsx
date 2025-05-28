@@ -566,10 +566,6 @@ const AdminPanel = ({ users: initialUsers }) => {
         toast.success(`User ${user.name} has been reported for "${customReason}"`);
     };
 
-    const getUserActivity = (userId) => {
-        return userActivities[userId] || [];
-    };
-
     const renderAdminNav = () => (
         <div className="bg-white border-b border-gray-200 px-6 py-2.5 flex items-center space-x-4">
             <button

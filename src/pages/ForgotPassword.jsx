@@ -29,13 +29,13 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-blue-600 to-indigo-600 p-5">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-blue-600 to-indigo-600 p-5 font-sans">
       <div className="bg-white/95 p-10 rounded-2xl shadow-xl max-w-md w-full text-center relative overflow-hidden">
         <div className="before:absolute before:top-0 before:left-0 before:w-full before:h-[5px] before:bg-gradient-to-r before:from-blue-600 before:to-purple-600">
           <h2 className="text-2xl font-semibold mb-4 text-slate-800">
             Forgot Password
           </h2>
-          <p className="text-base text-gray-500 mb-8 leading-relaxed">
+          <p className="text-base text-gray-600 mb-8 leading-relaxed font-normal">
             Enter your email address and we'll send you a link to reset your
             password.
           </p>
@@ -48,7 +48,7 @@ const ForgotPassword = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="pl-12 pr-4 py-3.5 w-full border border-gray-300 rounded-lg text-base transition-all duration-300 bg-gray-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none focus:bg-white"
+                className="pl-12 pr-4 py-3.5 w-full border border-gray-300 rounded-lg text-gray-800 transition-all duration-300 bg-gray-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none focus:bg-white shadow-sm font-normal"
               />
             </div>
             <button
@@ -57,7 +57,7 @@ const ForgotPassword = () => {
               className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-none rounded-lg text-base cursor-pointer transition-all duration-300 font-medium shadow-md hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {isLoading ? (
-                <span className="flex items-center justify-center gap-2">
+                <span className="flex items-center justify-center gap-2.5">
                   <i className="fas fa-spinner animate-spin"></i> Sending...
                 </span>
               ) : (
@@ -65,7 +65,7 @@ const ForgotPassword = () => {
               )}
             </button>
           </form>
-          <div className="mt-6 text-gray-500 text-[0.95rem]">
+          <div className="mt-7 text-gray-600 text-[0.95rem] font-normal">
             <p>
               Remembered your password?{" "}
               <Link

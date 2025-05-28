@@ -17,12 +17,10 @@ const ChatWindow = ({
     const [isRecording, setIsRecording] = useState(false);
     const messagesEndRef = useRef(null);
     const [recognition, setRecognition] = useState(null);
-
     const isAdminChat = selectedUser?.role === "admin";
     const isBannedUser = selectedUser?.status === "banned";
     const isBlockedUser = selectedUser?.status === "blocked";
     const isMessageDisabled = ((isBannedUser || isBlockedUser) && !isAdmin);
-
     const { user: loggedInUser } = useContext(Context);
 
     useEffect(() => {

@@ -7,14 +7,11 @@ const ChatHeader = ({ user, toggleSidebar, sidebarOpen, notifications = [] }) =>
     const avatarUrl = user ? getAvatarByRole(user) : null;
     const { user: currentUser } = useContext(Context);
     const [showNotifications, setShowNotifications] = useState(false);
-
     const incomingNotifications = currentUser ?
         notifications.filter(n => n.sender?._id !== currentUser._id) :
         [];
-
     const systemNotifications = currentUser?.notifications || [];
     const unreadSystemNotifications = systemNotifications.filter(n => !n.read);
-
     const hasNotifications = incomingNotifications.length > 0 || unreadSystemNotifications.length > 0;
 
     const markNotificationsAsRead = () => {

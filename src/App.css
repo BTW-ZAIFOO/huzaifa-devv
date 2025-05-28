@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-/* Design System */
 :root {
   --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
   --secondary-gradient: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
@@ -21,7 +20,6 @@ body {
   background-color: #f8fafc;
 }
 
-/* Animations */
 @keyframes float {
   0% {
     transform: translateY(0px);
@@ -75,7 +73,6 @@ body {
   animation: gradient-shift 6s ease infinite;
 }
 
-/* Glass UI Effects */
 .glass-effect {
   background: var(--surface-white);
   backdrop-filter: var(--glass-blur);
@@ -92,7 +89,6 @@ body {
   box-shadow: var(--subtle-shadow);
 }
 
-/* Cards */
 .card {
   border-radius: 16px;
   box-shadow: var(--card-shadow);
@@ -104,7 +100,6 @@ body {
   box-shadow: var(--hover-shadow);
 }
 
-/* Button Styles */
 .btn-primary {
   background: var(--primary-gradient);
   color: white;
@@ -151,7 +146,6 @@ body {
   box-shadow: 0 10px 15px -3px rgba(139, 92, 246, 0.5);
 }
 
-/* Form Inputs */
 .modern-input {
   border-radius: 12px;
   border: 1px solid #e2e8f0;
@@ -167,7 +161,6 @@ body {
   outline: none;
 }
 
-/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -187,7 +180,6 @@ body {
   background: #818cf8;
 }
 
-/* Section headings */
 .section-title {
   font-size: 2.5rem;
   font-weight: 800;

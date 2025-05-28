@@ -25,7 +25,6 @@ const ChatInterface = ({ adminMode }) => {
     const [reconnectAttempt, setReconnectAttempt] = useState(0);
     const socketRef = useRef(null);
     const heartbeatRef = useRef(null);
-
     const SOCKET_URL = "http://localhost:4000";
 
     useEffect(() => {
@@ -447,6 +446,7 @@ const ChatInterface = ({ adminMode }) => {
     if (!isAuthenticated) {
         return <Navigate to="/auth" />;
     }
+    
     if (adminMode && !isAdmin) {
         return <Navigate to="/chat" />;
     }

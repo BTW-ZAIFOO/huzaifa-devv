@@ -1,4 +1,4 @@
-import React  from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -23,15 +23,15 @@ const Register = () => {
   };
 
   return (
-    <div className="py-2.5">
+    <div className="py-4 font-sans">
       <form className="w-full" onSubmit={handleSubmit(handleRegister)}>
         <div className="space-y-6">
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <label htmlFor="name" className="block text-sm font-medium text-white">
               Full Name
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                 <i className="far fa-user text-indigo-300"></i>
               </div>
               <input
@@ -40,17 +40,17 @@ const Register = () => {
                 placeholder="Enter your name"
                 required
                 {...register("name")}
-                className="pl-10 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white/20 focus:outline-none"
+                className="pl-11 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white/20 focus:outline-none font-normal text-base shadow-sm"
               />
             </div>
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <label htmlFor="register-email" className="block text-sm font-medium text-white">
               Email Address
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                 <i className="far fa-envelope text-indigo-300"></i>
               </div>
               <input
@@ -59,17 +59,17 @@ const Register = () => {
                 placeholder="Enter your email"
                 required
                 {...register("email")}
-                className="pl-10 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white/20 focus:outline-none"
+                className="pl-11 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white/20 focus:outline-none font-normal text-base shadow-sm"
               />
             </div>
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <label htmlFor="register-password" className="block text-sm font-medium text-white">
               Password
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                 <i className="fas fa-lock text-indigo-300"></i>
               </div>
               <input
@@ -78,16 +78,16 @@ const Register = () => {
                 placeholder="Create a password"
                 required
                 {...register("password")}
-                className="pl-10 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white/20 focus:outline-none"
+                className="pl-11 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white/20 focus:outline-none font-normal text-base shadow-sm"
               />
             </div>
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <p className="text-sm font-medium text-white">
               Select Verification Method
             </p>
-            <div className="mt-2 bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20">
+            <div className="mt-2 bg-white/10 backdrop-blur-md rounded-xl p-3.5 border border-white/20">
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="radio"
@@ -98,8 +98,8 @@ const Register = () => {
                   className="h-5 w-5 accent-indigo-500"
                 />
                 <div>
-                  <span className="text-white">Email Verification</span>
-                  <p className="text-white/70 text-xs mt-0.5">We'll send a verification code to your email</p>
+                  <span className="text-white font-medium">Email Verification</span>
+                  <p className="text-white/70 text-xs mt-0.5 font-normal">We'll send a verification code to your email</p>
                 </div>
               </label>
             </div>
@@ -107,9 +107,9 @@ const Register = () => {
 
           <button
             type="submit"
-            className="w-full py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white border-none rounded-xl text-base font-medium cursor-pointer transition-all duration-300 shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 flex items-center justify-center"
+            className="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white border-none rounded-xl text-base font-medium cursor-pointer transition-all duration-300 shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 flex items-center justify-center"
           >
-            <i className="fas fa-user-plus mr-2"></i>
+            <i className="fas fa-user-plus mr-2.5"></i>
             Create Account
           </button>
         </div>

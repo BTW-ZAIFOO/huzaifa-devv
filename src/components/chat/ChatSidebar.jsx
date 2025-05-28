@@ -151,7 +151,7 @@ const ChatSidebar = ({
                                                             src={avatarUrl}
                                                             alt={user.name || "User"}
                                                             className={`w-12 h-12 rounded-full object-cover border border-gray-200 shadow-sm ${user.status === "blocked" ? "opacity-75" :
-                                                                    user.status === "banned" ? "opacity-60 grayscale" : ""
+                                                                user.status === "banned" ? "opacity-60 grayscale" : ""
                                                                 }`}
                                                             onError={(e) => {
                                                                 e.target.onerror = null;
@@ -165,8 +165,8 @@ const ChatSidebar = ({
                                                         )}
                                                         <span
                                                             className={`absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full ${user.status === "online" ? "bg-green-500" :
-                                                                    user.status === "blocked" ? "bg-red-500" :
-                                                                        user.status === "banned" ? "bg-black" : "bg-gray-400"
+                                                                user.status === "blocked" ? "bg-red-500" :
+                                                                    user.status === "banned" ? "bg-black" : "bg-gray-400"
                                                                 } border-2 border-white`}
                                                         ></span>
                                                     </div>
@@ -254,6 +254,23 @@ const ChatSidebar = ({
                         </div>
                     </div>
                 )}
+
+                <div className="p-4 border-t border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+                    <button
+                        onClick={async () => {
+                            try {
+                                await axios.get('http://localhost:4000/api/v1/user/logout', { withCredentials: true });
+                                window.location.href = '/login';
+                            } catch (error) {
+                                console.error('Logout failed:', error);
+                            }
+                        }}
+                        className="w-full flex items-center justify-center gap-2 py-2.5 bg-white hover:bg-red-50 text-gray-700 hover:text-red-600 rounded-xl border border-gray-200 shadow-sm transition-colors"
+                    >
+                        <i className="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </button>
+                </div>
             </div>
         </>
     );

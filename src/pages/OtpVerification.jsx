@@ -100,7 +100,7 @@ const OtpVerification = () => {
   }
 
   return (
-    <div className="min-h-screen w-full flex justify-center items-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-5 relative overflow-hidden">
+    <div className="min-h-screen w-full flex justify-center items-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-5 relative overflow-hidden font-sans">
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
         <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-float"></div>
         <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-float" style={{ animationDelay: "2s" }}></div>
@@ -116,12 +116,12 @@ const OtpVerification = () => {
           <h1 className="text-2xl font-bold mb-2 text-white text-center">
             OTP Verification
           </h1>
-          <p className="text-white/70 mb-8 leading-relaxed text-center">
+          <p className="text-white/80 mb-8 leading-relaxed text-center font-normal">
             We've sent a 5-digit code to{" "}
             <span className="font-medium text-white">{email}</span>
           </p>
           <form onSubmit={handleOtpVerification} className="space-y-8">
-            <div className="flex justify-between gap-2">
+            <div className="flex justify-between gap-2.5">
               {otp.map((digit, index) => (
                 <input
                   id={`otp-input-${index}`}
@@ -131,7 +131,7 @@ const OtpVerification = () => {
                   value={digit}
                   onChange={(e) => handleChange(e.target.value, index)}
                   onKeyDown={(e) => handleKeyDown(e, index)}
-                  className="w-12 h-14 text-2xl text-center bg-white/10 backdrop-blur-md border border-white/20 rounded-lg outline-none transition-all text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white/20"
+                  className="w-12 h-14 text-2xl text-center bg-white/10 backdrop-blur-md border border-white/20 rounded-lg outline-none transition-all text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white/20 shadow-sm"
                 />
               ))}
             </div>
@@ -140,12 +140,12 @@ const OtpVerification = () => {
                 <button
                   type="button"
                   onClick={handleResendOtp}
-                  className="text-indigo-200 hover:text-white transition-colors text-sm"
+                  className="text-indigo-200 hover:text-white transition-colors text-sm font-medium"
                 >
-                  <i className="fas fa-redo-alt mr-1"></i> Resend OTP
+                  <i className="fas fa-redo-alt mr-1.5"></i> Resend OTP
                 </button>
               ) : (
-                <p className="text-white/70 text-sm">
+                <p className="text-white/80 text-sm">
                   Resend OTP in <span className="font-medium text-white">{countdown}s</span>
                 </p>
               )}
@@ -156,7 +156,7 @@ const OtpVerification = () => {
               className="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white border-none rounded-xl text-base cursor-pointer transition-all duration-300 font-medium shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center"
             >
               {isLoading ? (
-                <span className="flex items-center justify-center gap-2">
+                <span className="flex items-center justify-center gap-2.5">
                   <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -165,7 +165,7 @@ const OtpVerification = () => {
                 </span>
               ) : (
                 <>
-                  <i className="fas fa-shield-check mr-2"></i>
+                  <i className="fas fa-shield-check mr-2.5"></i>
                   Verify OTP
                 </>
               )}

@@ -6,6 +6,9 @@ import { toast } from "react-toastify";
 const UserProfile = () => {
     const { isAuthenticated, user, setUser } = useContext(Context);
     const [loading, setLoading] = useState(false);
+    const [avatarPreview, setAvatarPreview] = useState(null);
+    const [activeTab, setActiveTab] = useState("profile");
+
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -17,8 +20,6 @@ const UserProfile = () => {
         confirmPassword: "",
         avatar: null
     });
-    const [avatarPreview, setAvatarPreview] = useState(null);
-    const [activeTab, setActiveTab] = useState("profile");
 
     useEffect(() => {
         if (user) {

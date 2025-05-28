@@ -62,15 +62,15 @@ const AdminLogin = () => {
     );
 
     return (
-        <div className="py-2.5">
+        <div className="py-4 font-sans">
             <form className="w-full" onSubmit={handleSubmit(handleAdminLogin)}>
                 <div className="space-y-6">
-                    <div className="space-y-1.5">
+                    <div className="space-y-2">
                         <label htmlFor="email" className="block text-sm font-medium text-white">
                             Admin Email
                         </label>
                         <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                                 <i className="far fa-envelope text-purple-300"></i>
                             </div>
                             <input
@@ -79,17 +79,17 @@ const AdminLogin = () => {
                                 placeholder="Enter admin email"
                                 required
                                 {...register("email")}
-                                className="pl-10 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:bg-white/20 focus:outline-none"
+                                className="pl-11 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:bg-white/20 focus:outline-none font-normal text-base shadow-sm"
                             />
                         </div>
                     </div>
 
-                    <div className="space-y-1.5">
+                    <div className="space-y-2">
                         <label htmlFor="password" className="block text-sm font-medium text-white">
                             Password
                         </label>
                         <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                                 <i className="fas fa-lock text-purple-300"></i>
                             </div>
                             <input
@@ -98,13 +98,13 @@ const AdminLogin = () => {
                                 placeholder="Enter admin password"
                                 required
                                 {...register("password")}
-                                className="pl-10 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:bg-white/20 focus:outline-none"
+                                className="pl-11 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:bg-white/20 focus:outline-none font-normal text-base shadow-sm"
                             />
                         </div>
                     </div>
 
                     <div className="text-right text-sm">
-                        <Link to="/password/forgot" className="text-pink-300 hover:text-white transition-colors">
+                        <Link to="/password/forgot" className="text-pink-300 hover:text-white transition-colors font-medium">
                             Forgot password?
                         </Link>
                     </div>
@@ -112,11 +112,11 @@ const AdminLogin = () => {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white border-none rounded-xl text-base font-medium cursor-pointer transition-all duration-300 shadow-lg hover:shadow-pink-500/30 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center"
+                        className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white border-none rounded-xl text-base font-medium cursor-pointer transition-all duration-300 shadow-lg hover:shadow-pink-500/30 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center"
                     >
                         {isLoading ? <LoadingSpinner /> : (
                             <>
-                                <i className="fas fa-shield-alt mr-2"></i>
+                                <i className="fas fa-shield-alt mr-2.5"></i>
                                 Admin Sign In
                             </>
                         )}
@@ -124,10 +124,10 @@ const AdminLogin = () => {
                 </div>
 
                 <div className="mt-8 text-white/70 text-center">
-                    <p>
+                    <p className="font-normal">
                         Admin access only. For moderation and system management.
                         <br />
-                        <span className="text-xs text-white/50 mt-1 block">
+                        <span className="text-xs text-white/50 mt-1.5 block">
                             With full message moderation and user ban capabilities
                         </span>
                     </p>
