@@ -11,7 +11,6 @@ const AdminRegister = () => {
     const {
         register,
         handleSubmit,
-        formState: { errors },
     } = useForm();
 
     const handleAdminRegister = async (data) => {

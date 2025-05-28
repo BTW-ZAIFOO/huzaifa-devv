@@ -261,8 +261,8 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
                                                                 alt={user.name}
                                                             />
                                                             <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white ${user.status === 'online' ? 'bg-green-500' :
-                                                                    user.status === 'blocked' ? 'bg-red-500' :
-                                                                        user.status === 'banned' ? 'bg-black' : 'bg-gray-400'
+                                                                user.status === 'blocked' ? 'bg-red-500' :
+                                                                    user.status === 'banned' ? 'bg-black' : 'bg-gray-400'
                                                                 }`}></span>
                                                         </div>
                                                         <div className="ml-4">

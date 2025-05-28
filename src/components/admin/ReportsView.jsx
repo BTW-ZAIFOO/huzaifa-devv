@@ -269,7 +269,6 @@ const ReportsView = ({
                                         </div>
                                     )}
 
-                                    {/* Actions */}
                                     {selectedReport.status === 'pending' && (
                                         <div className="pt-4 border-t border-gray-200">
                                             <div className="flex flex-wrap gap-2">

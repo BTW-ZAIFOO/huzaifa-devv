@@ -1,9 +1,7 @@
-import React, { useContext } from "react";
-import { Context } from "../main";
+import React from "react";
 import { Link } from "react-router-dom";
 
 const Hero = () => {
-  const { user } = useContext(Context);
 
   const buttonBaseClass =
     "py-3 px-6 rounded-xl font-medium text-base transition-all flex items-center gap-2 hover:-translate-y-1 hover:shadow-lg";

@@ -310,9 +310,9 @@ const ChatWindow = ({
     return (
         <div className="flex-1 flex flex-col bg-white/90 rounded-br-3xl shadow-inner">
             <div className={`py-5 px-8 border-b flex justify-between items-center shadow-sm rounded-tr-3xl ${isAdminChat ? 'bg-purple-50' :
-                    isBannedUser ? 'bg-red-50' :
-                        isBlockedUser ? 'bg-yellow-50' :
-                            'bg-gradient-to-r from-blue-50 to-indigo-50'
+                isBannedUser ? 'bg-red-50' :
+                    isBlockedUser ? 'bg-yellow-50' :
+                        'bg-gradient-to-r from-blue-50 to-indigo-50'
                 }`}>
                 <div className="flex items-center">
                     {isAdminChat ? (
@@ -327,9 +327,9 @@ const ChatWindow = ({
                                 className="w-12 h-12 rounded-full object-cover mr-3 border-2 border-white shadow-sm"
                             />
                             <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${selectedUser.status === "online" ? "bg-green-500" :
-                                    selectedUser.status === "banned" ? "bg-black" :
-                                        selectedUser.status === "blocked" ? "bg-red-500" :
-                                            "bg-gray-400"
+                                selectedUser.status === "banned" ? "bg-black" :
+                                    selectedUser.status === "blocked" ? "bg-red-500" :
+                                        "bg-gray-400"
                                 }`}></span>
                         </div>
                     )}
@@ -364,9 +364,9 @@ const ChatWindow = ({
             </div>
             <div
                 className={`flex-1 p-8 overflow-y-auto ${isAdminChat ? 'bg-purple-50/30' :
-                        isBannedUser ? 'bg-red-50/20' :
-                            isBlockedUser ? 'bg-yellow-50/20' :
-                                'bg-gradient-to-br from-gray-50 to-blue-50/30'
+                    isBannedUser ? 'bg-red-50/20' :
+                        isBlockedUser ? 'bg-yellow-50/20' :
+                            'bg-gradient-to-br from-gray-50 to-blue-50/30'
                     }`}
                 style={{
                     scrollBehavior: 'smooth',

@@ -122,7 +122,6 @@ const ChatHeader = ({ user, toggleSidebar, sidebarOpen, notifications = [] }) =>
                                                 key={`sys-${index}`}
                                                 className={`p-3 ${notification.read ? "bg-white" : "bg-gray-50"} hover:bg-gray-100 border-l-4 ${badgeClass} mb-1 cursor-pointer`}
                                                 onClick={() => {
-                                                    // Mark this notification as read
                                                     if (currentUser && currentUser.notifications) {
                                                         currentUser.notifications = currentUser.notifications.map(n =>
                                                             n.id === notification.id ? { ...n, read: true } : n
@@ -193,15 +192,6 @@ const ChatHeader = ({ user, toggleSidebar, sidebarOpen, notifications = [] }) =>
                         )}
                     </div>
 
-                    <Link to="/chat" className="text-gray-600 hover:text-blue-600 relative">
-                        <i className="fas fa-comments text-xl"></i>
-                        <span className="hidden md:inline ml-2">Chat</span>
-                        {incomingNotifications.length > 0 && (
-                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                {incomingNotifications.length > 9 ? '9+' : incomingNotifications.length}
-                            </span>
-                        )}
-                    </Link>
                     <Link to="/" className="text-gray-600 hover:text-blue-600 relative">
                         <i className="fas fa-home text-xl"></i>
                         <span className="hidden md:inline ml-2">Home</span>

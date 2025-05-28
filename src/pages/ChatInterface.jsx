@@ -85,7 +85,6 @@ const ChatInterface = ({ adminMode }) => {
             });
 
             socketRef.current.on("error", (error) => {
-                console.error("Socket error from server:", error);
                 toast.error("Server error: " + (error.message || "Unknown error"));
             });
         };
@@ -188,7 +187,6 @@ const ChatInterface = ({ adminMode }) => {
 
                     if (currentUserFromApi.status === 'banned' &&
                         !currentUserFromApi.notifications?.some(n => n.type === 'ban')) {
-
                         const reason = currentUserFromApi.bannedReason || "Multiple violations";
                         addUserNotification({
                             type: 'ban',
@@ -200,7 +198,6 @@ const ChatInterface = ({ adminMode }) => {
 
                     if (currentUserFromApi.status === 'blocked' &&
                         !currentUserFromApi.notifications?.some(n => n.type === 'block')) {
-
                         const reason = currentUserFromApi.blockReason || "Temporary suspension";
                         addUserNotification({
                             type: 'block',

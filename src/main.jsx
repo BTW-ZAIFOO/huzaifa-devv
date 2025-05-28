@@ -15,7 +15,6 @@ const AppWrapper = () => {
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
-
   const isAdmin = useMemo(() => user?.role === "admin", [user]);
 
   return (
