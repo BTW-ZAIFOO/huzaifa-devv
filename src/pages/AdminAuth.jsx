@@ -3,14 +3,18 @@ import { Navigate, Link } from "react-router-dom";
 import { Context } from "../main";
 import AdminLogin from "../components/admin/AdminLogin";
 import AdminRegister from "../components/admin/AdminRegister";
+import LoadingScreen from "../components/LoadingScreen";
 
 const AdminAuth = () => {
-    const { isAuthenticated, isAdmin } = useContext(Context);
+    const { isAuthenticated, isAdmin, isAuthLoading } = useContext(Context);
     const [isLogin, setIsLogin] = useState(true);
 
-    if (isAuthenticated) {
+    // Only redirect after auth check is complete
+    if (isAuthenticated && !isAuthLoading) {
         return <Navigate to={isAdmin ? "/admin" : "/chat"} />;
     }
+
+    if (isAuthLoading) return <LoadingScreen />;
 
     return (
         <div className="min-h-screen w-full flex justify-center items-center bg-gradient-to-br from-purple-600 via-violet-500 to-indigo-500 p-5 relative overflow-hidden">

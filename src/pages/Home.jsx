@@ -3,9 +3,10 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { Context } from "../main";
 import { Link, Navigate } from "react-router-dom";
+import LoadingScreen from "../components/LoadingScreen";
 
 const Home = () => {
-  const { isAuthenticated, setIsAuthenticated, setUser, user, isAdmin } = useContext(Context);
+  const { isAuthenticated, setIsAuthenticated, setUser, user, isAdmin, isAuthLoading } = useContext(Context);
 
   const logout = async () => {
     try {
@@ -21,7 +22,11 @@ const Home = () => {
     }
   };
 
-  if (!isAuthenticated) return <Navigate to="/auth" />;
+  if (isAuthLoading) return <LoadingScreen />;
+  // Only redirect after auth check is complete
+  if (!isAuthLoading && !isAuthenticated) {
+    return <Navigate to="/auth" />;
+  }
 
   return (
     <>

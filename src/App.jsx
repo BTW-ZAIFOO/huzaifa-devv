@@ -14,7 +14,10 @@ import OtpVerification from "./pages/OtpVerification";
 import "./App.css";
 
 const AdminRoute = ({ children }) => {
-  const { isAuthenticated, isAdmin } = useContext(Context);
+  const { isAuthenticated, isAdmin, isAuthLoading } = useContext(Context);
+
+  // During loading, render the children to avoid UI flashing
+  if (isAuthLoading) return children;
 
   if (!isAuthenticated) return <Navigate to="/admin/auth" />;
   if (!isAdmin) return <Navigate to="/chat" />;
@@ -23,12 +26,16 @@ const AdminRoute = ({ children }) => {
 };
 
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated } = useContext(Context);
+  const { isAuthenticated, isAuthLoading } = useContext(Context);
+
+  // During loading, render the children to avoid UI flashing
+  if (isAuthLoading) return children;
+
   return isAuthenticated ? children : <Navigate to="/auth" />;
 };
 
 const App = () => {
-  const { setIsAuthenticated, setUser, isAdmin } = useContext(Context);
+  const { setIsAuthenticated, setUser, isAdmin, setIsAuthLoading } = useContext(Context);
 
   useEffect(() => {
     const link = document.createElement('link');
@@ -36,26 +43,35 @@ const App = () => {
     link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css';
     document.head.appendChild(link);
 
+    // Flag to prevent multiple redirects
+    let isMounted = true;
+
     (async () => {
+      setIsAuthLoading(true);
       try {
         const res = await axios.get("http://localhost:4000/api/v1/user/me", { withCredentials: true });
-        setUser(res.data.user);
-        setIsAuthenticated(true);
-
-        if (window.location.pathname === "/") {
-          window.location.href = res.data.user.role === "admin" ? "/admin" : "/chat";
+        if (isMounted) {
+          setUser(res.data.user);
+          setIsAuthenticated(true);
         }
       } catch (err) {
-        setUser(null);
-        setIsAuthenticated(false);
+        if (isMounted) {
+          setUser(null);
+          setIsAuthenticated(false);
+        }
+      } finally {
+        if (isMounted) {
+          setIsAuthLoading(false);
+        }
       }
     })();
 
     return () => {
+      isMounted = false;
       const link = document.querySelector('link[href*="font-awesome"]');
-      if (link) document.head.removeChild(link);
+      if (link) document.head.appendChild(link);
     };
-  }, [setIsAuthenticated, setUser]);
+  }, [setIsAuthenticated, setUser, setIsAuthLoading]);
 
   return (
     <Router>

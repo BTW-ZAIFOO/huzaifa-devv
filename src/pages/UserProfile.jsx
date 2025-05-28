@@ -2,9 +2,10 @@ import React, { useContext, useState, useEffect } from "react";
 import { Context } from "../main";
 import { Navigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import LoadingScreen from "../components/LoadingScreen";
 
 const UserProfile = () => {
-    const { isAuthenticated, user, setUser } = useContext(Context);
+    const { isAuthenticated, isAuthLoading, user, setUser } = useContext(Context);
     const [loading, setLoading] = useState(false);
     const [avatarPreview, setAvatarPreview] = useState(null);
     const [activeTab, setActiveTab] = useState("profile");
@@ -106,7 +107,11 @@ const UserProfile = () => {
         }
     };
 
-    if (!isAuthenticated) return <Navigate to="/auth" />;
+    if (isAuthLoading) return <LoadingScreen />;
+    // Only redirect after auth check is complete
+    if (!isAuthLoading && !isAuthenticated) {
+        return <Navigate to="/auth" />;
+    }
 
     const renderStatusBadge = () => {
         if (user?.status === 'banned') {

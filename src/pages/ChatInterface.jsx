@@ -11,9 +11,10 @@ import ChatHeader from "../components/chat/ChatHeader";
 import ConnectionStatus from "../components/chat/ConnectionStatus";
 import { getAvatarByRole } from "../utils/avatarUtils";
 import { containsInappropriateContent, extractInappropriateWords } from "../utils/moderationUtils";
+import LoadingScreen from "../components/LoadingScreen";
 
 const ChatInterface = ({ adminMode }) => {
-    const { isAuthenticated, user, isAdmin, setUser } = useContext(Context);
+    const { isAuthenticated, user, isAdmin, setUser, isAuthLoading } = useContext(Context);
     const [selectedUser, setSelectedUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -443,12 +444,19 @@ const ChatInterface = ({ adminMode }) => {
 
     const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
-    if (!isAuthenticated) {
-        return <Navigate to="/auth" />;
+    if (isAuthLoading) {
+        return <LoadingScreen />;
     }
-    
-    if (adminMode && !isAdmin) {
-        return <Navigate to="/chat" />;
+
+    // Don't redirect during auth loading to prevent UI flash
+    if (!isAuthLoading) {
+        if (!isAuthenticated) {
+            return <Navigate to="/auth" />;
+        }
+
+        if (adminMode && !isAdmin) {
+            return <Navigate to="/chat" />;
+        }
     }
 
     if (adminMode && isAdmin) {

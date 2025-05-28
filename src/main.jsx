@@ -9,12 +9,15 @@ export const Context = createContext({
   user: null,
   setUser: () => { },
   isAdmin: false,
+  isAuthLoading: true,
+  setIsAuthLoading: () => { },
 });
 
 const AppWrapper = () => {
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const isAdmin = useMemo(() => user?.role === "admin", [user]);
 
   return (
@@ -24,7 +27,9 @@ const AppWrapper = () => {
         setIsAuthenticated,
         user,
         setUser,
-        isAdmin
+        isAdmin,
+        isAuthLoading,
+        setIsAuthLoading
       }}
     >
       <ErrorBoundary>
