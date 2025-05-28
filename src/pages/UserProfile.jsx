@@ -58,7 +58,6 @@ const UserProfile = () => {
         setLoading(true);
 
         try {
-            // Simulate API call
             setTimeout(() => {
                 setUser(prev => ({
                     ...prev,
@@ -89,7 +88,6 @@ const UserProfile = () => {
         }
 
         try {
-            // Simulate API call
             setTimeout(() => {
                 toast.success("Password updated successfully");
                 setFormData(prev => ({
@@ -109,7 +107,6 @@ const UserProfile = () => {
 
     if (!isAuthenticated) return <Navigate to="/auth" />;
 
-    // Helper function for rendering status badges
     const renderStatusBadge = () => {
         if (user?.status === 'banned') {
             return (
@@ -136,7 +133,6 @@ const UserProfile = () => {
         return null;
     };
 
-    // Helper function for notification UI
     const getNotificationStyles = (type) => {
         switch (type) {
             case 'report': return { bg: 'bg-yellow-50', border: 'border-yellow-200', icon: 'bg-yellow-200 text-yellow-700', iconClass: 'fa-flag' };

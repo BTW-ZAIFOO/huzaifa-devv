@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import { useForm } from "react-hook-form";
-import { Context } from "../main";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -27,7 +26,6 @@ const Register = () => {
     <div className="py-2.5">
       <form className="w-full" onSubmit={handleSubmit(handleRegister)}>
         <div className="space-y-6">
-          {/* Name field */}
           <div className="space-y-1.5">
             <label htmlFor="name" className="block text-sm font-medium text-white">
               Full Name
@@ -47,7 +45,6 @@ const Register = () => {
             </div>
           </div>
 
-          {/* Email field */}
           <div className="space-y-1.5">
             <label htmlFor="register-email" className="block text-sm font-medium text-white">
               Email Address
@@ -67,7 +64,6 @@ const Register = () => {
             </div>
           </div>
 
-          {/* Password field */}
           <div className="space-y-1.5">
             <label htmlFor="register-password" className="block text-sm font-medium text-white">
               Password
@@ -87,7 +83,6 @@ const Register = () => {
             </div>
           </div>
 
-          {/* Verification Method */}
           <div className="space-y-1.5">
             <p className="text-sm font-medium text-white">
               Select Verification Method
@@ -110,7 +105,6 @@ const Register = () => {
             </div>
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             className="w-full py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white border-none rounded-xl text-base font-medium cursor-pointer transition-all duration-300 shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 flex items-center justify-center"

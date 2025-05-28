@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 
-const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBanUser, flaggedUsers = {}, userActivities = {} }) => {
+const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBanUser, flaggedUsers = {} }) => {
     const [filter, setFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState('name');
@@ -232,7 +232,6 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
                                             ...(flaggedUsers[userId] || [])
                                         ];
 
-                                        // Define border style based on user status
                                         const getBorderStyle = () => {
                                             if (user.isReported) return "border-l-4 border-yellow-500 ";
                                             if (user.status === 'banned') return "border-l-4 border-black ";
@@ -241,7 +240,6 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
                                             return "";
                                         };
 
-                                        // Define status badge style
                                         const getStatusStyle = () => {
                                             const styles = {
                                                 'online': 'bg-green-100 text-green-800',

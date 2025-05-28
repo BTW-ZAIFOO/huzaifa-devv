@@ -106,7 +106,6 @@ const AdminPanel = ({ users: initialUsers }) => {
                 ...prev
             ]);
 
-            // Simulated messages for UI demonstration
             const simulatedMessages = [
                 {
                     _id: "msg1",
