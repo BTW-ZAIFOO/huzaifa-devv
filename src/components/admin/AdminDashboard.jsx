@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
+import { generateAvatar, getAvatarByRole } from '../../utils/avatarUtils';
 
 const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBanUser, flaggedUsers = {} }) => {
     const [filter, setFilter] = useState('all');
@@ -230,6 +231,7 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
                                             ...(flaggedUsers[userId] || [])
                                         ];
 
+                                        const avatar = getAvatarByRole(user);
                                         const getBorderStyle = () => {
                                             if (user.isReported) return "border-l-4 border-yellow-500 ";
                                             if (user.status === 'banned') return "border-l-4 border-black ";
@@ -253,11 +255,20 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="flex items-center">
                                                         <div className="flex-shrink-0 h-10 w-10 relative">
-                                                            <img
-                                                                className="h-10 w-10 rounded-full object-cover border border-gray-200"
-                                                                src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`}
-                                                                alt={user.name}
-                                                            />
+                                                            {avatar.imageUrl ? (
+                                                                <img
+                                                                    className="h-10 w-10 rounded-full object-cover border border-gray-200"
+                                                                    src={avatar.imageUrl}
+                                                                    alt={user.name}
+                                                                />
+                                                            ) : (
+                                                                <div
+                                                                    className="h-10 w-10 rounded-full border border-gray-200 flex items-center justify-center text-white text-sm"
+                                                                    style={{ backgroundColor: avatar.color }}
+                                                                >
+                                                                    {avatar.initials}
+                                                                </div>
+                                                            )}
                                                             <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white ${user.status === 'online' ? 'bg-green-500' :
                                                                 user.status === 'blocked' ? 'bg-red-500' :
                                                                     user.status === 'banned' ? 'bg-black' : 'bg-gray-400'

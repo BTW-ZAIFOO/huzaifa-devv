@@ -4,35 +4,67 @@ const prepareUserData = (user, defaultName) => {
     return { userId, userName };
 };
 
+// Color palette for avatars - vibrant, accessible colors
+const colorPalette = [
+    "#4f46e5", "#7c3aed", "#c026d3", "#db2777", "#e11d48",
+    "#ea580c", "#d97706", "#65a30d", "#16a34a", "#0d9488",
+    "#0891b2", "#0284c7", "#2563eb", "#4338ca", "#6d28d9"
+];
+
+// Get user initials (up to 2 characters)
+export const getUserInitials = (name) => {
+    if (!name) return '?';
+
+    const nameParts = name.split(/\s+/);
+    if (nameParts.length === 1) {
+        return nameParts[0].charAt(0).toUpperCase();
+    }
+
+    return (nameParts[0].charAt(0) + nameParts[nameParts.length - 1].charAt(0)).toUpperCase();
+};
+
+// Get deterministic color based on ID
+export const getAvatarColor = (id, name) => {
+    if (!id && !name) return colorPalette[0];
+
+    // Use id or hash name to pick a color
+    const stringToHash = id?.toString() || name;
+    let hash = 0;
+    for (let i = 0; i < stringToHash.length; i++) {
+        hash = stringToHash.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    // Ensure positive number
+    hash = Math.abs(hash);
+    return colorPalette[hash % colorPalette.length];
+};
+
 export const generateAvatar = (user) => {
-    if (!user) return "https://api.dicebear.com/7.x/avataaars/svg?seed=fallback";
-    if (user?.avatar) return user.avatar;
+    if (!user) return { color: colorPalette[0], initials: '?' };
+    if (user?.avatar) return { imageUrl: user.avatar };
 
     const { userId, userName } = prepareUserData(user, "User");
-    const seed = `${userName.replace(/\s+/g, '')}-${userId}`;
 
-    const avatarTypes = [
-        `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`,
-        `https://api.dicebear.com/7.x/bottts/svg?seed=${seed}`,
-        `https://api.dicebear.com/7.x/adventurer/svg?seed=${seed}`,
-        `https://api.dicebear.com/7.x/micah/svg?seed=${seed}`,
-        `https://api.dicebear.com/7.x/personas/svg?seed=${seed}`,
-    ];
-
-    return avatarTypes[parseInt(userId.toString().slice(-1)) % avatarTypes.length];
+    return {
+        color: getAvatarColor(userId, userName),
+        initials: getUserInitials(userName)
+    };
 };
 
 export const generateAdminAvatar = (user) => {
-    if (!user) return "https://api.dicebear.com/7.x/bottts/svg?seed=admin&backgroundColor=purple";
-    if (user?.avatar) return user.avatar;
+    if (!user) return { color: "#9333ea", initials: 'A' }; // Purple for admins
+    if (user?.avatar) return { imageUrl: user.avatar };
 
     const { userId, userName } = prepareUserData(user, "Admin");
-    const adminSeed = `admin-${userName.replace(/\s+/g, '')}-${userId}`;
 
-    return `https://api.dicebear.com/7.x/bottts/svg?seed=${adminSeed}&backgroundColor=purple`;
+    // Always use purple variant for admins
+    return {
+        color: "#9333ea", // Use consistent purple for admins
+        initials: getUserInitials(userName)
+    };
 };
 
 export const getAvatarByRole = (user) => {
-    if (!user) return "https://api.dicebear.com/7.x/avataaars/svg?seed=fallback";
+    if (!user) return { color: colorPalette[0], initials: '?' };
     return user.role === "admin" ? generateAdminAvatar(user) : generateAvatar(user);
 };

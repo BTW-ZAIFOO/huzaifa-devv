@@ -4,7 +4,7 @@ import { getAvatarByRole } from "../../utils/avatarUtils";
 import { Context } from "../../main";
 
 const ChatHeader = ({ user, toggleSidebar, sidebarOpen, notifications = [] }) => {
-    const avatarUrl = user ? getAvatarByRole(user) : null;
+    const avatar = user ? getAvatarByRole(user) : null;
     const { user: currentUser } = useContext(Context);
     const [showNotifications, setShowNotifications] = useState(false);
     const incomingNotifications = currentUser ?
@@ -194,13 +194,18 @@ const ChatHeader = ({ user, toggleSidebar, sidebarOpen, notifications = [] }) =>
                         <span className="hidden md:inline ml-2">Home</span>
                     </Link>
                     <Link to="/profile" className="flex items-center gap-2 text-gray-600 hover:text-blue-600">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white overflow-hidden shadow-sm relative">
-                            {avatarUrl ? (
-                                <img src={avatarUrl} alt={user?.name || "User"} className="w-full h-full object-cover" />
-                            ) : (
-                                <span className="font-medium text-sm">{user?.name?.charAt(0) || "?"}</span>
-                            )}
-                        </div>
+                        {avatar?.imageUrl ? (
+                            <div className="w-8 h-8 rounded-full overflow-hidden shadow-sm">
+                                <img src={avatar.imageUrl} alt={user?.name || "User"} className="w-full h-full object-cover" />
+                            </div>
+                        ) : (
+                            <div
+                                className="w-8 h-8 rounded-full flex items-center justify-center text-white overflow-hidden shadow-sm"
+                                style={{ backgroundColor: avatar?.color || "#4f46e5" }}
+                            >
+                                <span className="font-medium text-sm">{avatar?.initials || user?.name?.charAt(0) || "?"}</span>
+                            </div>
+                        )}
                         <span className="hidden md:inline">{user?.name || "User"}</span>
                     </Link>
                 </div>

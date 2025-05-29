@@ -131,7 +131,7 @@ const ChatSidebar = ({
                                         const userId = user._id?.toString() || user.id?.toString();
                                         const selectedId = selectedUser?._id?.toString() || selectedUser?.id?.toString();
                                         const userNotifications = notifications.filter(n => n.sender?._id === userId);
-                                        const avatarUrl = user.role === "admin" ? generateAdminAvatar(user) : generateAvatar(user);
+                                        const avatar = user.role === "admin" ? generateAdminAvatar(user) : generateAvatar(user);
                                         const isSelected = selectedId === userId;
 
                                         let borderClass = "";
@@ -147,17 +147,28 @@ const ChatSidebar = ({
                                                     onClick={() => onSelectUser(user)}
                                                 >
                                                     <div className="relative">
-                                                        <img
-                                                            src={avatarUrl}
-                                                            alt={user.name || "User"}
-                                                            className={`w-12 h-12 rounded-full object-cover border border-gray-200 shadow-sm ${user.status === "blocked" ? "opacity-75" :
-                                                                user.status === "banned" ? "opacity-60 grayscale" : ""
-                                                                }`}
-                                                            onError={(e) => {
-                                                                e.target.onerror = null;
-                                                                e.target.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=fallback";
-                                                            }}
-                                                        />
+                                                        {avatar.imageUrl ? (
+                                                            <img
+                                                                src={avatar.imageUrl}
+                                                                alt={user.name || "User"}
+                                                                className={`w-12 h-12 rounded-full object-cover border border-gray-200 shadow-sm ${user.status === "blocked" ? "opacity-75" :
+                                                                    user.status === "banned" ? "opacity-60 grayscale" : ""
+                                                                    }`}
+                                                                onError={(e) => {
+                                                                    e.target.onerror = null;
+                                                                    e.target.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=fallback";
+                                                                }}
+                                                            />
+                                                        ) : (
+                                                            <div
+                                                                className={`w-12 h-12 rounded-full border border-gray-200 shadow-sm flex items-center justify-center text-white font-medium text-lg ${user.status === "blocked" ? "opacity-75" :
+                                                                    user.status === "banned" ? "opacity-60 grayscale" : ""
+                                                                    }`}
+                                                                style={{ backgroundColor: avatar.color }}
+                                                            >
+                                                                {avatar.initials}
+                                                            </div>
+                                                        )}
                                                         {userNotifications.length > 0 && (
                                                             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 min-w-5 px-1 flex items-center justify-center">
                                                                 {userNotifications.length > 9 ? '9+' : userNotifications.length}

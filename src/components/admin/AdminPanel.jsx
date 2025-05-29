@@ -8,6 +8,7 @@ import ReportsView from "./ReportsView";
 import { Context } from "../../main";
 import { extractInappropriateWords, containsInappropriateContent } from "../../utils/moderationUtils";
 import io from "socket.io-client";
+import { getAvatarByRole, generateAvatar, generateAdminAvatar } from "../../utils/avatarUtils";
 
 const AdminPanel = ({ users: initialUsers }) => {
     const [selectedUser, setSelectedUser] = useState(null);
@@ -843,6 +844,124 @@ const AdminPanel = ({ users: initialUsers }) => {
         toast.info(`Report marked as ignored`);
     };
 
+    const renderMessageQueue = () => {
+        if (messageQueue.length === 0) {
+            return (
+                <div className="text-center py-20 bg-white rounded-lg shadow-sm">
+                    <div className="text-gray-400 text-5xl mb-4">
+                        <i className="far fa-comment-alt"></i>
+                    </div>
+                    <h3 className="text-xl font-medium text-gray-700">No messages in queue</h3>
+                    <p className="text-gray-500 mt-2">New messages will appear here in real-time</p>
+                </div>
+            );
+        } else {
+            return (
+                <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                            <tr>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Message</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                            {messageQueue.map((message) => {
+                                const hasFlaggedContent = containsInappropriateContent(message.content);
+                                const flaggedWords = hasFlaggedContent ? extractInappropriateWords(message.content) : [];
+                                const avatar = generateAvatar(message.sender);
+
+                                return (
+                                    <tr key={message._id} className={hasFlaggedContent ? "bg-red-50" : ""}>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="flex items-center">
+                                                <div className="flex-shrink-0 h-10 w-10 relative">
+                                                    {avatar.imageUrl ? (
+                                                        <img
+                                                            src={avatar.imageUrl}
+                                                            alt={message.sender.name}
+                                                            className="h-10 w-10 rounded-full"
+                                                        />
+                                                    ) : (
+                                                        <div
+                                                            className="h-10 w-10 rounded-full flex items-center justify-center text-white font-medium"
+                                                            style={{ backgroundColor: avatar.color }}
+                                                        >
+                                                            {avatar.initials}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="ml-4">
+                                                    <div className="text-sm font-medium text-gray-900">{message.sender.name}</div>
+                                                    <div className="text-xs text-gray-500">{message.sender._id}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="text-sm text-gray-900">
+                                                {hasFlaggedContent ? (
+                                                    <div>
+                                                        {message.content.split(' ').map((word, i) => {
+                                                            const isFlagged = flaggedWords.includes(word.toLowerCase());
+                                                            return (
+                                                                <span key={i} className={isFlagged ? "bg-red-200 text-red-800 px-1 rounded mx-1" : "mx-1"}>
+                                                                    {word}
+                                                                </span>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                ) : (
+                                                    message.content
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {new Date(message.createdAt).toLocaleTimeString()}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            {hasFlaggedContent ? (
+                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                                    Flagged
+                                                </span>
+                                            ) : (
+                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                    Clean
+                                                </span>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                                            <button
+                                                onClick={() => handleViewUserChat(message.sender)}
+                                                className="text-indigo-600 hover:text-indigo-900"
+                                            >
+                                                <i className="fas fa-comments"></i>
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteMessage(message._id)}
+                                                className="text-red-600 hover:text-red-900"
+                                            >
+                                                <i className="fas fa-trash"></i>
+                                            </button>
+                                            <button
+                                                onClick={() => handleBlockUserAction(message.sender._id, "block", "Inappropriate message content")}
+                                                className="text-yellow-600 hover:text-yellow-900"
+                                            >
+                                                <i className="fas fa-ban"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+            );
+        }
+    };
+
     return (
         <>
             <div className="flex-1 flex flex-col h-full">
@@ -997,107 +1116,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                                     </div>
                                 </div>
 
-                                {messageQueue.length === 0 ? (
-                                    <div className="text-center py-20 bg-white rounded-lg shadow-sm">
-                                        <div className="text-gray-400 text-5xl mb-4">
-                                            <i className="far fa-comment-alt"></i>
-                                        </div>
-                                        <h3 className="text-xl font-medium text-gray-700">No messages in queue</h3>
-                                        <p className="text-gray-500 mt-2">New messages will appear here in real-time</p>
-                                    </div>
-                                ) : (
-                                    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                                        <table className="min-w-full divide-y divide-gray-200">
-                                            <thead className="bg-gray-50">
-                                                <tr>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Message</th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="bg-white divide-y divide-gray-200">
-                                                {messageQueue.map((message) => {
-                                                    const hasFlaggedContent = containsInappropriateContent(message.content);
-                                                    const flaggedWords = hasFlaggedContent ? extractInappropriateWords(message.content) : [];
-
-                                                    return (
-                                                        <tr key={message._id} className={hasFlaggedContent ? "bg-red-50" : ""}>
-                                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                                <div className="flex items-center">
-                                                                    <div className="flex-shrink-0 h-10 w-10 relative">
-                                                                        <img
-                                                                            src={message.sender.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(message.sender.name)}`}
-                                                                            alt={message.sender.name}
-                                                                            className="h-10 w-10 rounded-full"
-                                                                        />
-                                                                    </div>
-                                                                    <div className="ml-4">
-                                                                        <div className="text-sm font-medium text-gray-900">{message.sender.name}</div>
-                                                                        <div className="text-xs text-gray-500">{message.sender._id}</div>
-                                                                    </div>
-                                                                </div>
-                                                            </td>
-                                                            <td className="px-6 py-4">
-                                                                <div className="text-sm text-gray-900">
-                                                                    {hasFlaggedContent ? (
-                                                                        <div>
-                                                                            {message.content.split(' ').map((word, i) => {
-                                                                                const isFlagged = flaggedWords.includes(word.toLowerCase());
-                                                                                return (
-                                                                                    <span key={i} className={isFlagged ? "bg-red-200 text-red-800 px-1 rounded mx-1" : "mx-1"}>
-                                                                                        {word}
-                                                                                    </span>
-                                                                                );
-                                                                            })}
-                                                                        </div>
-                                                                    ) : (
-                                                                        message.content
-                                                                    )}
-                                                                </div>
-                                                            </td>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                                {new Date(message.createdAt).toLocaleTimeString()}
-                                                            </td>
-                                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                                {hasFlaggedContent ? (
-                                                                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                                                        Flagged
-                                                                    </span>
-                                                                ) : (
-                                                                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                                        Clean
-                                                                    </span>
-                                                                )}
-                                                            </td>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                                                <button
-                                                                    onClick={() => handleViewUserChat(message.sender)}
-                                                                    className="text-indigo-600 hover:text-indigo-900"
-                                                                >
-                                                                    <i className="fas fa-comments"></i>
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => handleDeleteMessage(message._id)}
-                                                                    className="text-red-600 hover:text-red-900"
-                                                                >
-                                                                    <i className="fas fa-trash"></i>
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => handleBlockUserAction(message.sender._id, "block", "Inappropriate message content")}
-                                                                    className="text-yellow-600 hover:text-yellow-900"
-                                                                >
-                                                                    <i className="fas fa-ban"></i>
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    );
-                                                })}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                )}
+                                {renderMessageQueue()}
                             </div>
                         )}
                         {activeView === "settings" && renderSettingsView()}

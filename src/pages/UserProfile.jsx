@@ -35,7 +35,10 @@ const UserProfile = () => {
                 avatar: null
             });
 
-            setAvatarPreview(user.avatar || "https://ui-avatars.com/api/?name=" + encodeURIComponent(user.name) + "&background=random");
+            // Use user.avatar directly if it exists, otherwise don't set avatarPreview
+            if (user.avatar) {
+                setAvatarPreview(user.avatar);
+            }
         }
     }, [user]);
 
@@ -107,7 +110,7 @@ const UserProfile = () => {
     };
 
     if (isAuthLoading) return <LoadingScreen />;
-    
+
     if (!isAuthLoading && !isAuthenticated) {
         return <Navigate to="/auth" />;
     }
@@ -162,7 +165,7 @@ const UserProfile = () => {
                             <a href="/admin" className="text-gray-600 hover:text-blue-600"><i className="fas fa-shield-alt"></i> Admin</a>
                         )}
                         <div className="flex items-center gap-2 text-blue-600">
-                            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden">
+                            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center overflow-hidden text-white">
                                 {avatarPreview ?
                                     <img src={avatarPreview} alt={user?.name} className="w-full h-full object-cover" /> :
                                     <span className="font-medium text-sm">{user?.name?.charAt(0)}</span>
@@ -177,10 +180,10 @@ const UserProfile = () => {
                         <div className="relative h-48 bg-gradient-to-r from-blue-600 to-indigo-600">
                             <div className="absolute -bottom-16 left-8">
                                 <div className="relative">
-                                    <div className="w-32 h-32 rounded-full border-4 border-white overflow-hidden bg-white">
+                                    <div className="w-32 h-32 rounded-full border-4 border-white overflow-hidden bg-blue-600 text-white flex items-center justify-center text-4xl font-bold">
                                         {avatarPreview ?
                                             <img src={avatarPreview} alt={user?.name} className="w-full h-full object-cover" /> :
-                                            <div className="w-full h-full flex items-center justify-center bg-blue-100 text-blue-600 text-4xl font-bold">{user?.name?.charAt(0)}</div>
+                                            <span>{user?.name?.charAt(0)}</span>
                                         }
                                     </div>
                                     <label htmlFor="avatar-upload" className="absolute bottom-0 right-0 bg-gray-900 bg-opacity-80 rounded-full p-2 text-white cursor-pointer hover:bg-opacity-100">

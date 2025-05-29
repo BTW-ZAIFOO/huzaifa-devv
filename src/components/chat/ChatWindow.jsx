@@ -12,7 +12,7 @@ const ChatWindow = ({
     isAdmin,
     onDeleteMessage,
     onBanUser,
-    onCloseChat, 
+    onCloseChat,
     flaggedWords = []
 }) => {
     const [messageText, setMessageText] = useState("");
@@ -219,6 +219,9 @@ const ChatWindow = ({
         const isMessageFlagged = message.flagged || containsInappropriateContent(messageText, flaggedWords);
         const isDeleted = message.isDeleted;
 
+        // Get avatar data for the sender
+        const avatar = generateAvatar(message.sender);
+
         return (
             <div
                 key={message._id || message.id}
@@ -226,11 +229,18 @@ const ChatWindow = ({
             >
                 <div className={`max-w-[75%] flex ${isMe ? "flex-row-reverse" : ""}`}>
                     {!isMe && (
-                        <img
-                            src={generateAvatar(selectedUser)}
-                            alt={selectedUser.name}
-                            className="w-10 h-10 rounded-full mt-1 mr-2 border-2 border-white shadow-sm"
-                        />
+                        avatar.imageUrl ?
+                            <img
+                                src={avatar.imageUrl}
+                                alt={selectedUser.name}
+                                className="w-10 h-10 rounded-full mt-1 mr-2 border-2 border-white shadow-sm"
+                            /> :
+                            <div
+                                className="w-10 h-10 rounded-full mt-1 mr-2 border-2 border-white shadow-sm flex items-center justify-center text-white text-sm font-medium"
+                                style={{ backgroundColor: avatar.color }}
+                            >
+                                {avatar.initials}
+                            </div>
                     )}
 
                     <div
@@ -321,11 +331,23 @@ const ChatWindow = ({
                         </div>
                     ) : (
                         <div className="relative">
-                            <img
-                                src={generateAvatar(selectedUser)}
-                                alt={selectedUser.name}
-                                className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover mr-3 border-2 border-white shadow-sm"
-                            />
+                            {(() => {
+                                const avatar = generateAvatar(selectedUser);
+                                return avatar.imageUrl ? (
+                                    <img
+                                        src={avatar.imageUrl}
+                                        alt={selectedUser.name}
+                                        className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover mr-3 border-2 border-white shadow-sm"
+                                    />
+                                ) : (
+                                    <div
+                                        className="w-10 h-10 md:w-12 md:h-12 rounded-full mr-3 border-2 border-white shadow-sm flex items-center justify-center text-white font-medium"
+                                        style={{ backgroundColor: avatar.color }}
+                                    >
+                                        {avatar.initials}
+                                    </div>
+                                );
+                            })()}
                             <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${selectedUser.status === "online" ? "bg-green-500" :
                                 selectedUser.status === "banned" ? "bg-black" :
                                     selectedUser.status === "blocked" ? "bg-red-500" :

@@ -11,6 +11,8 @@ const UserProfile = ({ user, onClose, isAdmin, onBlockUser, onReportUser }) => {
         }
     };
 
+    const avatar = getAvatarByRole(user);
+
     return (
         <>
             <div className="w-[300px] bg-white border-l border-gray-200 shadow-lg absolute right-0 top-0 bottom-0 z-20 transform transition-transform duration-300 overflow-y-auto">
@@ -26,15 +28,20 @@ const UserProfile = ({ user, onClose, isAdmin, onBlockUser, onReportUser }) => {
                     </div>
                     <div className="flex flex-col items-center">
                         <div className="relative mb-4">
-                            <img
-                                src={user ? getAvatarByRole(user) : "https://api.dicebear.com/7.x/avataaars/svg?seed=fallback"}
-                                alt={user?.name || "User"}
-                                className="w-24 h-24 rounded-full object-cover border-4 border-blue-100"
-                                onError={(e) => {
-                                    e.target.onerror = null;
-                                    e.target.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=fallback";
-                                }}
-                            />
+                            {avatar.imageUrl ? (
+                                <img
+                                    src={avatar.imageUrl}
+                                    alt={user?.name || "User"}
+                                    className="w-24 h-24 rounded-full object-cover border-4 border-blue-100"
+                                />
+                            ) : (
+                                <div
+                                    className="w-24 h-24 rounded-full border-4 border-blue-100 flex items-center justify-center text-white text-3xl font-bold"
+                                    style={{ backgroundColor: avatar.color }}
+                                >
+                                    {avatar.initials}
+                                </div>
+                            )}
                             <span className={`absolute bottom-1 right-1 w-4 h-4 rounded-full ${getStatusColor()} border-2 border-white`}></span>
                         </div>
                         <h2 className="text-xl font-semibold text-gray-800">{user.name}</h2>
