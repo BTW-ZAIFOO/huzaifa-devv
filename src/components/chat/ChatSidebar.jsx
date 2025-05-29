@@ -71,8 +71,8 @@ const ChatSidebar = ({
 
     return (
         <>
-            <div className="w-[320px] bg-white/95 border-r border-gray-200 flex flex-col h-full shadow-xl rounded-l-3xl">
-                <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-100 via-indigo-100 to-purple-100 rounded-tl-3xl">
+            <div className="w-[280px] lg:w-[320px] bg-white/95 border-r border-gray-200 flex flex-col h-full shadow-xl rounded-l-3xl">
+                <div className="p-4 lg:p-6 border-b border-gray-200 bg-gradient-to-r from-blue-100 via-indigo-100 to-purple-100 rounded-tl-3xl">
                     <h2 className="text-xl font-bold text-blue-700 mb-4 tracking-wide">
                         {isAdmin ? "User Management" : "Chats"}
                     </h2>
@@ -82,7 +82,7 @@ const ChatSidebar = ({
                             placeholder="Search users..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full py-3 pl-12 pr-4 bg-white/80 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-colors shadow"
+                            className="w-full py-2 lg:py-3 pl-12 pr-4 bg-white/80 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-colors shadow"
                         />
                         <i className="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                     </div>

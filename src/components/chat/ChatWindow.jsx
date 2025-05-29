@@ -306,15 +306,15 @@ const ChatWindow = ({
     }
 
     return (
-        <div className="flex-1 flex flex-col bg-white/90 rounded-br-3xl shadow-inner">
-            <div className={`py-5 px-8 border-b flex justify-between items-center shadow-sm rounded-tr-3xl ${isAdminChat ? 'bg-purple-50' :
+        <div className="flex-1 flex flex-col bg-white/90 rounded-br-3xl shadow-inner overflow-hidden">
+            <div className={`py-3 md:py-5 px-4 md:px-8 border-b flex justify-between items-center shadow-sm rounded-tr-3xl ${isAdminChat ? 'bg-purple-50' :
                 isBannedUser ? 'bg-red-50' :
                     isBlockedUser ? 'bg-yellow-50' :
                         'bg-gradient-to-r from-blue-50 to-indigo-50'
                 }`}>
                 <div className="flex items-center">
                     {isAdminChat ? (
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center mr-3 shadow-md">
+                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center mr-3 shadow-md">
                             <i className="fas fa-headset text-white text-lg"></i>
                         </div>
                     ) : (
@@ -322,7 +322,7 @@ const ChatWindow = ({
                             <img
                                 src={generateAvatar(selectedUser)}
                                 alt={selectedUser.name}
-                                className="w-12 h-12 rounded-full object-cover mr-3 border-2 border-white shadow-sm"
+                                className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover mr-3 border-2 border-white shadow-sm"
                             />
                             <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${selectedUser.status === "online" ? "bg-green-500" :
                                 selectedUser.status === "banned" ? "bg-black" :
@@ -332,11 +332,11 @@ const ChatWindow = ({
                         </div>
                     )}
                     <div>
-                        <h3 className="font-medium text-lg flex items-center">
+                        <h3 className="font-medium text-base md:text-lg flex items-center">
                             {selectedUser.name}
                             {renderUserStatusBadge()}
                         </h3>
-                        <span className="text-sm text-gray-500">
+                        <span className="text-xs md:text-sm text-gray-500">
                             {selectedUser.status === "online" ? (
                                 <span className="flex items-center">
                                     <span className="w-2 h-2 bg-green-500 rounded-full mr-1.5 animate-pulse"></span>
@@ -351,37 +351,37 @@ const ChatWindow = ({
                 <div className="flex items-center gap-3">
                     {!isAdminChat && (
                         <button
-                            className="p-2.5 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition-colors"
+                            className="p-2 md:p-2.5 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition-colors"
                             onClick={onViewProfile}
                             title="View Profile"
                         >
-                            <i className="far fa-user-circle text-xl"></i>
+                            <i className="far fa-user-circle text-lg md:text-xl"></i>
                         </button>
                     )}
                 </div>
             </div>
             <div
-                className={`flex-1 p-8 overflow-y-auto ${isAdminChat ? 'bg-purple-50/30' :
+                className={`flex-1 p-4 md:p-8 overflow-y-auto ${isAdminChat ? 'bg-purple-50/30' :
                     isBannedUser ? 'bg-red-50/20' :
                         isBlockedUser ? 'bg-yellow-50/20' :
                             'bg-gradient-to-br from-gray-50 to-blue-50/30'
                     }`}
                 style={{
                     scrollBehavior: 'smooth',
-                    maxHeight: 'calc(100vh - 220px)',
+                    maxHeight: 'calc(100vh - 200px)',
                     overflowY: 'auto'
                 }}
             >
                 {renderMessages()}
                 <div ref={messagesEndRef} className="h-4" />
             </div>
-            <form onSubmit={handleSendMessage} className="p-6 border-t flex items-end gap-3 bg-white/95 shadow-lg rounded-b-3xl">
+            <form onSubmit={handleSendMessage} className="p-4 md:p-6 border-t flex items-end gap-3 bg-white/95 shadow-lg rounded-b-3xl">
                 <div className="flex-1 relative">
                     <textarea
                         value={messageText}
                         onChange={(e) => setMessageText(e.target.value)}
                         placeholder={getInputPlaceholder()}
-                        className={`w-full p-4 pr-12 bg-gray-100 rounded-2xl resize-none focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-100 border border-transparent focus:border-blue-200 transition-all ${isMessageDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                        className={`w-full p-3 md:p-4 pr-12 bg-gray-100 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-100 border border-transparent focus:border-blue-200 transition-all ${isMessageDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
                         style={{ maxHeight: '120px', minHeight: '50px' }}
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' && !e.shiftKey) {

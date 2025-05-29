@@ -485,8 +485,8 @@ const ChatInterface = ({ adminMode }) => {
     }
 
     return (
-        <div className="min-h-screen h-screen w-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex flex-col">
-            <div className="flex-1 flex flex-col h-full w-full bg-white/90">
+        <div className="min-h-screen h-screen w-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex flex-col overflow-hidden">
+            <div className="flex-1 flex flex-col h-full w-full bg-white/90 overflow-hidden">
                 <ChatHeader
                     user={user}
                     toggleSidebar={toggleSidebar}
@@ -500,7 +500,7 @@ const ChatInterface = ({ adminMode }) => {
                 />
                 <div className="flex flex-1 overflow-hidden h-full w-full">
                     {(sidebarOpen || window.innerWidth > 1024) && (
-                        <div className="bg-white/95 border-r border-gray-200 shadow-lg h-full">
+                        <div className="bg-white/95 border-r border-gray-200 shadow-lg h-full z-10">
                             <ChatSidebar
                                 users={allUsers}
                                 selectedUser={selectedChat?.otherUser}
@@ -512,8 +512,8 @@ const ChatInterface = ({ adminMode }) => {
                             />
                         </div>
                     )}
-                    <div className="flex-1 flex flex-col bg-gradient-to-br from-white via-blue-50 to-indigo-50 h-full">
-                        <div className="flex-1 flex flex-col h-full">
+                    <div className="flex-1 flex flex-col bg-gradient-to-br from-white via-blue-50 to-indigo-50 h-full overflow-hidden">
+                        <div className="flex-1 flex flex-col h-full overflow-hidden">
                             {selectedChat ? (
                                 <ChatWindow
                                     selectedUser={selectedChat.otherUser}

@@ -12,8 +12,7 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
     const blockedUsers = getUserCount(user => user.status === 'blocked');
     const bannedUsers = getUserCount(user => user.status === 'banned');
     const reportedUsers = getUserCount(user => user.isReported);
-    const flaggedContent = getUserCount(user =>
-        (user.flaggedWords && user.flaggedWords.length > 0) || flaggedUsers[user._id || user.id]);
+    const flaggedContent = getUserCount(user => (user.flaggedWords && user.flaggedWords.length > 0) || flaggedUsers[user._id || user.id]);
 
     if (!users || users.length === 0) {
         return (
@@ -126,7 +125,7 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
 
     return (
         <>
-            <div className="flex-1 p-6 bg-gray-50">
+            <div className="flex-1 p-6 bg-gray-50 h-full overflow-auto">
                 <div className="mb-6">
                     <h1 className="text-2xl font-bold text-gray-800 mb-2">Admin Dashboard</h1>
                     <p className="text-gray-600">Manage users, moderate content, and monitor chat activities</p>
@@ -187,7 +186,7 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
                         />
                     ))}
                 </div>
-                <div className="bg-white rounded-lg shadow-sm p-6">
+                <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-xl font-semibold text-gray-800">User Management</h2>
                         <div className="relative">
