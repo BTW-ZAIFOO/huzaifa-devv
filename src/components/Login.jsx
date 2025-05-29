@@ -35,11 +35,12 @@ const Login = () => {
   };
 
   return (
-    <div className="py-4 font-sans">
-      <form className="w-full" onSubmit={handleSubmit(handleLogin)}>
+    <div className="py-6 px-4 font-sans max-w-md mx-auto">
+      <h2 className="text-2xl font-bold mb-6 text-black text-center">Welcome Back</h2>
+      <form className="w-full bg-none border border-white/10" onSubmit={handleSubmit(handleLogin)}>
         <div className="space-y-6">
           <div className="space-y-2">
-            <label htmlFor="email" className="block text-sm font-medium text-white">
+            <label htmlFor="email" className="block text-sm font-medium text-black">
               Email Address
             </label>
             <div className="relative">
@@ -52,12 +53,12 @@ const Login = () => {
                 placeholder="Enter your email"
                 required
                 {...register("email")}
-                className="pl-11 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white/20 focus:outline-none font-normal text-base shadow-sm"
+                className="pl-11 pr-4 py-3 h-12 w-full bg-white border border-white/20 rounded-xl text-black transition-all focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:outline-none font-normal text-base shadow-sm"
               />
             </div>
           </div>
           <div className="space-y-2">
-            <label htmlFor="password" className="block text-sm font-medium text-white">
+            <label htmlFor="password" className="block text-sm font-medium text-black">
               Password
             </label>
             <div className="relative">
@@ -70,14 +71,14 @@ const Login = () => {
                 placeholder="Enter your password"
                 required
                 {...register("password")}
-                className="pl-11 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white/20 focus:outline-none font-normal text-base shadow-sm"
+                className="pl-11 pr-4 py-3 h-12 w-full bg-white border border-white/20 rounded-xl text-black transition-all focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:outline-none font-normal text-base shadow-sm"
               />
             </div>
           </div>
           <div className="text-right text-sm">
             <Link
               to="/password/forgot"
-              className="text-indigo-300 hover:text-white transition-colors font-medium"
+              className="text-indigo-300 hover:text-black transition-colors font-medium"
             >
               Forgot your password?
             </Link>
@@ -103,10 +104,10 @@ const Login = () => {
             )}
           </button>
         </div>
-        <div className="mt-8 text-white/80 text-center font-normal">
-          <p>
+        <div className="mt-6 text-white/80 text-center font-normal">
+          <p className="text-sm text-black">
             Don't have an account?{" "}
-            <span className="toggle-signup text-indigo-300 font-medium cursor-pointer hover:text-white transition-colors">
+            <span className="toggle-signup text-indigo-300 font-medium cursor-pointer hover:text-black">
               Sign up
             </span>
           </p>

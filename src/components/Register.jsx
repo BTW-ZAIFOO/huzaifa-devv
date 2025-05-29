@@ -23,11 +23,12 @@ const Register = () => {
   };
 
   return (
-    <div className="py-4 font-sans">
-      <form className="w-full" onSubmit={handleSubmit(handleRegister)}>
+    <div className="py-6 px-4 font-sans max-w-md mx-auto">
+      <h2 className="text-2xl font-bold mb-6 text-black text-center">Create Account</h2>
+      <form className="w-full border border-white/10" onSubmit={handleSubmit(handleRegister)}>
         <div className="space-y-6">
           <div className="space-y-2">
-            <label htmlFor="name" className="block text-sm font-medium text-white">
+            <label htmlFor="name" className="block text-sm font-medium text-black">
               Full Name
             </label>
             <div className="relative">
@@ -40,13 +41,13 @@ const Register = () => {
                 placeholder="Enter your name"
                 required
                 {...register("name")}
-                className="pl-11 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white/20 focus:outline-none font-normal text-base shadow-sm"
+                className="pl-11 pr-4 py-3 h-12 w-full bg-white border border-white/20 rounded-xl text-black transition-all focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:outline-none font-normal text-base shadow-sm"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="register-email" className="block text-sm font-medium text-white">
+            <label htmlFor="register-email" className="block text-sm font-medium text-black">
               Email Address
             </label>
             <div className="relative">
@@ -59,13 +60,13 @@ const Register = () => {
                 placeholder="Enter your email"
                 required
                 {...register("email")}
-                className="pl-11 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white/20 focus:outline-none font-normal text-base shadow-sm"
+                className="pl-11 pr-4 py-3 h-12 w-full bg-white border border-white/20 rounded-xl text-black transition-all focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:outline-none font-normal text-base shadow-sm"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="register-password" className="block text-sm font-medium text-white">
+            <label htmlFor="register-password" className="block text-sm font-medium text-black">
               Password
             </label>
             <div className="relative">
@@ -78,13 +79,13 @@ const Register = () => {
                 placeholder="Create a password"
                 required
                 {...register("password")}
-                className="pl-11 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white/20 focus:outline-none font-normal text-base shadow-sm"
+                className="pl-11 pr-4 py-3 h-12 w-full bg-white border border-white/20 rounded-xl text-black transition-all focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:outline-none font-normal text-base shadow-sm"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <p className="text-sm font-medium text-white">
+            <p className="text-sm font-medium text-black">
               Select Verification Method
             </p>
             <div className="mt-2 bg-white/10 backdrop-blur-md rounded-xl p-3.5 border border-white/20">
@@ -98,8 +99,8 @@ const Register = () => {
                   className="h-5 w-5 accent-indigo-500"
                 />
                 <div>
-                  <span className="text-white font-medium">Email Verification</span>
-                  <p className="text-white/70 text-xs mt-0.5 font-normal">We'll send a verification code to your email</p>
+                  <span className="text-black font-medium">Email Verification</span>
+                  <p className="text-black text-xs mt-0.5 font-normal">We'll send a verification code to your email</p>
                 </div>
               </label>
             </div>
@@ -114,6 +115,9 @@ const Register = () => {
           </button>
         </div>
       </form>
+      <div className="text-center mt-4 text-sm">
+        <p className="text-sm text-black">Already have an account? <span className="toggle-login text-indigo-300 font-medium cursor-pointer hover:text-black">Sign in</span></p>
+      </div>
     </div>
   );
 };

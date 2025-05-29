@@ -59,7 +59,7 @@ const ResetPassword = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="pl-12 pr-4 py-3.5 w-full border border-gray-300 rounded-lg text-gray-800 transition-all duration-300 bg-gray-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none focus:bg-white font-normal shadow-sm"
+                className="pl-12 pr-4 py-3.5 w-full border border-gray-300 rounded-lg text-black transition-all duration-300 bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none font-normal shadow-sm"
               />
             </div>
             <div className="relative mb-7">
@@ -70,7 +70,7 @@ const ResetPassword = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className="pl-12 pr-4 py-3.5 w-full border border-gray-300 rounded-lg text-gray-800 transition-all duration-300 bg-gray-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none focus:bg-white font-normal shadow-sm"
+                className="pl-12 pr-4 py-3.5 w-full border border-gray-300 rounded-lg text-black transition-all duration-300 bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none font-normal shadow-sm"
               />
             </div>
             <button

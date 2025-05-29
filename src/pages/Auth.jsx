@@ -27,13 +27,13 @@ const Auth = () => {
         <div className="p-8 md:p-10">
           <div className="flex mb-10 bg-white/10 backdrop-blur-md rounded-xl relative overflow-hidden">
             <button
-              className={`w-1/2 py-4 text-base border-none cursor-pointer transition-all duration-300 font-medium z-10 relative ${isLogin ? "text-white" : "text-white/70"}`}
+              className={`w-1/2 py-4 text-base border-none cursor-pointer transition-all duration-300 font-medium z-10 relative ${isLogin ? "text-black" : "text-slate-700"}`}
               onClick={() => setIsLogin(true)}
             >
               Login
             </button>
             <button
-              className={`w-1/2 py-4 text-base border-none cursor-pointer transition-all duration-300 font-medium z-10 relative ${!isLogin ? "text-white" : "text-white/70"}`}
+              className={`w-1/2 py-4 text-base border-none cursor-pointer transition-all duration-300 font-medium z-10 relative ${!isLogin ? "text-black" : "text-slate-700"}`}
               onClick={() => setIsLogin(false)}
             >
               Register
@@ -43,10 +43,10 @@ const Auth = () => {
             ></div>
           </div>
           {isLogin ? <Login /> : <Register />}
-          <div className="mt-8 pt-6 border-t border-white/20 text-center">
+          <div className="mt-8 pt-6 border-t border-slate-700 text-center">
             <Link
               to="/admin/auth"
-              className="text-white/90 hover:text-white transition-colors text-sm flex items-center justify-center mx-auto group"
+              className="text-black transition-colors text-sm flex items-center justify-center mx-auto group"
             >
               <span className="w-8 h-8 rounded-lg bg-white/10 backdrop-blur-md flex items-center justify-center mr-2 group-hover:bg-white/20 transition-all">
                 <i className="fas fa-shield-alt"></i>

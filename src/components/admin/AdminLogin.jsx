@@ -9,7 +9,7 @@ const AdminLogin = () => {
     const { setIsAuthenticated, setUser } = useContext(Context);
     const navigateTo = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
-    const { register, handleSubmit } = useForm();
+    const { register, handleSubmit, formState: { errors } } = useForm();
 
     const handleAdminLogin = async (data) => {
         setIsLoading(true);
@@ -36,7 +36,7 @@ const AdminLogin = () => {
     };
 
     const LoadingSpinner = () => (
-        <>
+        <span className="flex items-center justify-center gap-2.5">
             <svg
                 className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
                 xmlns="http://www.w3.org/2000/svg"
@@ -58,15 +58,16 @@ const AdminLogin = () => {
                 ></path>
             </svg>
             Authenticating...
-        </>
+        </span>
     );
 
     return (
-        <div className="py-4 font-sans">
-            <form className="w-full" onSubmit={handleSubmit(handleAdminLogin)}>
+        <div className="py-6 px-4 font-sans max-w-md mx-auto">
+            <h2 className="text-2xl font-bold mb-6 text-black text-center">Admin Login</h2>
+            <form className="w-full border border-white/10" onSubmit={handleSubmit(handleAdminLogin)}>
                 <div className="space-y-6">
                     <div className="space-y-2">
-                        <label htmlFor="email" className="block text-sm font-medium text-white">
+                        <label htmlFor="email" className="block text-sm font-medium text-black">
                             Admin Email
                         </label>
                         <div className="relative">
@@ -77,15 +78,21 @@ const AdminLogin = () => {
                                 id="email"
                                 type="email"
                                 placeholder="Enter admin email"
-                                required
-                                {...register("email")}
-                                className="pl-11 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:bg-white/20 focus:outline-none font-normal text-base shadow-sm"
+                                {...register("email", {
+                                    required: "Email is required",
+                                    pattern: {
+                                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                                        message: "Invalid email address"
+                                    }
+                                })}
+                                className="pl-11 pr-4 py-3 h-12 w-full bg-white border border-white/20 rounded-xl text-black transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:outline-none font-normal text-base shadow-sm"
                             />
                         </div>
+                        {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
                     </div>
 
                     <div className="space-y-2">
-                        <label htmlFor="password" className="block text-sm font-medium text-white">
+                        <label htmlFor="password" className="block text-sm font-medium text-black">
                             Password
                         </label>
                         <div className="relative">
@@ -96,15 +103,15 @@ const AdminLogin = () => {
                                 id="password"
                                 type="password"
                                 placeholder="Enter admin password"
-                                required
-                                {...register("password")}
-                                className="pl-11 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:bg-white/20 focus:outline-none font-normal text-base shadow-sm"
+                                {...register("password", { required: "Password is required" })}
+                                className="pl-11 pr-4 py-3 h-12 w-full bg-white border border-white/20 rounded-xl text-black transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:outline-none font-normal text-base shadow-sm"
                             />
                         </div>
+                        {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
                     </div>
 
                     <div className="text-right text-sm">
-                        <Link to="/password/forgot" className="text-pink-300 hover:text-white transition-colors font-medium">
+                        <Link to="/password/forgot" className="text-pink-300 hover:text-black transition-colors font-medium">
                             Forgot password?
                         </Link>
                     </div>
@@ -123,11 +130,11 @@ const AdminLogin = () => {
                     </button>
                 </div>
 
-                <div className="mt-8 text-white/70 text-center">
-                    <p className="font-normal">
+                <div className="mt-6 text-black text-center">
+                    <p className="font-normal text-sm">
                         Admin access only. For moderation and system management.
                         <br />
-                        <span className="text-xs text-white/50 mt-1.5 block">
+                        <span className="text-xs mt-1.5 block opacity-80">
                             With full message moderation and user ban capabilities
                         </span>
                     </p>

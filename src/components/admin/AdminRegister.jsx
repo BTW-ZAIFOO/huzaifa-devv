@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 const AdminRegister = () => {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
-    const [register, handleSubmit] = useForm();
+    const { register, handleSubmit, formState: { errors } } = useForm();
 
     const handleAdminRegister = async (data) => {
         setIsLoading(true);
@@ -34,11 +34,20 @@ const AdminRegister = () => {
     };
 
     return (
-        <div className="py-4 font-sans">
-            <form className="w-full" onSubmit={handleSubmit(handleAdminRegister)}>
+        <div className="py-6 px-4 font-sans max-w-md mx-auto">
+            <h2 className="text-2xl font-bold mb-6 text-black text-center">
+                Admin Registration
+            </h2>
+            <form
+                className="w-full border border-white/10"
+                onSubmit={handleSubmit(handleAdminRegister)}
+            >
                 <div className="space-y-6">
                     <div className="space-y-2">
-                        <label htmlFor="name" className="block text-sm font-medium text-white">
+                        <label
+                            htmlFor="name"
+                            className="block text-sm font-medium text-black"
+                        >
                             Full Name
                         </label>
                         <div className="relative">
@@ -49,13 +58,23 @@ const AdminRegister = () => {
                                 id="name"
                                 type="text"
                                 placeholder="Enter your name"
-                                {...register("name", { required: true })}
-                                className="pl-11 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:bg-white/20 focus:outline-none font-normal text-base shadow-sm"
+                                {...register("name", {
+                                    required: "Name is required",
+                                    minLength: {
+                                        value: 3,
+                                        message: "Name must be at least 3 characters"
+                                    }
+                                })}
+                                className="pl-11 pr-4 py-3 h-12 w-full bg-white border border-white/20 rounded-xl text-black transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:outline-none font-normal text-base shadow-sm"
                             />
                         </div>
+                        {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
                     </div>
                     <div className="space-y-2">
-                        <label htmlFor="email" className="block text-sm font-medium text-white">
+                        <label
+                            htmlFor="email"
+                            className="block text-sm font-medium text-black"
+                        >
                             Email Address
                         </label>
                         <div className="relative">
@@ -66,13 +85,23 @@ const AdminRegister = () => {
                                 id="email"
                                 type="email"
                                 placeholder="Enter your email"
-                                {...register("email", { required: true })}
-                                className="pl-11 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:bg-white/20 focus:outline-none font-normal text-base shadow-sm"
+                                {...register("email", {
+                                    required: "Email is required",
+                                    pattern: {
+                                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                                        message: "Invalid email address"
+                                    }
+                                })}
+                                className="pl-11 pr-4 py-3 h-12 w-full bg-white border border-white/20 rounded-xl text-black transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:outline-none font-normal text-base shadow-sm"
                             />
                         </div>
+                        {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
                     </div>
                     <div className="space-y-2">
-                        <label htmlFor="password" className="block text-sm font-medium text-white">
+                        <label
+                            htmlFor="password"
+                            className="block text-sm font-medium text-black"
+                        >
                             Password
                         </label>
                         <div className="relative">
@@ -83,10 +112,17 @@ const AdminRegister = () => {
                                 id="password"
                                 type="password"
                                 placeholder="Create a password"
-                                {...register("password", { required: true })}
-                                className="pl-11 pr-4 py-3 h-12 w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:bg-white/20 focus:outline-none font-normal text-base shadow-sm"
+                                {...register("password", {
+                                    required: "Password is required",
+                                    minLength: {
+                                        value: 6,
+                                        message: "Password must be at least 6 characters"
+                                    }
+                                })}
+                                className="pl-11 pr-4 py-3 h-12 w-full bg-white border border-white/20 rounded-xl text-black transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:outline-none font-normal text-base shadow-sm"
                             />
                         </div>
+                        {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
                     </div>
                     <button
                         type="submit"
@@ -126,6 +162,9 @@ const AdminRegister = () => {
                     </button>
                 </div>
             </form>
+            <div className="text-center mt-4 text-black text-sm">
+                <p>All fields are required for admin creation</p>
+            </div>
         </div>
     );
 };

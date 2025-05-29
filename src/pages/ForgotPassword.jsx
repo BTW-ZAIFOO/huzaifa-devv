@@ -48,7 +48,7 @@ const ForgotPassword = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="pl-12 pr-4 py-3.5 w-full border border-gray-300 rounded-lg text-gray-800 transition-all duration-300 bg-gray-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none focus:bg-white shadow-sm font-normal"
+                className="pl-12 pr-4 py-3.5 w-full border border-gray-300 rounded-lg text-black transition-all duration-300 bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none shadow-sm font-normal"
               />
             </div>
             <button

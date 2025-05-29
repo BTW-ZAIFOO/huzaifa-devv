@@ -106,7 +106,7 @@ const OtpVerification = () => {
         <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-float" style={{ animationDelay: "2s" }}></div>
         <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-pink-300 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-float" style={{ animationDelay: "4s" }}></div>
       </div>
-      <div className="glass-effect w-full max-w-md rounded-3xl shadow-xl z-10 overflow-hidden">
+      <div className="bg-black/40 backdrop-blur-md w-full max-w-md rounded-3xl shadow-xl z-10 overflow-hidden border border-white/10">
         <div className="p-8 md:p-10">
           <div className="flex justify-center mb-6">
             <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center">
@@ -131,7 +131,7 @@ const OtpVerification = () => {
                   value={digit}
                   onChange={(e) => handleChange(e.target.value, index)}
                   onKeyDown={(e) => handleKeyDown(e, index)}
-                  className="w-12 h-14 text-2xl text-center bg-white/10 backdrop-blur-md border border-white/20 rounded-lg outline-none transition-all text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white/20 shadow-sm"
+                  className="w-12 h-14 text-2xl text-center bg-white border border-white/20 rounded-lg outline-none transition-all text-black focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white shadow-sm"
                 />
               ))}
             </div>
