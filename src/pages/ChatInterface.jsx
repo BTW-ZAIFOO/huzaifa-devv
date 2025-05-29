@@ -29,6 +29,23 @@ const ChatInterface = ({ adminMode }) => {
     const SOCKET_URL = "http://localhost:4000";
 
     useEffect(() => {
+        if (user) {
+            try {
+                const savedChat = localStorage.getItem(`chat_state_${user._id}`);
+                if (savedChat) {
+                    const chatData = JSON.parse(savedChat);
+                    if (chatData.selectedChat && chatData.selectedUser) {
+                        setSelectedChat(chatData.selectedChat);
+                        setSelectedUser(chatData.selectedUser);
+                    }
+                }
+            } catch (error) {
+                console.error("Error restoring chat state from localStorage:", error);
+            }
+        }
+    }, [user]);
+
+    useEffect(() => {
         if (!user) return;
 
         const setupSocket = () => {
@@ -260,6 +277,20 @@ const ChatInterface = ({ adminMode }) => {
 
             setSelectedChat(newSelectedChat);
 
+            if (user) {
+                try {
+                    localStorage.setItem(
+                        `chat_state_${user._id}`,
+                        JSON.stringify({
+                            selectedChat: newSelectedChat,
+                            selectedUser: otherUser
+                        })
+                    );
+                } catch (error) {
+                    console.error("Error saving chat state to localStorage:", error);
+                }
+            }
+
             setNotifications(prev =>
                 prev.filter(n => n.chatId !== chatRes.data.chat._id)
             );
@@ -271,7 +302,19 @@ const ChatInterface = ({ adminMode }) => {
 
             setMessages(msgRes.data.messages);
             setSelectedUser(otherUser);
-        } catch (err) { }
+        } catch (err) {
+            console.error("Error selecting user:", err);
+            toast.error("Failed to load conversation");
+        }
+    };
+
+    const clearSelectedChat = () => {
+        setSelectedChat(null);
+        setSelectedUser(null);
+        setMessages([]);
+        if (user) {
+            localStorage.removeItem(`chat_state_${user._id}`);
+        }
     };
 
     const handleSendMessage = async (messageText, isVoice = false) => {
@@ -348,7 +391,10 @@ const ChatInterface = ({ adminMode }) => {
                     { withCredentials: true }
                 );
                 setMessages(res.data.messages);
-            } catch { }
+            } catch (error) {
+                console.error("Error loading messages:", error);
+                toast.error("Failed to load conversation");
+            }
         }
     };
 
@@ -522,6 +568,7 @@ const ChatInterface = ({ adminMode }) => {
                                     isAdmin={isAdmin}
                                     onDeleteMessage={isAdmin ? handleDeleteMessage : null}
                                     onBanUser={isAdmin ? handleBanUser : null}
+                                    onCloseChat={clearSelectedChat} // Add this prop for closing chat
                                 />
                             ) : (
                                 <EmptyState setSidebarOpen={setSidebarOpen} />

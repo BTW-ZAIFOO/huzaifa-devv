@@ -11,6 +11,8 @@ const ChatWindow = ({
     onViewProfile,
     isAdmin,
     onDeleteMessage,
+    onBanUser,
+    onCloseChat, 
     flaggedWords = []
 }) => {
     const [messageText, setMessageText] = useState("");
@@ -356,6 +358,15 @@ const ChatWindow = ({
                             title="View Profile"
                         >
                             <i className="far fa-user-circle text-lg md:text-xl"></i>
+                        </button>
+                    )}
+                    {onCloseChat && (
+                        <button
+                            className="p-2 md:p-2.5 bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 transition-colors"
+                            onClick={onCloseChat}
+                            title="Close Chat"
+                        >
+                            <i className="fas fa-times text-lg md:text-xl"></i>
                         </button>
                     )}
                 </div>
