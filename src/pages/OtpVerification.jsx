@@ -8,11 +8,11 @@ const OtpVerification = () => {
   const { isAuthenticated, setIsAuthenticated, setUser } = useContext(Context);
   const { email } = useParams();
   const [searchParams] = useSearchParams();
-  const role = searchParams.get('role') || 'user';
   const [otp, setOtp] = useState(["", "", "", "", ""]);
   const [isLoading, setIsLoading] = useState(false);
   const [countdown, setCountdown] = useState(60);
   const [canResend, setCanResend] = useState(false);
+  const role = searchParams.get('role') || 'user';
 
   const handleChange = (value, index) => {
     if (!/^\d*$/.test(value)) return;

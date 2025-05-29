@@ -7,11 +7,7 @@ import { useNavigate } from "react-router-dom";
 const AdminRegister = () => {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
-
-    const {
-        register,
-        handleSubmit,
-    } = useForm();
+    const [register, handleSubmit] = useForm();
 
     const handleAdminRegister = async (data) => {
         setIsLoading(true);

@@ -7,9 +7,9 @@ import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const { setIsAuthenticated, setUser } = useContext(Context);
-  const navigateTo = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const { register, handleSubmit } = useForm();
+  const navigateTo = useNavigate();
 
   const handleLogin = async (data) => {
     setIsLoading(true);

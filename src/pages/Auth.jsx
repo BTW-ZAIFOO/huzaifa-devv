@@ -9,7 +9,6 @@ const Auth = () => {
   const { isAuthenticated, isAdmin, isAuthLoading } = useContext(Context);
   const [isLogin, setIsLogin] = useState(true);
 
-  // Only redirect after auth check is complete
   if (isAuthenticated && !isAuthLoading) {
     return <Navigate to={isAdmin ? "/admin" : "/chat"} />;
   }

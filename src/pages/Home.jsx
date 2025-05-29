@@ -23,7 +23,7 @@ const Home = () => {
   };
 
   if (isAuthLoading) return <LoadingScreen />;
-  // Only redirect after auth check is complete
+  
   if (!isAuthLoading && !isAuthenticated) {
     return <Navigate to="/auth" />;
   }

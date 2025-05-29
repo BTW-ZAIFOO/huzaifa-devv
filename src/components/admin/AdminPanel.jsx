@@ -25,7 +25,6 @@ const AdminPanel = ({ users: initialUsers }) => {
     const { user: adminUser } = useContext(Context);
     const socketRef = useRef(null);
     const SOCKET_URL = "http://localhost:4000";
-
     const [adminSettings, setAdminSettings] = useState({
         autoDeleteFlaggedContent: false,
         notifyUsersOnAction: true,

@@ -9,7 +9,6 @@ const UserProfile = () => {
     const [loading, setLoading] = useState(false);
     const [avatarPreview, setAvatarPreview] = useState(null);
     const [activeTab, setActiveTab] = useState("profile");
-
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -108,7 +107,7 @@ const UserProfile = () => {
     };
 
     if (isAuthLoading) return <LoadingScreen />;
-    // Only redirect after auth check is complete
+    
     if (!isAuthLoading && !isAuthenticated) {
         return <Navigate to="/auth" />;
     }

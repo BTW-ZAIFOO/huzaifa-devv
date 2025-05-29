@@ -6,7 +6,6 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState('name');
     const [sortDirection, setSortDirection] = useState('asc');
-
     const getUserCount = (condition) => users ? users.filter(condition).length : 0;
     const totalUsers = getUserCount(user => user.role !== 'admin');
     const onlineUsers = getUserCount(user => user.status === 'online' && user.role !== 'admin');

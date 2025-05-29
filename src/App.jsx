@@ -16,9 +16,7 @@ import "./App.css";
 const AdminRoute = ({ children }) => {
   const { isAuthenticated, isAdmin, isAuthLoading } = useContext(Context);
 
-  // During loading, render the children to avoid UI flashing
   if (isAuthLoading) return children;
-
   if (!isAuthenticated) return <Navigate to="/admin/auth" />;
   if (!isAdmin) return <Navigate to="/chat" />;
 
@@ -28,7 +26,6 @@ const AdminRoute = ({ children }) => {
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, isAuthLoading } = useContext(Context);
 
-  // During loading, render the children to avoid UI flashing
   if (isAuthLoading) return children;
 
   return isAuthenticated ? children : <Navigate to="/auth" />;
@@ -43,7 +40,6 @@ const App = () => {
     link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css';
     document.head.appendChild(link);
 
-    // Flag to prevent multiple redirects
     let isMounted = true;
 
     (async () => {

@@ -448,7 +448,6 @@ const ChatInterface = ({ adminMode }) => {
         return <LoadingScreen />;
     }
 
-    // Don't redirect during auth loading to prevent UI flash
     if (!isAuthLoading) {
         if (!isAuthenticated) {
             return <Navigate to="/auth" />;
