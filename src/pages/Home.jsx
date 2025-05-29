@@ -17,9 +17,9 @@ const Home = () => {
       toast.success(res.data.message);
       setUser(null);
       setIsAuthenticated(false);
-    } catch (err) {
+    } 
+    catch (err) {
       toast.error(err.response.data.message);
-      console.error(err);
     }
   };
 

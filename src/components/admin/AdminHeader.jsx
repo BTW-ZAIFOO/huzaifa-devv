@@ -10,7 +10,6 @@ const AdminHeader = ({ user, onLogout }) => {
             <Link to="/admin" className="text-xl font-bold flex items-center">
                 <i className="fas fa-shield-alt mr-2"></i> Admin Dashboard
             </Link>
-
             <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
                     {avatar.imageUrl ? (

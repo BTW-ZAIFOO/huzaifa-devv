@@ -40,7 +40,7 @@ const ChatInterface = ({ adminMode }) => {
                     }
                 }
             } catch (error) {
-                console.error("Error restoring chat state from localStorage:", error);
+                console.error(error);
             }
         }
     }, [user]);
@@ -49,8 +49,6 @@ const ChatInterface = ({ adminMode }) => {
         if (!user) return;
 
         const setupSocket = () => {
-            console.log(`Setting up socket connection, attempt: ${reconnectAttempt + 1}`);
-
             if (socketRef.current) {
                 socketRef.current.disconnect();
                 socketRef.current = null;
@@ -66,7 +64,6 @@ const ChatInterface = ({ adminMode }) => {
             });
 
             socketRef.current.on("connect", () => {
-                console.log("Socket connected successfully");
                 setSocketConnected(true);
                 setReconnectAttempt(0);
 
@@ -79,7 +76,6 @@ const ChatInterface = ({ adminMode }) => {
             });
 
             socketRef.current.on("disconnect", () => {
-                console.log("Socket disconnected");
                 setSocketConnected(false);
 
                 if (heartbeatRef.current) {
@@ -88,7 +84,6 @@ const ChatInterface = ({ adminMode }) => {
             });
 
             socketRef.current.on("connect_error", (error) => {
-                console.error("Socket connection error:", error);
                 setSocketConnected(false);
 
                 if (reconnectAttempt < 5) {
@@ -130,7 +125,6 @@ const ChatInterface = ({ adminMode }) => {
 
         return () => {
             if (socketRef.current) {
-                console.log("Cleaning up socket connection");
                 socketRef.current.disconnect();
                 socketRef.current = null;
             }
@@ -144,8 +138,6 @@ const ChatInterface = ({ adminMode }) => {
 
     useEffect(() => {
         if (!user || !socketConnected || !socketRef.current) return;
-
-        console.log("Joining chat rooms for user");
 
         axios.get("http://localhost:4000/api/v1/user/all", { withCredentials: true })
             .then(res => {
@@ -302,8 +294,8 @@ const ChatInterface = ({ adminMode }) => {
 
             setMessages(msgRes.data.messages);
             setSelectedUser(otherUser);
-        } catch (err) {
-            console.error("Error selecting user:", err);
+        }
+         catch (err) {
             toast.error("Failed to load conversation");
         }
     };
@@ -365,7 +357,6 @@ const ChatInterface = ({ adminMode }) => {
             ));
 
         } catch (err) {
-            console.error("Error sending message:", err);
             toast.error("Failed to send message");
 
             setMessages(prev => prev.filter((msg) => !msg.isOptimistic));
@@ -392,7 +383,6 @@ const ChatInterface = ({ adminMode }) => {
                 );
                 setMessages(res.data.messages);
             } catch (error) {
-                console.error("Error loading messages:", error);
                 toast.error("Failed to load conversation");
             }
         }
@@ -428,8 +418,8 @@ const ChatInterface = ({ adminMode }) => {
             } catch (apiError) {
                 console.error("API error when deleting message:", apiError);
             }
-        } catch (error) {
-            console.error("Error handling message deletion:", error);
+        } 
+        catch (error) {
             toast.error("Failed to delete message");
         }
     };
@@ -483,7 +473,6 @@ const ChatInterface = ({ adminMode }) => {
             }
 
         } catch (error) {
-            console.error("Error banning user:", error);
             toast.error("Failed to ban user");
         }
     };

@@ -37,16 +37,13 @@ const ChatWindow = ({
             recognitionInstance.continuous = true;
             recognitionInstance.interimResults = true;
             recognitionInstance.lang = 'en-US';
-
             recognitionInstance.onresult = (event) => {
                 const transcript = Array.from(event.results)
                     .map(result => result[0].transcript)
                     .join('');
                 setMessageText(transcript);
             };
-
             recognitionInstance.onerror = (event) => {
-                console.error("Speech recognition error", event.error);
                 toast.error("Speech recognition failed. Please try again.");
                 setIsRecording(false);
             };
@@ -218,8 +215,6 @@ const ChatWindow = ({
         const messageText = message.content || message.text || "";
         const isMessageFlagged = message.flagged || containsInappropriateContent(messageText, flaggedWords);
         const isDeleted = message.isDeleted;
-
-        // Get avatar data for the sender
         const avatar = generateAvatar(message.sender);
 
         return (

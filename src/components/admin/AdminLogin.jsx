@@ -28,9 +28,11 @@ const AdminLogin = () => {
             } else {
                 toast.error("This account doesn't have admin privileges");
             }
-        } catch (error) {
+        }
+        catch (error) {
             toast.error(error.response?.data?.message || "Invalid credentials");
-        } finally {
+        }
+        finally {
             setIsLoading(false);
         }
     };
@@ -90,7 +92,7 @@ const AdminLogin = () => {
                         </div>
                         {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
                     </div>
-
+                    
                     <div className="space-y-2">
                         <label htmlFor="password" className="block text-sm font-medium text-black">
                             Password

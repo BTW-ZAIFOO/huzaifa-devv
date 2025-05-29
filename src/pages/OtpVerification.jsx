@@ -50,7 +50,8 @@ const OtpVerification = () => {
       toast.info("A new OTP has been sent to your email");
       setCountdown(60);
       setCanResend(false);
-    } catch (error) {
+    } 
+    catch (error) {
       toast.error(error.response?.data?.message || "Failed to resend OTP");
     }
   };

@@ -36,14 +36,12 @@ const AdminPanel = ({ users: initialUsers }) => {
     useEffect(() => {
         if (!adminUser?.role === "admin") return;
 
-        console.log("Admin connecting to socket for real-time monitoring");
         socketRef.current = io(SOCKET_URL, {
             withCredentials: true,
             reconnection: true,
         });
 
         socketRef.current.on("connect", () => {
-            console.log("Admin socket connected for message monitoring");
             socketRef.current.emit("join-admin-room");
         });
 
@@ -128,8 +126,8 @@ const AdminPanel = ({ users: initialUsers }) => {
             ];
 
             setMessages(simulatedMessages);
-        } catch (error) {
-            console.error("Error loading messages:", error);
+        } 
+        catch (error) {
             toast.error("Failed to load conversation");
         }
     };
@@ -174,7 +172,6 @@ const AdminPanel = ({ users: initialUsers }) => {
             }
 
             setMessageQueue(prev => prev.filter(m => m._id !== messageId));
-
             const messageUser = users.find(u => u._id === messageToDelete.sender._id);
             if (messageUser) {
                 if (!messageUser.notifications) {
@@ -225,8 +222,8 @@ const AdminPanel = ({ users: initialUsers }) => {
             if (!isAutoDelete) {
                 toast.success("Message deleted and logged");
             }
-        } catch (error) {
-            console.error("Error deleting message:", error);
+        } 
+        catch (error) {
             toast.error("Failed to delete message");
         }
     };
@@ -263,8 +260,8 @@ const AdminPanel = ({ users: initialUsers }) => {
                 }, {
                     withCredentials: true
                 });
-            } catch (apiError) {
-                console.error("API error when banning user:", apiError);
+            } 
+            catch (apiError) {
                 toast.warning("API call failed, but proceeding with local user update");
             }
 
@@ -320,8 +317,8 @@ const AdminPanel = ({ users: initialUsers }) => {
                 setActiveView("dashboard");
                 setSelectedUser(null);
             }
-        } catch (error) {
-            console.error("Error banning user:", error);
+        }
+         catch (error) {
             toast.error("Failed to ban user");
         }
     };
@@ -395,8 +392,8 @@ const AdminPanel = ({ users: initialUsers }) => {
                     }, {
                         withCredentials: true
                     });
-                } catch (apiError) {
-                    console.error("API error when unblocking user:", apiError);
+                }
+                 catch (apiError) {
                     toast.warning("API call failed, but proceeding with local user update");
                 }
 
@@ -439,8 +436,8 @@ const AdminPanel = ({ users: initialUsers }) => {
                     }, {
                         withCredentials: true
                     });
-                } catch (apiError) {
-                    console.error("API error when unbanning user:", apiError);
+                } 
+                catch (apiError) {
                     toast.warning("API call failed, but proceeding with local user update");
                 }
 
@@ -483,8 +480,6 @@ const AdminPanel = ({ users: initialUsers }) => {
             },
             ...prev.slice(0, 99)
         ]);
-
-        console.log(`Admin activity: ${action} (${type})`);
     };
 
     const handleReportUserAction = (userId, customReason = "") => {
@@ -696,7 +691,6 @@ const AdminPanel = ({ users: initialUsers }) => {
                     </div>
                     <div>
                         <h3 className="text-lg font-medium text-gray-800 mb-4">Admin Preferences</h3>
-
                         <div className="space-y-4">
                             <div className="pt-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -767,8 +761,8 @@ const AdminPanel = ({ users: initialUsers }) => {
             setUsers(enhancedUsers);
             logAdminActivity(`Loaded ${enhancedUsers.length} users`);
             processUsersForModeration(enhancedUsers);
-        } catch (err) {
-            console.error("Error fetching users:", err);
+        } 
+        catch (err) {
             setError("Failed to load users. Please try again.");
             toast.error("Error loading users");
         } finally {

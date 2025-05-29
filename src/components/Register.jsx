@@ -17,7 +17,8 @@ const Register = () => {
 
       toast.success(response.data.message);
       navigateTo(`/otp-verification/${data.email}?role=user`);
-    } catch (error) {
+    } 
+    catch (error) {
       toast.error(error.response.data.message);
     }
   };

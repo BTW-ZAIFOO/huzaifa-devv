@@ -50,12 +50,14 @@ const App = () => {
           setUser(res.data.user);
           setIsAuthenticated(true);
         }
-      } catch (err) {
+      } 
+      catch (err) {
         if (isMounted) {
           setUser(null);
           setIsAuthenticated(false);
         }
-      } finally {
+      } 
+      finally {
         if (isMounted) {
           setIsAuthLoading(false);
         }

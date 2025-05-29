@@ -29,9 +29,11 @@ const ResetPassword = () => {
       setIsAuthenticated(true);
       setUser(res.data.user);
       window.location.href = res.data.user.role === "admin" ? "/admin" : "/chat";
-    } catch (error) {
+    } 
+    catch (error) {
       toast.error(error.response.data.message);
-    } finally {
+    } 
+    finally {
       setIsLoading(false);
     }
   };

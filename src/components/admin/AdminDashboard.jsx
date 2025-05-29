@@ -45,7 +45,6 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
         };
 
         if (!filterConditions[filter]) return false;
-
         if (searchTerm) {
             const term = searchTerm.toLowerCase();
             return (
