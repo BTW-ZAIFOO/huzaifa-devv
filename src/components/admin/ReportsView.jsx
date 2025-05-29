@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { generateAvatar } from '../../utils/avatarUtils';
 
 const ReportsView = ({
     reports,
@@ -51,37 +50,6 @@ const ReportsView = ({
         }
 
         setSelectedReport(null);
-    };
-
-    const renderUserInfo = (user) => {
-        if (!user) return null;
-
-        const avatar = generateAvatar(user);
-
-        return (
-            <div className="flex items-center">
-                <div className="mr-3">
-                    {avatar.imageUrl ? (
-                        <img
-                            src={avatar.imageUrl}
-                            alt={user.name}
-                            className="w-10 h-10 rounded-full border border-gray-200"
-                        />
-                    ) : (
-                        <div
-                            className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-white font-medium"
-                            style={{ backgroundColor: avatar.color }}
-                        >
-                            {avatar.initials}
-                        </div>
-                    )}
-                </div>
-                <div>
-                    <div className="font-medium">{user.name}</div>
-                    <div className="text-xs text-gray-500">{user.email || user.id}</div>
-                </div>
-            </div>
-        );
     };
 
     return (

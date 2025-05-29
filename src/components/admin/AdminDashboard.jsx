@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { generateAvatar, getAvatarByRole } from '../../utils/avatarUtils';
+import { getAvatarByRole } from '../../utils/avatarUtils';
 
 const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBanUser, flaggedUsers = {} }) => {
     const [filter, setFilter] = useState('all');

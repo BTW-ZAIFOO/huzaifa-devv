@@ -35,7 +35,6 @@ const UserProfile = () => {
                 avatar: null
             });
 
-            // Use user.avatar directly if it exists, otherwise don't set avatarPreview
             if (user.avatar) {
                 setAvatarPreview(user.avatar);
             }

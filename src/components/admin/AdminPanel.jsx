@@ -8,7 +8,7 @@ import ReportsView from "./ReportsView";
 import { Context } from "../../main";
 import { extractInappropriateWords, containsInappropriateContent } from "../../utils/moderationUtils";
 import io from "socket.io-client";
-import { getAvatarByRole, generateAvatar, generateAdminAvatar } from "../../utils/avatarUtils";
+import { generateAvatar } from "../../utils/avatarUtils";
 
 const AdminPanel = ({ users: initialUsers }) => {
     const [selectedUser, setSelectedUser] = useState(null);

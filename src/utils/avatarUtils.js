@@ -4,14 +4,12 @@ const prepareUserData = (user, defaultName) => {
     return { userId, userName };
 };
 
-// Color palette for avatars - vibrant, accessible colors
 const colorPalette = [
     "#4f46e5", "#7c3aed", "#c026d3", "#db2777", "#e11d48",
     "#ea580c", "#d97706", "#65a30d", "#16a34a", "#0d9488",
     "#0891b2", "#0284c7", "#2563eb", "#4338ca", "#6d28d9"
 ];
 
-// Get user initials (up to 2 characters)
 export const getUserInitials = (name) => {
     if (!name) return '?';
 
@@ -23,18 +21,15 @@ export const getUserInitials = (name) => {
     return (nameParts[0].charAt(0) + nameParts[nameParts.length - 1].charAt(0)).toUpperCase();
 };
 
-// Get deterministic color based on ID
 export const getAvatarColor = (id, name) => {
     if (!id && !name) return colorPalette[0];
 
-    // Use id or hash name to pick a color
     const stringToHash = id?.toString() || name;
     let hash = 0;
     for (let i = 0; i < stringToHash.length; i++) {
         hash = stringToHash.charCodeAt(i) + ((hash << 5) - hash);
     }
 
-    // Ensure positive number
     hash = Math.abs(hash);
     return colorPalette[hash % colorPalette.length];
 };
@@ -52,14 +47,13 @@ export const generateAvatar = (user) => {
 };
 
 export const generateAdminAvatar = (user) => {
-    if (!user) return { color: "#9333ea", initials: 'A' }; // Purple for admins
+    if (!user) return { color: "#9333ea", initials: 'A' }; 
     if (user?.avatar) return { imageUrl: user.avatar };
 
-    const { userId, userName } = prepareUserData(user, "Admin");
+    const { userName } = prepareUserData(user, "Admin");
 
-    // Always use purple variant for admins
     return {
-        color: "#9333ea", // Use consistent purple for admins
+        color: "#9333ea", 
         initials: getUserInitials(userName)
     };
 };
