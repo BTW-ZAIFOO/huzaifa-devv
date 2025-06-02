@@ -26,10 +26,10 @@ const AdminRegister = () => {
 
             toast.success(response.data.message);
             navigate(`/otp-verification/${data.email}?role=admin`);
-        } 
+        }
         catch (error) {
             toast.error(error.response?.data?.message || "Registration failed");
-        } 
+        }
         finally {
             setIsLoading(false);
         }

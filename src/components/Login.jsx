@@ -27,10 +27,10 @@ const Login = () => {
       setIsAuthenticated(true);
       toast.success("Login successful!");
       navigateTo(response.data.user?.role === "admin" ? "/admin" : "/chat");
-    } 
+    }
     catch (error) {
       toast.error(error.response?.data?.message || "Login failed");
-    } 
+    }
     finally {
       setIsLoading(false);
     }

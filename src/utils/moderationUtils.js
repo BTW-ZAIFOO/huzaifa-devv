@@ -1,9 +1,26 @@
 export const INAPPROPRIATE_WORDS = [
-    "shit", "fuck", "damn", "bitch", "asshole", "cunt", "dick", "pussy",
-    "idiot", "stupid", "dumb", "retard", "moron", "bastard", "whore",
-    "slut", "hate", "kill", "murder", "suicide", "die", "attack",
-    "racist", "nigger", "chink", "spic", "kike", "fag", "nigga"
+    // English Abusive Words
+    "fuck", "fucker", "fucking", "shit", "bullshit", "piss", "pissed",
+    "bitch", "ass", "asshole", "dick", "cock", "prick", "crap", "bastard",
+    "motherfucker", "mf", "wtf", "damn", "goddamn",
+    "cunt", "pussy", "slut", "whore", "twat", "skank", "dildo", "cum", "fap",
+    "jerkoff", "jackoff", "porn", "boobs", "tits", "tit", "ahegao", "milf",
+    "idiot", "moron", "retard", "retarded", "dumb", "stupid", "loser", "clown",
+    "fatass", "ugly", "cringe", "soyboy", "simp",
+    "kill", "die", "suicide", "murder", "rape", "stab", "shoot", "abuse", "hang", "beat",
+    "n*gger", "n*gga", "ch*nk", "sp*c", "k*ke", "f*g", "tr*nny", "dyke", "cripple", "midget",
+    "fuk", "phuck", "shiit", "azzhole", "beetch", "d1ck", "c0ck", "pussee", "b!tch", "a$$",
+
+    // URDU Abusive Words
+    "chutiya", "gandu", "gaand", "bhenchod", "madarchod", "teri maa ki", "harami", "randi",
+    "lulli", "lund", "kutti", "kutte", "kanjar", "chod", "chuda", "rakhail", "behen ke lode",
+    "makhlooq", "raand", "bakchod", "bhosdike", "tatti", "tatti kha", "jhant", "jhantoo",
+    "gaand mara", "jhaant", "maderchod", "kamina", "kameeni", "bhosri", "bhosri ke", "bhen ke takkay",
+    "teri maa", "teri bahan", "maa chod", "maa ki chut", "behan ka loda", "lode ka bacha",
+    "bhen ka bhosda", "teri maa ka", "maa ki aankh", "teri behan ki chut", "teri behan ka loda"
 ];
+
+
 
 const createWordRegex = (word) => new RegExp(`\\b${word}\\b`, 'i');
 

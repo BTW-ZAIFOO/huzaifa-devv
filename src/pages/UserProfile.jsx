@@ -73,7 +73,7 @@ const UserProfile = () => {
                 toast.success("Profile updated successfully");
                 setLoading(false);
             }, 1000);
-        } 
+        }
         catch (error) {
             toast.error(error.response?.data?.message || "Failed to update profile");
             setLoading(false);
@@ -101,7 +101,7 @@ const UserProfile = () => {
                 }));
                 setLoading(false);
             }, 1000);
-        } 
+        }
         catch (error) {
             toast.error(error.response?.data?.message || "Failed to update password");
             setLoading(false);

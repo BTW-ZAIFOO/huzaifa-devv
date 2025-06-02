@@ -126,7 +126,7 @@ const AdminPanel = ({ users: initialUsers }) => {
             ];
 
             setMessages(simulatedMessages);
-        } 
+        }
         catch (error) {
             toast.error("Failed to load conversation");
         }
@@ -222,7 +222,7 @@ const AdminPanel = ({ users: initialUsers }) => {
             if (!isAutoDelete) {
                 toast.success("Message deleted and logged");
             }
-        } 
+        }
         catch (error) {
             toast.error("Failed to delete message");
         }
@@ -260,7 +260,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                 }, {
                     withCredentials: true
                 });
-            } 
+            }
             catch (apiError) {
                 toast.warning("API call failed, but proceeding with local user update");
             }
@@ -318,7 +318,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                 setSelectedUser(null);
             }
         }
-         catch (error) {
+        catch (error) {
             toast.error("Failed to ban user");
         }
     };
@@ -393,7 +393,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                         withCredentials: true
                     });
                 }
-                 catch (apiError) {
+                catch (apiError) {
                     toast.warning("API call failed, but proceeding with local user update");
                 }
 
@@ -436,7 +436,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                     }, {
                         withCredentials: true
                     });
-                } 
+                }
                 catch (apiError) {
                     toast.warning("API call failed, but proceeding with local user update");
                 }
@@ -761,7 +761,7 @@ const AdminPanel = ({ users: initialUsers }) => {
             setUsers(enhancedUsers);
             logAdminActivity(`Loaded ${enhancedUsers.length} users`);
             processUsersForModeration(enhancedUsers);
-        } 
+        }
         catch (err) {
             setError("Failed to load users. Please try again.");
             toast.error("Error loading users");

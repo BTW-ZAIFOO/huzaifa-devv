@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { Context } from "../../main";
 import { generateAvatar } from "../../utils/avatarUtils";
 import { highlightInappropriateContent, containsInappropriateContent } from "../../utils/moderationUtils";
+import axios from "axios";
 
 const ChatWindow = ({
     selectedUser,
@@ -11,6 +12,7 @@ const ChatWindow = ({
     onViewProfile,
     isAdmin,
     onDeleteMessage,
+    onDeleteOwnMessage,
     onBanUser,
     onCloseChat,
     flaggedWords = []
@@ -107,6 +109,32 @@ const ChatWindow = ({
         if (onDeleteMessage && isAdmin) {
             onDeleteMessage(messageId);
             toast.success("Message deleted successfully");
+        }
+    };
+
+    const handleDeleteOwnMessage = async (messageId, permanent = false) => {
+        if (!messageId) return;
+
+        try {
+            if (permanent) {
+                const confirmed = window.confirm("Permanently delete this message? This cannot be undone.");
+                if (!confirmed) return;
+            }
+
+            if (onDeleteOwnMessage) {
+                await onDeleteOwnMessage(messageId, permanent);
+            } else {
+                await axios({
+                    method: 'DELETE',
+                    url: `http://localhost:4000/api/v1/message/${messageId}`,
+                    data: { permanent },
+                    withCredentials: true
+                });
+                toast.success(permanent ? "Message permanently deleted" : "Message deleted");
+            }
+        } catch (error) {
+            console.error("Error deleting message:", error);
+            toast.error("Failed to delete message");
         }
     };
 
@@ -215,6 +243,7 @@ const ChatWindow = ({
         const messageText = message.content || message.text || "";
         const isMessageFlagged = message.flagged || containsInappropriateContent(messageText, flaggedWords);
         const isDeleted = message.isDeleted;
+        const isPermanentlyDeleted = message.permanentlyDeleted;
         const avatar = generateAvatar(message.sender);
 
         return (
@@ -239,7 +268,7 @@ const ChatWindow = ({
                     )}
 
                     <div
-                        className={`relative rounded-2xl px-5 py-3 shadow-sm ${isDeleted
+                        className={`relative rounded-2xl px-5 py-3 shadow-sm ${isDeleted || isPermanentlyDeleted
                             ? "bg-gray-200 text-gray-500 italic"
                             : isMe
                                 ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-tr-none"
@@ -260,7 +289,7 @@ const ChatWindow = ({
                             </span>
                         )}
 
-                        {isDeleted ? (
+                        {isDeleted || isPermanentlyDeleted ? (
                             <div className="flex items-center text-gray-500">
                                 <i className="fas fa-ban mr-2"></i>
                                 <span className="italic">{messageText}</span>
@@ -283,10 +312,11 @@ const ChatWindow = ({
                         <div className={`text-xs mt-1.5 flex items-center gap-1.5 ${isMe ? "text-blue-100" : "text-gray-500"}`}>
                             {message.time || (message.createdAt && new Date(message.createdAt).toLocaleTimeString())}
                             {isMe && renderMessageStatus(message)}
-                            {isDeleted && <span className="ml-1 italic">(deleted by admin)</span>}
+                            {isDeleted && !isPermanentlyDeleted && <span className="ml-1 italic">(deleted)</span>}
+                            {isPermanentlyDeleted && <span className="ml-1 italic">(permanently deleted)</span>}
                         </div>
 
-                        {isAdmin && onDeleteMessage && !isDeleted && (
+                        {isAdmin && onDeleteMessage && !isDeleted && !isPermanentlyDeleted && (
                             <div className="absolute -top-2 -right-2 flex gap-1">
                                 <button
                                     className="bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-all shadow"
@@ -304,6 +334,25 @@ const ChatWindow = ({
                                         <i className="fas fa-user-slash text-xs"></i>
                                     </button>
                                 )}
+                            </div>
+                        )}
+
+                        {isMe && !isDeleted && !isPermanentlyDeleted && !isAdmin && (
+                            <div className="absolute -top-2 -right-2 flex gap-1">
+                                <button
+                                    className="bg-gray-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-gray-600 transition-all shadow"
+                                    onClick={() => handleDeleteOwnMessage(message._id || message.id, false)}
+                                    title="Delete message"
+                                >
+                                    <i className="fas fa-times text-xs"></i>
+                                </button>
+                                <button
+                                    className="bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-all shadow"
+                                    onClick={() => handleDeleteOwnMessage(message._id || message.id, true)}
+                                    title="Permanently delete message"
+                                >
+                                    <i className="fas fa-trash-alt text-xs"></i>
+                                </button>
                             </div>
                         )}
                     </div>

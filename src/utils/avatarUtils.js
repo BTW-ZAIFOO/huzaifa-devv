@@ -47,13 +47,13 @@ export const generateAvatar = (user) => {
 };
 
 export const generateAdminAvatar = (user) => {
-    if (!user) return { color: "#9333ea", initials: 'A' }; 
+    if (!user) return { color: "#9333ea", initials: 'A' };
     if (user?.avatar) return { imageUrl: user.avatar };
 
     const { userName } = prepareUserData(user, "Admin");
 
     return {
-        color: "#9333ea", 
+        color: "#9333ea",
         initials: getUserInitials(userName)
     };
 };

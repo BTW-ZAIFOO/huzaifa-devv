@@ -295,7 +295,7 @@ const ChatInterface = ({ adminMode }) => {
             setMessages(msgRes.data.messages);
             setSelectedUser(otherUser);
         }
-         catch (err) {
+        catch (err) {
             toast.error("Failed to load conversation");
         }
     };
@@ -418,7 +418,7 @@ const ChatInterface = ({ adminMode }) => {
             } catch (apiError) {
                 console.error("API error when deleting message:", apiError);
             }
-        } 
+        }
         catch (error) {
             toast.error("Failed to delete message");
         }
