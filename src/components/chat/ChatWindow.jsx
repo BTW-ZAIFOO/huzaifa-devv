@@ -368,7 +368,7 @@ const ChatWindow = ({
 
     return (
         <div className="flex-1 flex flex-col bg-white/90 rounded-br-3xl shadow-inner overflow-hidden">
-            <div className={`py-3 md:py-5 px-4 md:px-8 border-b flex justify-between items-center shadow-sm rounded-tr-3xl ${isAdminChat ? 'bg-purple-50' :
+            <div className={`py-3 md:py-5 px-4 md:px-8 border-b flex justify-between items-center shadow-sm ${isAdminChat ? 'bg-purple-50' :
                 isBannedUser ? 'bg-red-50' :
                     isBlockedUser ? 'bg-yellow-50' :
                         'bg-gradient-to-r from-blue-50 to-indigo-50'
@@ -457,8 +457,8 @@ const ChatWindow = ({
                 {renderMessages()}
                 <div ref={messagesEndRef} className="h-4" />
             </div>
-            <form onSubmit={handleSendMessage} className="p-4 md:p-6 border-t flex items-end gap-3 bg-white/95 shadow-lg rounded-b-3xl">
-                <div className="flex-1 relative">
+            <form onSubmit={handleSendMessage} className="p-4 md:p-6 border-t flex items-end gap-3 bg-white/95 shadow-lg">
+                <div className="flex-1 relative items-center">
                     <textarea
                         value={messageText}
                         onChange={(e) => setMessageText(e.target.value)}
@@ -493,7 +493,7 @@ const ChatWindow = ({
                 </div>
                 <button
                     type="submit"
-                    className={`p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full flex-shrink-0 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 transition-all ${isMessageDisabled || isChatDisabled || (!messageText.trim() && !isRecording) ? "opacity-50 cursor-not-allowed" : ""
+                    className={`p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl flex-shrink-0 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 transition-all mb-2 ${isMessageDisabled || isChatDisabled || (!messageText.trim() && !isRecording) ? "opacity-50 cursor-not-allowed" : ""
                         }`}
                     disabled={isMessageDisabled || isChatDisabled || (!messageText.trim() && !isRecording)}
                 >

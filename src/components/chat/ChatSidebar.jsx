@@ -71,8 +71,8 @@ const ChatSidebar = ({
 
     return (
         <>
-            <div className="w-[280px] lg:w-[320px] bg-white/95 border-r border-gray-200 flex flex-col h-full shadow-xl rounded-l-3xl">
-                <div className="p-4 lg:p-6 border-b border-gray-200 bg-gradient-to-r from-blue-100 via-indigo-100 to-purple-100 rounded-tl-3xl">
+            <div className="w-[280px] lg:w-[320px] bg-white/95 border-r border-gray-200 flex flex-col h-full">
+                <div className="p-4 lg:p-6 border-b border-gray-200 bg-gradient-to-r from-blue-100 via-indigo-100 to-purple-200 ">
                     <h2 className="text-xl font-bold text-blue-700 mb-4 tracking-wide">
                         {isAdmin ? "User Management" : "Chats"}
                     </h2>
