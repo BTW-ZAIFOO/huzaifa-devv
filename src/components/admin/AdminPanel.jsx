@@ -205,6 +205,13 @@ const AdminPanel = ({ users: initialUsers }) => {
 
             logAdminActivity(actionMsg, isAutoDelete ? 'warning' : 'standard');
 
+            if (socketRef.current && messageToDelete.chat) {
+                socketRef.current.emit("admin-delete-message", {
+                    messageId,
+                    chatId: messageToDelete.chat
+                });
+            }
+
             if (isAutoDelete) {
                 addNewReport({
                     type: 'message',
@@ -262,7 +269,6 @@ const AdminPanel = ({ users: initialUsers }) => {
                 });
             }
             catch (apiError) {
-                toast.warning("API call failed, but proceeding with local user update");
             }
 
             if (!userToBan.notifications) {
@@ -281,6 +287,20 @@ const AdminPanel = ({ users: initialUsers }) => {
                 adminAction: true,
                 actionTimestamp: new Date().toISOString()
             });
+
+            if (socketRef.current) {
+                socketRef.current.emit("admin-ban-user", {
+                    userId,
+                    notification: {
+                        type: "ban",
+                        title: "Account Banned",
+                        message: `Your account has been banned: "${reason || 'Violation of community guidelines'}"`,
+                        reason: reason || "Violation of community guidelines",
+                        createdAt: new Date().toISOString(),
+                        adminName: adminUser.name
+                    }
+                });
+            }
 
             toast.success(`User ${userToBan.name} has been banned for ${reason}`);
             logAdminActivity(`Banned user ${userToBan.name} for: ${reason}`, 'alert');
@@ -360,7 +380,6 @@ const AdminPanel = ({ users: initialUsers }) => {
                     });
                 } catch (apiError) {
                     console.error("API error when blocking user:", apiError);
-                    toast.warning("API call failed, but proceeding with local user update");
                 }
 
                 updatedUser.notifications.unshift({
@@ -375,6 +394,20 @@ const AdminPanel = ({ users: initialUsers }) => {
                     adminAction: true,
                     actionTimestamp: new Date().toISOString()
                 });
+
+                if (socketRef.current) {
+                    socketRef.current.emit("admin-block-user", {
+                        userId,
+                        notification: {
+                            type: "block",
+                            title: "Account Blocked",
+                            message: `Your account has been temporarily blocked. Reason: ${reason || "Administrative action"}`,
+                            reason: reason || "Administrative action",
+                            createdAt: new Date().toISOString(),
+                            adminName: adminUser.name
+                        }
+                    });
+                }
 
                 updatedUser.blockReason = reason || "Administrative action";
                 updatedUser.blockedAt = new Date().toISOString();
@@ -394,7 +427,6 @@ const AdminPanel = ({ users: initialUsers }) => {
                     });
                 }
                 catch (apiError) {
-                    toast.warning("API call failed, but proceeding with local user update");
                 }
 
                 updatedUser.notifications.unshift({
@@ -438,7 +470,6 @@ const AdminPanel = ({ users: initialUsers }) => {
                     });
                 }
                 catch (apiError) {
-                    toast.warning("API call failed, but proceeding with local user update");
                 }
 
                 const updatedUser = { ...user, status: "online" };

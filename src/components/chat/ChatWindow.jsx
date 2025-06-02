@@ -26,6 +26,8 @@ const ChatWindow = ({
     const isBlockedUser = selectedUser?.status === "blocked";
     const isMessageDisabled = ((isBannedUser || isBlockedUser) && !isAdmin);
     const { user: loggedInUser } = useContext(Context);
+    const isCurrentUserBlockedOrBanned = loggedInUser?.status === "blocked" || loggedInUser?.status === "banned";
+    const isChatDisabled = isCurrentUserBlockedOrBanned;
 
     useEffect(() => {
         initializeSpeechRecognition();
@@ -139,6 +141,9 @@ const ChatWindow = ({
     };
 
     const getInputPlaceholder = () => {
+        if (isCurrentUserBlockedOrBanned) return loggedInUser.status === "banned"
+            ? "You are banned and cannot send messages"
+            : "You are blocked and cannot send messages";
         if (isBannedUser && !isAdmin) return "This user has been banned";
         if (isBlockedUser && !isAdmin) return "This user has been blocked";
         if (isRecording) return "Listening...";
@@ -316,6 +321,25 @@ const ChatWindow = ({
                             {isPermanentlyDeleted && <span className="ml-1 italic">(permanently deleted)</span>}
                         </div>
 
+                        {!isDeleted && !isPermanentlyDeleted && (
+                            <div className="absolute -top-2 -right-2 flex gap-1">
+                                <button
+                                    className="bg-gray-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-gray-600 transition-all shadow"
+                                    onClick={() => handleDeleteOwnMessage(message._id || message.id, false)}
+                                    title="Delete message"
+                                >
+                                    <i className="fas fa-times text-xs"></i>
+                                </button>
+                                <button
+                                    className="bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-all shadow"
+                                    onClick={() => handleDeleteOwnMessage(message._id || message.id, true)}
+                                    title="Permanently delete message"
+                                >
+                                    <i className="fas fa-trash-alt text-xs"></i>
+                                </button>
+                            </div>
+                        )}
+
                         {isAdmin && onDeleteMessage && !isDeleted && !isPermanentlyDeleted && (
                             <div className="absolute -top-2 -right-2 flex gap-1">
                                 <button
@@ -334,25 +358,6 @@ const ChatWindow = ({
                                         <i className="fas fa-user-slash text-xs"></i>
                                     </button>
                                 )}
-                            </div>
-                        )}
-
-                        {isMe && !isDeleted && !isPermanentlyDeleted && !isAdmin && (
-                            <div className="absolute -top-2 -right-2 flex gap-1">
-                                <button
-                                    className="bg-gray-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-gray-600 transition-all shadow"
-                                    onClick={() => handleDeleteOwnMessage(message._id || message.id, false)}
-                                    title="Delete message"
-                                >
-                                    <i className="fas fa-times text-xs"></i>
-                                </button>
-                                <button
-                                    className="bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-all shadow"
-                                    onClick={() => handleDeleteOwnMessage(message._id || message.id, true)}
-                                    title="Permanently delete message"
-                                >
-                                    <i className="fas fa-trash-alt text-xs"></i>
-                                </button>
                             </div>
                         )}
                     </div>
@@ -458,7 +463,7 @@ const ChatWindow = ({
                         value={messageText}
                         onChange={(e) => setMessageText(e.target.value)}
                         placeholder={getInputPlaceholder()}
-                        className={`w-full p-3 md:p-4 pr-12 bg-gray-100 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-100 border border-transparent focus:border-blue-200 transition-all ${isMessageDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                        className={`w-full p-3 md:p-4 pr-12 bg-gray-100 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-100 border border-transparent focus:border-blue-200 transition-all ${isMessageDisabled || isChatDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
                         style={{ maxHeight: '120px', minHeight: '50px' }}
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' && !e.shiftKey) {
@@ -467,7 +472,7 @@ const ChatWindow = ({
                             }
                         }}
                         rows={1}
-                        disabled={isMessageDisabled}
+                        disabled={isMessageDisabled || isChatDisabled}
                     ></textarea>
                     {isRecording && (
                         <div className="absolute right-12 bottom-3 flex items-center text-red-500">
@@ -478,19 +483,19 @@ const ChatWindow = ({
                     <button
                         type="button"
                         className={`absolute right-3 bottom-3 p-2 rounded-full focus:outline-none transition-all ${isRecording ? "bg-red-500 text-white animate-pulse" : "bg-gray-200 text-gray-500 hover:bg-gray-300"
-                            } ${isMessageDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                            } ${isMessageDisabled || isChatDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
                         onClick={handleVoiceInput}
                         title={isRecording ? "Stop recording" : "Voice to text"}
-                        disabled={isMessageDisabled}
+                        disabled={isMessageDisabled || isChatDisabled}
                     >
                         <i className={`fas ${isRecording ? "fa-stop" : "fa-microphone"}`}></i>
                     </button>
                 </div>
                 <button
                     type="submit"
-                    className={`p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full flex-shrink-0 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 transition-all ${isMessageDisabled || (!messageText.trim() && !isRecording) ? "opacity-50 cursor-not-allowed" : ""
+                    className={`p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full flex-shrink-0 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 transition-all ${isMessageDisabled || isChatDisabled || (!messageText.trim() && !isRecording) ? "opacity-50 cursor-not-allowed" : ""
                         }`}
-                    disabled={isMessageDisabled || (!messageText.trim() && !isRecording)}
+                    disabled={isMessageDisabled || isChatDisabled || (!messageText.trim() && !isRecording)}
                 >
                     <i className="fas fa-paper-plane"></i>
                 </button>

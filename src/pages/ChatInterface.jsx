@@ -99,6 +99,49 @@ const ChatInterface = ({ adminMode }) => {
             socketRef.current.on("error", (error) => {
                 toast.error("Server error: " + (error.message || "Unknown error"));
             });
+
+            socketRef.current.on("admin-message-deleted", ({ messageId }) => {
+                setMessages(prev =>
+                    prev.map(msg =>
+                        msg._id === messageId
+                            ? { ...msg, isDeleted: true, content: "This message was deleted by an admin" }
+                            : msg
+                    )
+                );
+                toast.info("A message was deleted by an admin.");
+            });
+
+            socketRef.current.on("admin-user-blocked", (notification) => {
+                if (notification && notification.type === "block") {
+                    setUser(prev => ({
+                        ...prev,
+                        status: "blocked",
+                        blockReason: notification.reason,
+                        notifications: [notification, ...(prev.notifications || [])]
+                    }));
+                    toast.warning(notification.message || "You have been blocked by an admin.");
+                }
+            });
+
+            socketRef.current.on("admin-user-banned", (notification) => {
+                if (notification && notification.type === "ban") {
+                    setUser(prev => ({
+                        ...prev,
+                        status: "banned",
+                        bannedReason: notification.reason,
+                        notifications: [notification, ...(prev.notifications || [])]
+                    }));
+                    toast.error(notification.message || "You have been banned by an admin.");
+                }
+            });
+
+            socketRef.current.on("admin-notification", (notification) => {
+                setUser(prev => ({
+                    ...prev,
+                    notifications: [notification, ...(prev.notifications || [])]
+                }));
+                toast.info(notification.message || "You have a new notification from admin.");
+            });
         };
 
         setupSocket();
@@ -479,8 +522,61 @@ const ChatInterface = ({ adminMode }) => {
 
     const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
+    const handleDeleteOwnMessage = async (messageId, permanent = false) => {
+        try {
+            await axios({
+                method: 'DELETE',
+                url: `http://localhost:4000/api/v1/message/${messageId}`,
+                data: { permanent },
+                withCredentials: true
+            });
+            setMessages(prev =>
+                prev.map(msg =>
+                    msg._id === messageId
+                        ? {
+                            ...msg,
+                            isDeleted: !permanent,
+                            permanentlyDeleted: permanent,
+                            content: permanent
+                                ? "This message has been permanently deleted"
+                                : "This message has been deleted"
+                        }
+                        : msg
+                )
+            );
+        } catch (error) {
+            toast.error("Failed to delete message");
+        }
+    };
+
     if (isAuthLoading) {
         return <LoadingScreen />;
+    }
+
+    if (!isAuthLoading && isAuthenticated && (user?.status === "blocked" || user?.status === "banned")) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
+                <div className="bg-white rounded-lg shadow-lg p-10 text-center max-w-md">
+                    <div className="text-5xl mb-4">
+                        <i className={`fas ${user.status === "banned" ? "fa-user-slash text-red-600" : "fa-ban text-yellow-600"}`}></i>
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                        {user.status === "banned" ? "Account Banned" : "Account Blocked"}
+                    </h2>
+                    <p className="text-gray-600 mb-4">
+                        {user.status === "banned"
+                            ? "Your account has been banned by an administrator. You cannot use the chat."
+                            : "Your account has been blocked by an administrator. You cannot use the chat."}
+                    </p>
+                    {user.bannedReason && (
+                        <div className="mb-2 text-red-700 text-sm">Reason: {user.bannedReason}</div>
+                    )}
+                    {user.blockReason && (
+                        <div className="mb-2 text-yellow-700 text-sm">Reason: {user.blockReason}</div>
+                    )}
+                </div>
+            </div>
+        );
     }
 
     if (!isAuthLoading) {
@@ -556,8 +652,9 @@ const ChatInterface = ({ adminMode }) => {
                                     onSendMessage={handleSendMessage}
                                     isAdmin={isAdmin}
                                     onDeleteMessage={isAdmin ? handleDeleteMessage : null}
+                                    onDeleteOwnMessage={handleDeleteOwnMessage}
                                     onBanUser={isAdmin ? handleBanUser : null}
-                                    onCloseChat={clearSelectedChat} // Add this prop for closing chat
+                                    onCloseChat={clearSelectedChat}
                                 />
                             ) : (
                                 <EmptyState setSidebarOpen={setSidebarOpen} />
