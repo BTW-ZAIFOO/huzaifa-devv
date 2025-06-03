@@ -20,9 +20,11 @@ const ForgotPassword = () => {
           headers: { "Content-Type": "application/json" },
         }
       );
+      console.log("Password reset link sent successfully");
       toast.success(res.data.message);
     }
     catch (error) {
+      console.error("Failed to send password reset link");
       toast.error(error.response.data.message);
     }
     finally {

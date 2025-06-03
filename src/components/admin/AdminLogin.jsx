@@ -23,13 +23,16 @@ const AdminLogin = () => {
             if (response.data.user.role === "admin") {
                 setUser(response.data.user);
                 setIsAuthenticated(true);
-                toast.success("Admin login successful!");
+                console.log("Admin login successfull:", response.data.user);
+                toast.success("Admin login successfull!");
                 navigateTo("/admin");
             } else {
+                console.error("This account doesn't have admin privileges");
                 toast.error("This account doesn't have admin privileges");
             }
         }
         catch (error) {
+            console.error("Invalid credentials:", error);
             toast.error(error.response?.data?.message || "Invalid credentials");
         }
         finally {

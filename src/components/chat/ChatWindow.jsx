@@ -48,6 +48,7 @@ const ChatWindow = ({
                 setMessageText(transcript);
             };
             recognitionInstance.onerror = (event) => {
+                console.error("Speech recognition error:", event.error);
                 toast.error("Speech recognition failed. Please try again.");
                 setIsRecording(false);
             };
@@ -74,10 +75,12 @@ const ChatWindow = ({
 
     const canSendMessage = () => {
         if (selectedUser.status === "banned" && !isAdmin) {
+            console.error("This user has been banned and cannot receive messages.");
             toast.error("This user has been banned and cannot receive messages.");
             return false;
         }
         if (selectedUser.status === "blocked" && !isAdmin) {
+            console.error("This user has been blocked and cannot receive messages.");
             toast.error("This user has been blocked and cannot receive messages.");
             return false;
         }
@@ -86,6 +89,7 @@ const ChatWindow = ({
 
     const handleVoiceInput = () => {
         if (!recognition) {
+            console.error("Speech recognition is not supported in this browser.");
             toast.error("Speech recognition is not supported in your browser");
             return;
         }
@@ -110,6 +114,7 @@ const ChatWindow = ({
     const handleDeleteMessage = (messageId) => {
         if (onDeleteMessage && isAdmin) {
             onDeleteMessage(messageId);
+            console.log("Message deleted by admin");
             toast.success("Message deleted successfully");
         }
     };
@@ -132,6 +137,7 @@ const ChatWindow = ({
                     data: { permanent },
                     withCredentials: true
                 });
+                console.log(`Message ${permanent ? "permanently deleted" : "deleted"} successfully`);
                 toast.success(permanent ? "Message permanently deleted" : "Message deleted");
             }
         } catch (error) {

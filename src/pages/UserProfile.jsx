@@ -70,11 +70,14 @@ const UserProfile = () => {
                     interests: formData.interests ? formData.interests.split(",").map(item => item.trim()) : [],
                     avatar: avatarPreview
                 }));
+
+                console.log("Profile updated successfully");
                 toast.success("Profile updated successfully");
                 setLoading(false);
             }, 1000);
         }
         catch (error) {
+            console.error("Failed to update profile", error);
             toast.error(error.response?.data?.message || "Failed to update profile");
             setLoading(false);
         }
@@ -85,6 +88,7 @@ const UserProfile = () => {
         setLoading(true);
 
         if (formData.newPassword !== formData.confirmPassword) {
+            console.error("New password and confirm password do not match");
             toast.error("New password and confirm password do not match");
             setLoading(false);
             return;
@@ -92,6 +96,7 @@ const UserProfile = () => {
 
         try {
             setTimeout(() => {
+                console.log("Password updated successfully");
                 toast.success("Password updated successfully");
                 setFormData(prev => ({
                     ...prev,
@@ -103,6 +108,7 @@ const UserProfile = () => {
             }, 1000);
         }
         catch (error) {
+            console.error("Failed to update password");
             toast.error(error.response?.data?.message || "Failed to update password");
             setLoading(false);
         }

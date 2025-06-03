@@ -23,13 +23,15 @@ const ReportsView = ({
         if (action === 'ban' || action === 'block') {
             reason = prompt(`Enter reason for ${action === 'ban' ? 'banning' : 'blocking'} this user:`);
             if (!reason) {
+                console.error(`Action canceled: A reason is required`);
                 toast.error(`Action canceled: A reason is required`);
                 return;
             }
         } else if (action === 'warning') {
             reason = prompt('Enter warning message to send to user:');
             if (!reason) {
-                toast.error('Action canceled: Warning message is required');
+                console.error(`Action canceled: A warning message is required`);
+                toast.error(`Action canceled: A warning message is required`);
                 return;
             }
         } else {
@@ -45,6 +47,7 @@ const ReportsView = ({
             } else if (action === 'block') {
                 onBlockUser(report.user._id, 'block', reason);
             } else if (action === 'warning') {
+                console.log(`Warning sent to ${report.user.name}: ${reason}`);
                 toast.success(`Warning sent to ${report.user.name}`);
             }
         }

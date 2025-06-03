@@ -92,11 +92,13 @@ const ChatInterface = ({ adminMode }) => {
                         setupSocket();
                     }, 2000);
                 } else {
+                    console.error("Unable to connect to chat server. Please check your connection and refresh the page.");
                     toast.error("Unable to connect to chat server. Please check your connection and refresh the page.");
                 }
             });
 
             socketRef.current.on("error", (error) => {
+                console.error("Server error.");
                 toast.error("Server error: " + (error.message || "Unknown error"));
             });
 
@@ -108,6 +110,7 @@ const ChatInterface = ({ adminMode }) => {
                             : msg
                     )
                 );
+                console.log("Message deleted by admin.");
                 toast.info("A message was deleted by an admin.");
             });
 
@@ -119,6 +122,7 @@ const ChatInterface = ({ adminMode }) => {
                         blockReason: notification.reason,
                         notifications: [notification, ...(prev.notifications || [])]
                     }));
+                    console.log(`You have been blocked by an admin.`);
                     toast.warning(notification.message || "You have been blocked by an admin.");
                 }
             });
@@ -131,6 +135,7 @@ const ChatInterface = ({ adminMode }) => {
                         bannedReason: notification.reason,
                         notifications: [notification, ...(prev.notifications || [])]
                     }));
+                    console.log(`You have been banned by an admin.`);
                     toast.error(notification.message || "You have been banned by an admin.");
                 }
             });
@@ -140,6 +145,7 @@ const ChatInterface = ({ adminMode }) => {
                     ...prev,
                     notifications: [notification, ...(prev.notifications || [])]
                 }));
+                console.log("New admin notification");
                 toast.info(notification.message || "You have a new notification from admin.");
             });
         };
@@ -339,6 +345,7 @@ const ChatInterface = ({ adminMode }) => {
             setSelectedUser(otherUser);
         }
         catch (err) {
+            console.error("Failed to load conversation");
             toast.error("Failed to load conversation");
         }
     };
@@ -358,12 +365,14 @@ const ChatInterface = ({ adminMode }) => {
         if (containsInappropriateContent(messageText)) {
             const flaggedWords = extractInappropriateWords(messageText);
             if (flaggedWords.length > 0 && !isAdmin) {
+                console.warn("Message contains inappropriate content");
                 toast.warn("Your message contains words that may be inappropriate. Please revise your message.");
                 return;
             }
         }
 
         if (!socketConnected || !socketRef.current) {
+            console.error("You are currently disconnected. Please wait while we reconnect.");
             toast.error("You are currently disconnected. Please wait while we reconnect.");
             return;
         }
@@ -401,7 +410,7 @@ const ChatInterface = ({ adminMode }) => {
 
         } catch (err) {
             toast.error("Failed to send message");
-
+            console.error("Failed to send message");
             setMessages(prev => prev.filter((msg) => !msg.isOptimistic));
         }
     };
@@ -426,6 +435,7 @@ const ChatInterface = ({ adminMode }) => {
                 );
                 setMessages(res.data.messages);
             } catch (error) {
+                console.error("Failed to load conversation");
                 toast.error("Failed to load conversation");
             }
         }
@@ -438,7 +448,7 @@ const ChatInterface = ({ adminMode }) => {
             setMessages(prev => prev.map(msg =>
                 msg._id === messageId ? { ...msg, isDeleted: true, content: "This message was deleted by an admin" } : msg
             ));
-
+            console.log("Message deleted successfully");
             toast.success("Message deleted successfully");
 
             try {
@@ -463,6 +473,7 @@ const ChatInterface = ({ adminMode }) => {
             }
         }
         catch (error) {
+            console.error("Failed to delete message");
             toast.error("Failed to delete message");
         }
     };
@@ -495,6 +506,7 @@ const ChatInterface = ({ adminMode }) => {
             userToBan.bannedAt = new Date();
             userToBan.bannedBy = user.name;
 
+            console.log(`Banning user ${userToBan.name} with reason: ${reason}`);
             toast.success(`User ${userToBan.name} has been banned for ${reason}`);
 
             const systemMessage = {
@@ -516,6 +528,7 @@ const ChatInterface = ({ adminMode }) => {
             }
 
         } catch (error) {
+            console.error("Failed to ban user");
             toast.error("Failed to ban user");
         }
     };
@@ -545,6 +558,7 @@ const ChatInterface = ({ adminMode }) => {
                 )
             );
         } catch (error) {
+            console.error("Failed to delete message");
             toast.error("Failed to delete message");
         }
     };

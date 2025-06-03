@@ -128,6 +128,7 @@ const AdminPanel = ({ users: initialUsers }) => {
             setMessages(simulatedMessages);
         }
         catch (error) {
+            console.error("Failed to load user messages:", error);
             toast.error("Failed to load conversation");
         }
     };
@@ -153,6 +154,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                 messageQueue.find(m => m._id === messageId);
 
             if (!messageToDelete) {
+                console.error("Message not found");
                 toast.error("Message not found");
                 return;
             }
@@ -227,10 +229,12 @@ const AdminPanel = ({ users: initialUsers }) => {
             }
 
             if (!isAutoDelete) {
+                console.log("Message deleted and logged.");
                 toast.success("Message deleted and logged");
             }
         }
         catch (error) {
+            console.log("Failed to delete message.");
             toast.error("Failed to delete message");
         }
     };
@@ -255,6 +259,7 @@ const AdminPanel = ({ users: initialUsers }) => {
         try {
             const userToBan = users.find(u => u._id === userId);
             if (!userToBan) {
+                console.error("User not found");
                 toast.error("User not found");
                 return;
             }
@@ -302,6 +307,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                 });
             }
 
+            console.log(`User ${userToBan.name} has been banned for: ${reason}`);
             toast.success(`User ${userToBan.name} has been banned for ${reason}`);
             logAdminActivity(`Banned user ${userToBan.name} for: ${reason}`, 'alert');
 
@@ -339,6 +345,7 @@ const AdminPanel = ({ users: initialUsers }) => {
             }
         }
         catch (error) {
+            console.error("Failed to ban user.");
             toast.error("Failed to ban user");
         }
     };
@@ -346,6 +353,7 @@ const AdminPanel = ({ users: initialUsers }) => {
     const handleBlockUserAction = async (userId, action = "block", reason = null) => {
         const user = users.find(u => u._id === userId || u.id === userId);
         if (!user) {
+            console.error("User not found");
             toast.error("User not found");
             return;
         }
@@ -379,6 +387,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                         withCredentials: true
                     });
                 } catch (apiError) {
+                    toast.error("Failed to block user");
                     console.error("API error when blocking user:", apiError);
                 }
 
@@ -456,6 +465,7 @@ const AdminPanel = ({ users: initialUsers }) => {
 
             logAdminActivity(`${isBlocked ? 'Unblocked' : 'Blocked'} user ${user.name}${!isBlocked ? ` for: ${reason || "Administrative action"}` : ""}`,
                 isBlocked ? 'standard' : 'warning');
+            console.log(`User ${user.name} ${isBlocked ? 'unblocked' : 'blocked'} successfully`);
             toast.success(`User ${user.name} ${isBlocked ? 'unblocked' : 'blocked'} successfully`);
 
         } else if (action === "ban") {
@@ -497,6 +507,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                 });
 
                 logAdminActivity(`Unbanned user ${user.name}`, 'standard');
+                console.log(`User ${user.name} unbanned successfully`);
                 toast.success(`User ${user.name} unbanned successfully`);
             }
         }
@@ -516,6 +527,7 @@ const AdminPanel = ({ users: initialUsers }) => {
     const handleReportUserAction = (userId, customReason = "") => {
         const user = users.find(u => u._id === userId || u.id === userId);
         if (!user) {
+            console.error("User not found");
             toast.error("User not found");
             return;
         }
@@ -542,6 +554,7 @@ const AdminPanel = ({ users: initialUsers }) => {
         if (!customReason) {
             const reportReason = prompt("Please provide a reason for reporting this user:");
             if (!reportReason || reportReason.trim() === "") {
+                console.error("Report cancelled: A reason is required");
                 toast.error("Report cancelled: A reason is required");
                 return;
             }
@@ -825,6 +838,7 @@ const AdminPanel = ({ users: initialUsers }) => {
 
     const handleRefreshUsers = () => {
         fetchUsers();
+        console.log("Refreshing user data...");
         toast.info("Refreshing user data...");
     };
 

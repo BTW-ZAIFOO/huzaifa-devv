@@ -51,11 +51,13 @@ const ChatSidebar = ({
             const matchesOnline = showOnlineOnly ? user.status === "online" : true;
 
             if (isAdmin) return matchesOnline;
+
             return userId !== currentId && matchesOnline;
         });
     };
 
     const baseUsers = searchTerm.trim() ? searchResults : users.filter(u => u.accountVerified);
+
     let displayUsers = filterUsers(baseUsers);
 
     if (showAdminChat) {

@@ -15,10 +15,12 @@ const Register = () => {
         headers: { "Content-Type": "application/json" },
       });
 
+      console.log("Registration successful:", response.data);
       toast.success(response.data.message);
       navigateTo(`/otp-verification/${data.email}?role=user`);
     }
     catch (error) {
+      console.error("Registration failed:", error);
       toast.error(error.response.data.message);
     }
   };

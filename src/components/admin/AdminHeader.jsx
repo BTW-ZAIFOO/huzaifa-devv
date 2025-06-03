@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { getAvatarByRole } from '../../utils/avatarUtils';
 
 const AdminHeader = ({ user, onLogout }) => {
+
     const avatar = getAvatarByRole(user);
 
     return (

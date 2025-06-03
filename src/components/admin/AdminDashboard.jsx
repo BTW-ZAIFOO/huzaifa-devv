@@ -45,6 +45,7 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
         };
 
         if (!filterConditions[filter]) return false;
+
         if (searchTerm) {
             const term = searchTerm.toLowerCase();
             return (
@@ -96,12 +97,14 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
     };
 
     const handleBanUserClick = (userId) => {
+        console.log(userId, "Banned by admin via dashboard");
         onBanUser(userId, "Banned by admin via dashboard");
     };
 
     const handleReportUserClick = (userId) => {
         const user = users.find(u => u._id === userId || u.id === userId);
         if (!user) {
+            console.error("User not found");
             toast.error("User not found");
             return;
         }
@@ -118,6 +121,7 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
                     autoClose: 5000
                 });
             } else {
+                console.error("Report cancelled: A reason is required");
                 toast.error("Report cancelled: A reason is required");
             }
         }
