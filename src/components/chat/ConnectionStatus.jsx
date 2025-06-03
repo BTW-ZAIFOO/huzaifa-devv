@@ -1,19 +1,32 @@
 import React, { useState, useEffect } from 'react';
 
+// ConnectionStatus component displays the current connection state to the user.
+// Props:
+// - isConnected: boolean indicating if the connection is active
+// - reconnecting: boolean indicating if a reconnection attempt is in progress
+// - attempt: current reconnection attempt number
 const ConnectionStatus = ({ isConnected, reconnecting = false, attempt = 0 }) => {
+
+    // State to control the visibility of the status message
     const [isVisible, setIsVisible] = useState(true);
 
     useEffect(() => {
+
+        // If connected and not reconnecting, hide the status after 5 seconds
         if (isConnected && !reconnecting) {
             const timer = setTimeout(() => setIsVisible(false), 5000);
-            return () => clearTimeout(timer);
+            return () => clearTimeout(timer); // Cleanup timer on unmount or dependency change
         } else {
+
+            // Show the status if not connected or reconnecting
             setIsVisible(true);
         }
     }, [isConnected, reconnecting]);
 
+    // If the status is not visible, render nothing
     if (!isVisible) return null;
 
+    // Render disconnected status with a refresh button
     if (!isConnected && !reconnecting) {
         return (
             <div className="fixed bottom-4 right-4 z-50 px-4 py-3 bg-red-100 text-red-800 rounded-full shadow-md flex items-center gap-2 text-sm">
@@ -29,6 +42,7 @@ const ConnectionStatus = ({ isConnected, reconnecting = false, attempt = 0 }) =>
         );
     }
 
+    // Render reconnecting status with attempt count
     if (reconnecting) {
         return (
             <div className="fixed bottom-4 right-4 z-50 px-4 py-3 bg-yellow-100 text-yellow-800 rounded-full shadow-md flex items-center gap-2 text-sm">
@@ -38,6 +52,7 @@ const ConnectionStatus = ({ isConnected, reconnecting = false, attempt = 0 }) =>
         );
     }
 
+    // Render connected status
     return (
         <div className="fixed bottom-4 right-4 z-50 px-4 py-3 bg-green-100 text-green-800 rounded-full shadow-md flex items-center gap-2 text-sm">
             <div className="w-2.5 h-2.5 bg-green-500 rounded-full"></div>

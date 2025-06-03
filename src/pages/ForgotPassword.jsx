@@ -3,15 +3,24 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 
+// ForgotPassword component handles the password reset request UI and logic
 const ForgotPassword = () => {
+
+  // State to store the user's email input
   const [email, setEmail] = useState("");
+
+  // State to indicate if the request is in progress
   const [isLoading, setIsLoading] = useState(false);
 
+  // Handles form submission for password reset
   const handleForgotPassword = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+
+    e.preventDefault(); // Prevent default form submission
+    setIsLoading(true); // Show loading state
 
     try {
+
+      // Send POST request to backend to initiate password reset
       const res = await axios.post(
         "http://localhost:4000/api/v1/user/password/forgot",
         { email },
@@ -20,32 +29,50 @@ const ForgotPassword = () => {
           headers: { "Content-Type": "application/json" },
         }
       );
+
+      // Notify user of success
       console.log("Password reset link sent successfully");
       toast.success(res.data.message);
     }
     catch (error) {
+
+      // Notify user of error
       console.error("Failed to send password reset link");
       toast.error(error.response.data.message);
     }
     finally {
-      setIsLoading(false);
+      setIsLoading(false); // Reset loading state
     }
   };
 
   return (
+
+    // Center the form vertically and horizontally with a gradient background
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-blue-600 to-indigo-600 p-5 font-sans">
       <div className="bg-white/95 p-10 rounded-2xl shadow-xl max-w-md w-full text-center relative overflow-hidden">
+
+        {/* Decorative gradient bar at the top */}
         <div className="before:absolute before:top-0 before:left-0 before:w-full before:h-[5px] before:bg-gradient-to-r before:from-blue-600 before:to-purple-600">
+
+          {/* Title */}
           <h2 className="text-2xl font-semibold mb-4 text-slate-800">
             Forgot Password
           </h2>
+
+          {/* Instructional text */}
           <p className="text-base text-gray-600 mb-8 leading-relaxed font-normal">
             Enter your email address and we'll send you a link to reset your
             password.
           </p>
+
+          {/* Password reset form */}
           <form onSubmit={handleForgotPassword}>
             <div className="relative mb-6">
+
+              {/* Email icon inside input */}
               <i className="far fa-envelope absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+
+              {/* Email input field */}
               <input
                 type="email"
                 placeholder="Enter your email"
@@ -55,12 +82,16 @@ const ForgotPassword = () => {
                 className="pl-12 pr-4 py-3.5 w-full border border-gray-300 rounded-lg text-black transition-all duration-300 bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none shadow-sm font-normal"
               />
             </div>
+
+            {/* Submit button with loading indicator */}
             <button
               type="submit"
               disabled={isLoading}
               className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-none rounded-lg text-base cursor-pointer transition-all duration-300 font-medium shadow-md hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {isLoading ? (
+
+                // Show spinner while loading
                 <span className="flex items-center justify-center gap-2.5">
                   <i className="fas fa-spinner animate-spin"></i> Sending...
                 </span>
@@ -69,6 +100,8 @@ const ForgotPassword = () => {
               )}
             </button>
           </form>
+
+          {/* Link to go back to login page */}
           <div className="mt-7 text-gray-600 text-[0.95rem] font-normal">
             <p>
               Remembered your password?{" "}

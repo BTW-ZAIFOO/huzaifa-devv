@@ -4,48 +4,62 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+// Admin registration component
 const AdminRegister = () => {
-    const navigate = useNavigate();
-    const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate(); // For navigation after registration
+    const [isLoading, setIsLoading] = useState(false); // Loading state for submit button
+
+    // useForm hook for form handling and validation
     const { register, handleSubmit, formState: { errors } } = useForm();
 
+    // Function to handle admin registration form submission
     const handleAdminRegister = async (data) => {
-        setIsLoading(true);
+        setIsLoading(true); // Show loading spinner
         try {
+
+            // Send registration data to backend API
             const response = await axios.post(
                 "http://localhost:4000/api/v1/user/register",
                 {
                     name: data.name,
                     email: data.email,
                     password: data.password,
-                    role: "admin",
-                    verificationMethod: "email",
+                    role: "admin", // Set role as admin
+                    verificationMethod: "email", // Verification method
                 },
                 { withCredentials: true }
             );
 
+            // Show success message and navigate to OTP verification page
             toast.success(response.data.message);
             navigate(`/otp-verification/${data.email}?role=admin`);
         }
         catch (error) {
+            // Handle registration errors
             console.error("Registration failed");
             toast.error(error.response?.data?.message || "Registration failed");
         }
         finally {
-            setIsLoading(false);
+            setIsLoading(false); // Hide loading spinner
         }
     };
 
     return (
         <div className="py-6 px-4 font-sans max-w-md mx-auto">
+
+            {/* Page title */}
             <h2 className="text-2xl font-bold mb-6 text-black text-center">
                 Admin Registration
             </h2>
+
+            {/* Registration form */}
             <form
                 className="w-full border border-white/10"
                 onSubmit={handleSubmit(handleAdminRegister)}
             >
                 <div className="space-y-6">
+
+                    {/* Name input field */}
                     <div className="space-y-2">
                         <label
                             htmlFor="name"
@@ -54,6 +68,8 @@ const AdminRegister = () => {
                             Full Name
                         </label>
                         <div className="relative">
+
+                            {/* User icon */}
                             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                                 <i className="far fa-user text-purple-300"></i>
                             </div>
@@ -71,8 +87,12 @@ const AdminRegister = () => {
                                 className="pl-11 pr-4 py-3 h-12 w-full bg-white border border-white/20 rounded-xl text-black transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:outline-none font-normal text-base shadow-sm"
                             />
                         </div>
+
+                        {/* Name validation error */}
                         {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
                     </div>
+
+                    {/* Email input field */}
                     <div className="space-y-2">
                         <label
                             htmlFor="email"
@@ -81,6 +101,8 @@ const AdminRegister = () => {
                             Email Address
                         </label>
                         <div className="relative">
+
+                            {/* Email icon */}
                             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                                 <i className="far fa-envelope text-purple-300"></i>
                             </div>
@@ -98,8 +120,12 @@ const AdminRegister = () => {
                                 className="pl-11 pr-4 py-3 h-12 w-full bg-white border border-white/20 rounded-xl text-black transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:outline-none font-normal text-base shadow-sm"
                             />
                         </div>
+
+                        {/* Email validation error */}
                         {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
                     </div>
+
+                    {/* Password input field */}
                     <div className="space-y-2">
                         <label
                             htmlFor="password"
@@ -108,6 +134,8 @@ const AdminRegister = () => {
                             Password
                         </label>
                         <div className="relative">
+
+                            {/* Lock icon */}
                             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                                 <i className="fas fa-lock text-purple-300"></i>
                             </div>
@@ -125,14 +153,20 @@ const AdminRegister = () => {
                                 className="pl-11 pr-4 py-3 h-12 w-full bg-white border border-white/20 rounded-xl text-black transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:outline-none font-normal text-base shadow-sm"
                             />
                         </div>
+
+                        {/* Password validation error */}
                         {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
                     </div>
+
+                    {/* Submit button */}
                     <button
                         type="submit"
                         disabled={isLoading}
                         className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white border-none rounded-xl text-base font-medium cursor-pointer transition-all duration-300 shadow-lg hover:shadow-pink-500/30 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center"
                     >
                         {isLoading ? (
+
+                            // Loading spinner and text
                             <span className="flex items-center justify-center gap-2.5">
                                 <svg
                                     className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
@@ -157,6 +191,8 @@ const AdminRegister = () => {
                                 Creating Account...
                             </span>
                         ) : (
+
+                            // Button text and icon
                             <>
                                 <i className="fas fa-user-shield mr-2.5"></i>
                                 Create Admin Account
@@ -165,6 +201,8 @@ const AdminRegister = () => {
                     </button>
                 </div>
             </form>
+
+            {/* Info message */}
             <div className="text-center mt-4 text-black text-sm">
                 <p>All fields are required for admin creation</p>
             </div>

@@ -13,7 +13,10 @@ import { getAvatarByRole } from "../utils/avatarUtils";
 import { containsInappropriateContent, extractInappropriateWords } from "../utils/moderationUtils";
 import LoadingScreen from "../components/LoadingScreen";
 
+// Main chat interface component
 const ChatInterface = ({ adminMode }) => {
+
+    // Context and state hooks
     const { isAuthenticated, user, isAdmin, setUser, isAuthLoading } = useContext(Context);
     const [selectedUser, setSelectedUser] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -28,6 +31,7 @@ const ChatInterface = ({ adminMode }) => {
     const heartbeatRef = useRef(null);
     const SOCKET_URL = "http://localhost:4000";
 
+    // Restore chat state from localStorage on mount
     useEffect(() => {
         if (user) {
             try {
@@ -45,15 +49,19 @@ const ChatInterface = ({ adminMode }) => {
         }
     }, [user]);
 
+    // Setup socket connection and listeners
     useEffect(() => {
         if (!user) return;
 
         const setupSocket = () => {
+
+            // Disconnect previous socket if exists
             if (socketRef.current) {
                 socketRef.current.disconnect();
                 socketRef.current = null;
             }
 
+            // Create new socket connection
             socketRef.current = socketIOClient(SOCKET_URL, {
                 withCredentials: true,
                 reconnection: true,
@@ -63,10 +71,12 @@ const ChatInterface = ({ adminMode }) => {
                 timeout: 20000
             });
 
+            // On successful connection
             socketRef.current.on("connect", () => {
                 setSocketConnected(true);
                 setReconnectAttempt(0);
 
+                // Start heartbeat interval to keep connection alive
                 if (heartbeatRef.current) clearInterval(heartbeatRef.current);
                 heartbeatRef.current = setInterval(() => {
                     if (socketRef.current) {
@@ -75,6 +85,7 @@ const ChatInterface = ({ adminMode }) => {
                 }, 15000);
             });
 
+            // On disconnect, clear heartbeat
             socketRef.current.on("disconnect", () => {
                 setSocketConnected(false);
 
@@ -83,6 +94,7 @@ const ChatInterface = ({ adminMode }) => {
                 }
             });
 
+            // Handle connection errors and attempt reconnection
             socketRef.current.on("connect_error", (error) => {
                 setSocketConnected(false);
 
@@ -97,11 +109,13 @@ const ChatInterface = ({ adminMode }) => {
                 }
             });
 
+            // Handle server errors
             socketRef.current.on("error", (error) => {
                 console.error("Server error.");
                 toast.error("Server error: " + (error.message || "Unknown error"));
             });
 
+            // Listen for admin actions (message deleted, user blocked/banned, notifications)
             socketRef.current.on("admin-message-deleted", ({ messageId }) => {
                 setMessages(prev =>
                     prev.map(msg =>
@@ -152,8 +166,11 @@ const ChatInterface = ({ adminMode }) => {
 
         setupSocket();
 
+        // Listen for new messages
         if (socketRef.current) {
             socketRef.current.on("new-message", (message) => {
+
+                // If message is not for the current chat, add to notifications
                 if (message.sender._id !== user._id && (!selectedChat || message.chat !== selectedChat.chat._id)) {
                     setNotifications(prev => [
                         {
@@ -166,12 +183,14 @@ const ChatInterface = ({ adminMode }) => {
                     ]);
                 }
 
+                // If message is for the current chat, add to messages
                 if (selectedChat && message.chat === selectedChat.chat._id) {
                     setMessages(prev => [...prev, message]);
                 }
             });
         }
 
+        // Cleanup on unmount
         return () => {
             if (socketRef.current) {
                 socketRef.current.disconnect();
@@ -185,9 +204,9 @@ const ChatInterface = ({ adminMode }) => {
         };
     }, [user, reconnectAttempt]);
 
+    // Join chat rooms for all users (except self) after socket connects
     useEffect(() => {
         if (!user || !socketConnected || !socketRef.current) return;
-
         axios.get("http://localhost:4000/api/v1/user/all", { withCredentials: true })
             .then(res => {
                 res.data.users.forEach(u => {
@@ -209,10 +228,12 @@ const ChatInterface = ({ adminMode }) => {
             .catch(err => console.error("Error fetching users for chat rooms:", err));
     }, [user, socketConnected]);
 
+    // Fetch users when admin mode or user changes
     useEffect(() => {
         fetchUsers();
     }, [adminMode, user?.id]);
 
+    // Load messages when a user is selected
     useEffect(() => {
         if (selectedUser) {
             loadUserMessages();
@@ -221,6 +242,7 @@ const ChatInterface = ({ adminMode }) => {
         }
     }, [selectedUser]);
 
+    // Fetch all users and check for notifications (report, ban, block)
     useEffect(() => {
         if (!user) return;
         setLoading(true);
@@ -229,6 +251,7 @@ const ChatInterface = ({ adminMode }) => {
                 setAllUsers(res.data.users);
                 setLoading(false);
 
+                // Check for new notifications and add if needed
                 const currentUserFromApi = res.data.users.find(u => u._id === user._id);
                 if (currentUserFromApi) {
                     if (currentUserFromApi.isReported &&
@@ -269,6 +292,7 @@ const ChatInterface = ({ adminMode }) => {
             .catch(() => setLoading(false));
     }, [user]);
 
+    // Helper to add a notification to the user and show a toast
     const addUserNotification = (notification) => {
         const newNotification = {
             id: `notification-${Date.now()}`,
@@ -287,6 +311,7 @@ const ChatInterface = ({ adminMode }) => {
 
         setUser(updatedUser);
 
+        // Choose toast type and icon based on severity/type
         const toastType = notification.severity === 'critical' ? toast.error :
             notification.severity === 'high' ? toast.warning :
                 notification.severity === 'medium' ? toast.info :
@@ -302,6 +327,7 @@ const ChatInterface = ({ adminMode }) => {
         });
     };
 
+    // Handle selecting a user to chat with
     const handleUserSelect = async (otherUser) => {
         try {
             const userId = otherUser._id || otherUser.id;
@@ -318,6 +344,7 @@ const ChatInterface = ({ adminMode }) => {
 
             setSelectedChat(newSelectedChat);
 
+            // Save chat state to localStorage
             if (user) {
                 try {
                     localStorage.setItem(
@@ -332,10 +359,12 @@ const ChatInterface = ({ adminMode }) => {
                 }
             }
 
+            // Remove notifications for this chat
             setNotifications(prev =>
                 prev.filter(n => n.chatId !== chatRes.data.chat._id)
             );
 
+            // Load messages for this chat
             const msgRes = await axios.get(
                 `http://localhost:4000/api/v1/message/${chatRes.data.chat._id}`,
                 { withCredentials: true }
@@ -350,6 +379,7 @@ const ChatInterface = ({ adminMode }) => {
         }
     };
 
+    // Clear selected chat and messages
     const clearSelectedChat = () => {
         setSelectedChat(null);
         setSelectedUser(null);
@@ -359,9 +389,11 @@ const ChatInterface = ({ adminMode }) => {
         }
     };
 
+    // Handle sending a message (with moderation check)
     const handleSendMessage = async (messageText, isVoice = false) => {
         if (!messageText.trim() || !selectedChat) return;
 
+        // Check for inappropriate content
         if (containsInappropriateContent(messageText)) {
             const flaggedWords = extractInappropriateWords(messageText);
             if (flaggedWords.length > 0 && !isAdmin) {
@@ -371,6 +403,7 @@ const ChatInterface = ({ adminMode }) => {
             }
         }
 
+        // Prevent sending if disconnected
         if (!socketConnected || !socketRef.current) {
             console.error("You are currently disconnected. Please wait while we reconnect.");
             toast.error("You are currently disconnected. Please wait while we reconnect.");
@@ -378,6 +411,8 @@ const ChatInterface = ({ adminMode }) => {
         }
 
         try {
+
+            // Optimistically add message to UI
             const optimisticMessage = {
                 _id: `temp-${Date.now()}`,
                 content: messageText,
@@ -394,6 +429,7 @@ const ChatInterface = ({ adminMode }) => {
 
             setMessages(prev => [...prev, optimisticMessage]);
 
+            // Send message to server
             const res = await axios.post(
                 "http://localhost:4000/api/v1/message/send",
                 {
@@ -404,6 +440,7 @@ const ChatInterface = ({ adminMode }) => {
                 { withCredentials: true }
             );
 
+            // Replace optimistic message with real one
             setMessages(prev => prev.map(msg =>
                 msg._id === optimisticMessage._id ? res.data.message : msg
             ));
@@ -415,6 +452,7 @@ const ChatInterface = ({ adminMode }) => {
         }
     };
 
+    // Fetch all users from API
     const fetchUsers = async () => {
         try {
             setLoading(true);
@@ -426,6 +464,7 @@ const ChatInterface = ({ adminMode }) => {
         }
     };
 
+    // Load messages for the selected chat
     const loadUserMessages = async () => {
         if (selectedChat && selectedChat.chat && selectedChat.chat._id) {
             try {
@@ -441,16 +480,20 @@ const ChatInterface = ({ adminMode }) => {
         }
     };
 
+    // Admin: Delete a message
     const handleDeleteMessage = async (messageId) => {
         if (!isAdmin) return;
 
         try {
+
+            // Optimistically mark message as deleted
             setMessages(prev => prev.map(msg =>
                 msg._id === messageId ? { ...msg, isDeleted: true, content: "This message was deleted by an admin" } : msg
             ));
             console.log("Message deleted successfully");
             toast.success("Message deleted successfully");
 
+            // Optionally update moderation history for sender
             try {
                 const targetMessage = messages.find(msg => msg._id === messageId);
                 if (targetMessage) {
@@ -478,6 +521,7 @@ const ChatInterface = ({ adminMode }) => {
         }
     };
 
+    // Admin: Ban a user
     const handleBanUser = async (userId, reason) => {
         if (!isAdmin) return;
 
@@ -488,6 +532,7 @@ const ChatInterface = ({ adminMode }) => {
                 return;
             }
 
+            // Gather messages for moderation record
             const userMessages = messages
                 .filter((msg) => msg.sender._id === userId)
                 .map((msg) => ({
@@ -501,6 +546,7 @@ const ChatInterface = ({ adminMode }) => {
                 messages: userMessages
             });
 
+            // Update user status locally (should also update on server)
             userToBan.status = "banned";
             userToBan.bannedReason = reason;
             userToBan.bannedAt = new Date();
@@ -509,6 +555,7 @@ const ChatInterface = ({ adminMode }) => {
             console.log(`Banning user ${userToBan.name} with reason: ${reason}`);
             toast.success(`User ${userToBan.name} has been banned for ${reason}`);
 
+            // Add a system message to chat
             const systemMessage = {
                 _id: `system-${Date.now()}`,
                 isSystemMessage: true,
@@ -519,6 +566,7 @@ const ChatInterface = ({ adminMode }) => {
 
             setMessages(prev => [...prev, systemMessage]);
 
+            // If banned user is currently selected, clear chat after a delay
             if (selectedUser && selectedUser._id === userId) {
                 setTimeout(() => {
                     setSelectedChat(null);
@@ -533,8 +581,10 @@ const ChatInterface = ({ adminMode }) => {
         }
     };
 
+    // Toggle sidebar visibility
     const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
+    // User deletes their own message (soft or permanent)
     const handleDeleteOwnMessage = async (messageId, permanent = false) => {
         try {
             await axios({
@@ -563,10 +613,12 @@ const ChatInterface = ({ adminMode }) => {
         }
     };
 
+    // Show loading screen while authentication is loading
     if (isAuthLoading) {
         return <LoadingScreen />;
     }
 
+    // Show blocked/banned message if user is blocked or banned
     if (!isAuthLoading && isAuthenticated && (user?.status === "blocked" || user?.status === "banned")) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
@@ -593,16 +645,19 @@ const ChatInterface = ({ adminMode }) => {
         );
     }
 
+    // Redirect to auth if not authenticated
     if (!isAuthLoading) {
         if (!isAuthenticated) {
             return <Navigate to="/auth" />;
         }
 
+        // Prevent non-admins from accessing admin mode
         if (adminMode && !isAdmin) {
             return <Navigate to="/chat" />;
         }
     }
 
+    // Render admin panel if in admin mode
     if (adminMode && isAdmin) {
         return (
             <div className="bg-gray-100 h-screen flex flex-col">
@@ -629,21 +684,28 @@ const ChatInterface = ({ adminMode }) => {
         );
     }
 
+    // Main chat UI
     return (
         <div className="min-h-screen h-screen w-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex flex-col overflow-hidden">
             <div className="flex-1 flex flex-col h-full w-full bg-white/90 overflow-hidden">
+
+                {/* Chat header with notifications and sidebar toggle */}
                 <ChatHeader
                     user={user}
                     toggleSidebar={toggleSidebar}
                     sidebarOpen={sidebarOpen}
                     notifications={notifications}
                 />
+
+                {/* Connection status indicator */}
                 <ConnectionStatus
                     isConnected={socketConnected}
                     reconnecting={!socketConnected && reconnectAttempt > 0}
                     attempt={reconnectAttempt}
                 />
                 <div className="flex flex-1 overflow-hidden h-full w-full">
+
+                    {/* Sidebar with user list */}
                     {(sidebarOpen || window.innerWidth > 1024) && (
                         <div className="bg-white/95 border-r border-gray-200 shadow-lg h-full z-10">
                             <ChatSidebar
@@ -657,6 +719,8 @@ const ChatInterface = ({ adminMode }) => {
                             />
                         </div>
                     )}
+
+                    {/* Main chat window */}
                     <div className="flex-1 flex flex-col bg-gradient-to-br from-white via-blue-50 to-indigo-50 h-full overflow-hidden">
                         <div className="flex-1 flex flex-col h-full overflow-hidden">
                             {selectedChat ? (
@@ -681,6 +745,7 @@ const ChatInterface = ({ adminMode }) => {
     );
 };
 
+// Admin header component for admin panel
 const AdminHeader = ({ user }) => (
     <div className="bg-white shadow-md py-4 px-6 flex justify-between items-center">
         <div className="flex items-center gap-3">
@@ -712,6 +777,7 @@ const AdminHeader = ({ user }) => (
     </div>
 );
 
+// Empty state shown when no chat is selected
 const EmptyState = ({ setSidebarOpen }) => (
     <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50/30">
         <div className="text-center p-10 bg-white rounded-2xl shadow-sm max-w-md">

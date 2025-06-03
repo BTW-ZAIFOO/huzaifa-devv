@@ -5,6 +5,7 @@ import { generateAvatar } from "../../utils/avatarUtils";
 import { highlightInappropriateContent, containsInappropriateContent } from "../../utils/moderationUtils";
 import axios from "axios";
 
+// ChatWindow component handles the chat UI, message sending, moderation, and admin actions
 const ChatWindow = ({
     selectedUser,
     messages,
@@ -17,10 +18,14 @@ const ChatWindow = ({
     onCloseChat,
     flaggedWords = []
 }) => {
+
+    // State for message input, voice recording, and speech recognition
     const [messageText, setMessageText] = useState("");
     const [isRecording, setIsRecording] = useState(false);
     const messagesEndRef = useRef(null);
     const [recognition, setRecognition] = useState(null);
+
+    // User and chat status flags
     const isAdminChat = selectedUser?.role === "admin";
     const isBannedUser = selectedUser?.status === "banned";
     const isBlockedUser = selectedUser?.status === "blocked";
@@ -29,11 +34,13 @@ const ChatWindow = ({
     const isCurrentUserBlockedOrBanned = loggedInUser?.status === "blocked" || loggedInUser?.status === "banned";
     const isChatDisabled = isCurrentUserBlockedOrBanned;
 
+    // Initialize speech recognition on mount
     useEffect(() => {
         initializeSpeechRecognition();
         return () => recognition?.stop();
     }, []);
 
+    // Setup speech recognition if supported
     const initializeSpeechRecognition = () => {
         if ("webkitSpeechRecognition" in window) {
             const SpeechRecognition = window.webkitSpeechRecognition;
@@ -42,12 +49,16 @@ const ChatWindow = ({
             recognitionInstance.interimResults = true;
             recognitionInstance.lang = 'en-US';
             recognitionInstance.onresult = (event) => {
+
+                // Update message text as speech is recognized
                 const transcript = Array.from(event.results)
                     .map(result => result[0].transcript)
                     .join('');
                 setMessageText(transcript);
             };
             recognitionInstance.onerror = (event) => {
+
+                // Handle speech recognition errors
                 console.error("Speech recognition error:", event.error);
                 toast.error("Speech recognition failed. Please try again.");
                 setIsRecording(false);
@@ -57,12 +68,14 @@ const ChatWindow = ({
         }
     };
 
+    // Scroll to bottom when messages change
     useEffect(() => {
         if (messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
     }, [messages]);
 
+    // Handle sending a message (text or voice)
     const handleSendMessage = (e) => {
         e.preventDefault();
         if (!canSendMessage()) return;
@@ -73,6 +86,7 @@ const ChatWindow = ({
         }
     };
 
+    // Check if the current user can send a message to the selected user
     const canSendMessage = () => {
         if (selectedUser.status === "banned" && !isAdmin) {
             console.error("This user has been banned and cannot receive messages.");
@@ -87,6 +101,7 @@ const ChatWindow = ({
         return true;
     };
 
+    // Handle toggling voice input (start/stop recording)
     const handleVoiceInput = () => {
         if (!recognition) {
             console.error("Speech recognition is not supported in this browser.");
@@ -96,12 +111,14 @@ const ChatWindow = ({
         isRecording ? stopRecording() : startRecording();
     };
 
+    // Start voice recording
     const startRecording = () => {
         setMessageText("");
         recognition.start();
         setIsRecording(true);
     };
 
+    // Stop voice recording and send the message if any text was recognized
     const stopRecording = () => {
         recognition.stop();
         setIsRecording(false);
@@ -111,6 +128,7 @@ const ChatWindow = ({
         }
     };
 
+    // Admin deletes any message
     const handleDeleteMessage = (messageId) => {
         if (onDeleteMessage && isAdmin) {
             onDeleteMessage(messageId);
@@ -119,6 +137,7 @@ const ChatWindow = ({
         }
     };
 
+    // User deletes their own message (soft or permanent)
     const handleDeleteOwnMessage = async (messageId, permanent = false) => {
         if (!messageId) return;
 
@@ -146,6 +165,7 @@ const ChatWindow = ({
         }
     };
 
+    // Get placeholder text for the input area based on user/chat status
     const getInputPlaceholder = () => {
         if (isCurrentUserBlockedOrBanned) return loggedInUser.status === "banned"
             ? "You are banned and cannot send messages"
@@ -156,10 +176,12 @@ const ChatWindow = ({
         return "Type a message...";
     };
 
+    // Highlight inappropriate words in a message
     function highlightInappropriate(text) {
         return highlightInappropriateContent(text, flaggedWords);
     }
 
+    // Render message status icons (sent, delivered, read)
     function renderMessageStatus(message) {
         if (message.from !== "me") return null;
 
@@ -172,6 +194,7 @@ const ChatWindow = ({
         );
     }
 
+    // Render badge for user status (admin, banned, blocked)
     function renderUserStatusBadge() {
         if (isAdminChat) {
             return <span className="ml-2 bg-purple-100 text-purple-800 text-xs px-1.5 py-0.5 rounded-full">Admin</span>;
@@ -185,6 +208,7 @@ const ChatWindow = ({
         return null;
     }
 
+    // Render all chat messages or empty state if no messages
     function renderMessages() {
         if (messages.length === 0) {
             return renderEmptyState();
@@ -202,6 +226,7 @@ const ChatWindow = ({
         );
     }
 
+    // Render UI when there are no messages yet
     function renderEmptyState() {
         return (
             <div className="flex items-center justify-center h-full text-gray-500">
@@ -218,6 +243,7 @@ const ChatWindow = ({
         );
     }
 
+    // Render notification if user is banned or blocked
     function renderStatusNotification() {
         if ((isBannedUser || isBlockedUser) && !isAdmin) {
             const isUserBanned = isBannedUser;
@@ -236,6 +262,7 @@ const ChatWindow = ({
         return null;
     }
 
+    // Render system messages (info, notifications)
     function renderSystemMessage(message) {
         return (
             <div key={message.id} className="flex justify-center">
@@ -247,7 +274,9 @@ const ChatWindow = ({
         );
     }
 
+    // Render a single chat message (with moderation, deletion, admin actions)
     function renderChatMessage(message) {
+        // Determine sender and message properties
         const senderId = message.sender?._id || message.sender || message.from;
         const currentUserId = loggedInUser?._id;
         const isMe = senderId && currentUserId && senderId.toString() === currentUserId.toString();
@@ -263,6 +292,8 @@ const ChatWindow = ({
                 className={`flex ${isMe ? "justify-end" : "justify-start"} group relative`}
             >
                 <div className={`max-w-[75%] flex ${isMe ? "flex-row-reverse" : ""}`}>
+
+                    {/* Show avatar for other users */}
                     {!isMe && (
                         avatar.imageUrl ?
                             <img
@@ -288,30 +319,38 @@ const ChatWindow = ({
                                     : "bg-gray-100 text-gray-800 rounded-tl-none shadow"
                             }`}
                     >
+
+                        {/* Show flagged badge if message is inappropriate */}
                         {isMessageFlagged && !isDeleted && (
                             <div className="absolute -top-6 right-0 bg-red-100 text-red-800 text-xs px-2 py-1 rounded-md shadow-sm">
                                 <i className="fas fa-flag mr-1"></i> Flagged content
                             </div>
                         )}
 
+                        {/* Show voice message badge */}
                         {message.isVoice && !isDeleted && (
                             <span className="absolute -top-6 left-0 text-xs text-gray-500 bg-white px-2 py-1 rounded-md shadow-sm">
                                 <i className="fas fa-microphone mr-1"></i> Voice message
                             </span>
                         )}
 
+                        {/* Show deleted/permanently deleted message */}
                         {isDeleted || isPermanentlyDeleted ? (
                             <div className="flex items-center text-gray-500">
                                 <i className="fas fa-ban mr-2"></i>
                                 <span className="italic">{messageText}</span>
                             </div>
                         ) : (isAdmin ? (
+
+                            // Admin sees highlighted inappropriate content
                             <div
                                 className={isMe ? "text-white break-words" : "text-gray-800 break-words"}
                                 style={{ wordBreak: "break-word", whiteSpace: "pre-wrap" }}
                                 dangerouslySetInnerHTML={{ __html: highlightInappropriate(messageText) }}
                             />
                         ) : (
+
+                            // Regular user sees plain text
                             <div
                                 className={isMe ? "text-white break-words" : "text-gray-800 break-words"}
                                 style={{ wordBreak: "break-word", whiteSpace: "pre-wrap" }}
@@ -320,6 +359,7 @@ const ChatWindow = ({
                             </div>
                         ))}
 
+                        {/* Message time and status */}
                         <div className={`text-xs mt-1.5 flex items-center gap-1.5 ${isMe ? "text-blue-100" : "text-gray-500"}`}>
                             {message.time || (message.createdAt && new Date(message.createdAt).toLocaleTimeString())}
                             {isMe && renderMessageStatus(message)}
@@ -327,6 +367,7 @@ const ChatWindow = ({
                             {isPermanentlyDeleted && <span className="ml-1 italic">(permanently deleted)</span>}
                         </div>
 
+                        {/* Message action buttons for user (delete, permanent delete) */}
                         {!isDeleted && !isPermanentlyDeleted && (
                             <div className="absolute -top-2 -right-2 flex gap-1">
                                 <button
@@ -346,6 +387,7 @@ const ChatWindow = ({
                             </div>
                         )}
 
+                        {/* Admin action buttons (delete, ban for flagged) */}
                         {isAdmin && onDeleteMessage && !isDeleted && !isPermanentlyDeleted && (
                             <div className="absolute -top-2 -right-2 flex gap-1">
                                 <button
@@ -372,8 +414,11 @@ const ChatWindow = ({
         );
     }
 
+    // Main render: header, messages, input area
     return (
         <div className="flex-1 flex flex-col bg-white/90 rounded-br-3xl shadow-inner overflow-hidden">
+
+            {/* Chat header with user info and actions */}
             <div className={`py-3 md:py-5 px-4 md:px-8 border-b flex justify-between items-center shadow-sm ${isAdminChat ? 'bg-purple-50' :
                 isBannedUser ? 'bg-red-50' :
                     isBlockedUser ? 'bg-yellow-50' :
@@ -381,10 +426,14 @@ const ChatWindow = ({
                 }`}>
                 <div className="flex items-center">
                     {isAdminChat ? (
+
+                        // Admin avatar
                         <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center mr-3 shadow-md">
                             <i className="fas fa-headset text-white text-lg"></i>
                         </div>
                     ) : (
+
+                        // User avatar with status indicator
                         <div className="relative">
                             {(() => {
                                 const avatar = generateAvatar(selectedUser);
@@ -402,7 +451,9 @@ const ChatWindow = ({
                                         {avatar.initials}
                                     </div>
                                 );
-                            })()}
+                            })}
+
+                            {/* Status dot */}
                             <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${selectedUser.status === "online" ? "bg-green-500" :
                                 selectedUser.status === "banned" ? "bg-black" :
                                     selectedUser.status === "blocked" ? "bg-red-500" :
@@ -428,6 +479,8 @@ const ChatWindow = ({
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
+
+                    {/* View profile button (not for admin chat) */}
                     {!isAdminChat && (
                         <button
                             className="p-2 md:p-2.5 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition-colors"
@@ -437,6 +490,8 @@ const ChatWindow = ({
                             <i className="far fa-user-circle text-lg md:text-xl"></i>
                         </button>
                     )}
+
+                    {/* Close chat button */}
                     {onCloseChat && (
                         <button
                             className="p-2 md:p-2.5 bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 transition-colors"
@@ -448,6 +503,8 @@ const ChatWindow = ({
                     )}
                 </div>
             </div>
+
+            {/* Message list area */}
             <div
                 className={`flex-1 p-4 md:p-8 overflow-y-auto ${isAdminChat ? 'bg-purple-50/30' :
                     isBannedUser ? 'bg-red-50/20' :
@@ -463,6 +520,8 @@ const ChatWindow = ({
                 {renderMessages()}
                 <div ref={messagesEndRef} className="h-4" />
             </div>
+
+            {/* Message input area */}
             <form onSubmit={handleSendMessage} className="p-4 md:p-6 border-t flex items-end gap-3 bg-white/95 shadow-lg">
                 <div className="flex-1 relative items-center">
                     <textarea
@@ -480,12 +539,16 @@ const ChatWindow = ({
                         rows={1}
                         disabled={isMessageDisabled || isChatDisabled}
                     ></textarea>
+
+                    {/* Voice recording indicator */}
                     {isRecording && (
                         <div className="absolute right-12 bottom-3 flex items-center text-red-500">
                             <div className="mr-2 h-2 w-2 bg-red-500 rounded-full animate-ping"></div>
                             Recording...
                         </div>
                     )}
+
+                    {/* Voice input button */}
                     <button
                         type="button"
                         className={`absolute right-3 bottom-3 p-2 rounded-full focus:outline-none transition-all ${isRecording ? "bg-red-500 text-white animate-pulse" : "bg-gray-200 text-gray-500 hover:bg-gray-300"
@@ -497,6 +560,8 @@ const ChatWindow = ({
                         <i className={`fas ${isRecording ? "fa-stop" : "fa-microphone"}`}></i>
                     </button>
                 </div>
+
+                {/* Send message button */}
                 <button
                     type="submit"
                     className={`p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl flex-shrink-0 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 transition-all mb-2 ${isMessageDisabled || isChatDisabled || (!messageText.trim() && !isRecording) ? "opacity-50 cursor-not-allowed" : ""

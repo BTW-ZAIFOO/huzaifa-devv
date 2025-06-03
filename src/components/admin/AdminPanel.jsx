@@ -10,7 +10,10 @@ import { extractInappropriateWords, containsInappropriateContent } from "../../u
 import io from "socket.io-client";
 import { generateAvatar } from "../../utils/avatarUtils";
 
+// Main AdminPanel component for admin functionalities
 const AdminPanel = ({ users: initialUsers }) => {
+
+    // State variables for managing UI and data
     const [selectedUser, setSelectedUser] = useState(null);
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [messages, setMessages] = useState([]);
@@ -33,6 +36,7 @@ const AdminPanel = ({ users: initialUsers }) => {
         moderationLevel: 'medium',
     });
 
+    // Effect: Setup socket connection for real-time admin monitoring
     useEffect(() => {
         if (!adminUser?.role === "admin") return;
 
@@ -41,13 +45,16 @@ const AdminPanel = ({ users: initialUsers }) => {
             reconnection: true,
         });
 
+        // Join admin room on connect
         socketRef.current.on("connect", () => {
             socketRef.current.emit("join-admin-room");
         });
 
+        // Listen for new messages for moderation
         socketRef.current.on("admin-message-monitor", (message) => {
             setMessageQueue(prev => [message, ...prev].slice(0, 50));
 
+            // Auto-flag inappropriate content
             if (containsInappropriateContent(message.content)) {
                 const flaggedWords = extractInappropriateWords(message.content);
                 logAdminActivity(`Auto-detected inappropriate content from ${message.sender.name}: ${flaggedWords.join(', ')}`, 'alert');
@@ -64,17 +71,20 @@ const AdminPanel = ({ users: initialUsers }) => {
                     ...prev
                 ]);
 
+                // Auto-delete if setting enabled
                 if (adminSettings.autoDeleteFlaggedContent) {
                     handleDeleteMessage(message._id, true);
                 }
             }
 
+            // Track user activity for analytics
             trackUserActivity(message.sender._id, 'message_sent', {
                 content: message.content.substring(0, 50) + (message.content.length > 50 ? '...' : ''),
                 timestamp: message.createdAt
             });
         });
 
+        // Cleanup on unmount
         return () => {
             if (socketRef.current) {
                 socketRef.current.disconnect();
@@ -83,6 +93,7 @@ const AdminPanel = ({ users: initialUsers }) => {
         };
     }, [adminUser, adminSettings.autoDeleteFlaggedContent]);
 
+    // Effect: Load messages when a user is selected or view changes
     useEffect(() => {
         if (selectedUser) {
             loadUserMessages();
@@ -91,10 +102,12 @@ const AdminPanel = ({ users: initialUsers }) => {
         }
     }, [selectedUser, activeView]);
 
+    // Effect: Fetch users on mount
     useEffect(() => {
         fetchUsers();
     }, []);
 
+    // Load chat history for selected user (simulated here)
     const loadUserMessages = async () => {
         try {
             const userId = selectedUser._id || selectedUser.id;
@@ -104,6 +117,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                 ...prev
             ]);
 
+            // Simulated messages for demonstration
             const simulatedMessages = [
                 {
                     _id: "msg1",
@@ -133,6 +147,7 @@ const AdminPanel = ({ users: initialUsers }) => {
         }
     };
 
+    // Send a message as admin to the selected user
     const handleSendMessage = (messageText, isVoice = false) => {
         if (!messageText.trim()) return;
 
@@ -148,8 +163,11 @@ const AdminPanel = ({ users: initialUsers }) => {
         logAdminActivity(`Sent message to ${selectedUser.name}`);
     };
 
+    // Delete a message (manual or auto)
     const handleDeleteMessage = async (messageId, isAutoDelete = false) => {
         try {
+
+            // Find message in either chat or queue
             const messageToDelete = messages.find(m => m._id === messageId) ||
                 messageQueue.find(m => m._id === messageId);
 
@@ -159,6 +177,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                 return;
             }
 
+            // Mark as deleted in chat window if present
             if (messages.find(m => m._id === messageId)) {
                 setMessages(prev => prev.map(m =>
                     m._id === messageId
@@ -173,6 +192,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                 ));
             }
 
+            // Remove from live message queue
             setMessageQueue(prev => prev.filter(m => m._id !== messageId));
             const messageUser = users.find(u => u._id === messageToDelete.sender._id);
             if (messageUser) {
@@ -180,6 +200,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                     messageUser.notifications = [];
                 }
 
+                // Notify user about deletion
                 messageUser.notifications.unshift({
                     id: `msg-deleted-${Date.now()}`,
                     type: 'message_deleted',
@@ -194,6 +215,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                     originalContent: messageToDelete.content.substring(0, 30) + (messageToDelete.content.length > 30 ? '...' : '')
                 });
 
+                // Track deletion activity
                 trackUserActivity(messageUser._id, 'message_deleted', {
                     content: messageToDelete.content.substring(0, 50),
                     deletedBy: isAutoDelete ? 'System' : adminUser.name,
@@ -201,12 +223,14 @@ const AdminPanel = ({ users: initialUsers }) => {
                 });
             }
 
+            // Log admin activity
             const actionMsg = isAutoDelete
                 ? `System automatically deleted message with inappropriate content from ${messageToDelete.sender.name}`
                 : `Deleted message from ${messageToDelete.sender.name}: "${messageToDelete.content.substring(0, 30)}${messageToDelete.content.length > 30 ? '...' : ''}"`;
 
             logAdminActivity(actionMsg, isAutoDelete ? 'warning' : 'standard');
 
+            // Notify backend via socket if needed
             if (socketRef.current && messageToDelete.chat) {
                 socketRef.current.emit("admin-delete-message", {
                     messageId,
@@ -214,6 +238,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                 });
             }
 
+            // Add report if auto-deleted
             if (isAutoDelete) {
                 addNewReport({
                     type: 'message',
@@ -239,6 +264,7 @@ const AdminPanel = ({ users: initialUsers }) => {
         }
     };
 
+    // Track user activity for analytics and logs
     const trackUserActivity = (userId, activity, details) => {
         const user = users.find(u => u._id === userId);
         if (!user) return;
@@ -255,6 +281,7 @@ const AdminPanel = ({ users: initialUsers }) => {
         user.lastActivityTime = new Date().toLocaleTimeString();
     };
 
+    // Ban a user and log/report the action
     const handleBanUser = async (userId, reason, evidence = null) => {
         try {
             const userToBan = users.find(u => u._id === userId);
@@ -264,6 +291,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                 return;
             }
 
+            // API call to ban user
             try {
                 await axios.post(`http://localhost:4000/api/v1/admin/ban-user`, {
                     userId,
@@ -274,12 +302,14 @@ const AdminPanel = ({ users: initialUsers }) => {
                 });
             }
             catch (apiError) {
+                // Ignore API error for demo
             }
 
             if (!userToBan.notifications) {
                 userToBan.notifications = [];
             }
 
+            // Notify user about ban
             userToBan.notifications.unshift({
                 id: `ban-${Date.now()}`,
                 type: 'ban',
@@ -293,6 +323,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                 actionTimestamp: new Date().toISOString()
             });
 
+            // Notify via socket
             if (socketRef.current) {
                 socketRef.current.emit("admin-ban-user", {
                     userId,
@@ -311,6 +342,7 @@ const AdminPanel = ({ users: initialUsers }) => {
             toast.success(`User ${userToBan.name} has been banned for ${reason}`);
             logAdminActivity(`Banned user ${userToBan.name} for: ${reason}`, 'alert');
 
+            // Update user status locally
             userToBan.status = "banned";
             userToBan.bannedReason = reason;
             userToBan.bannedAt = new Date().toISOString();
@@ -320,12 +352,14 @@ const AdminPanel = ({ users: initialUsers }) => {
                 u._id === userId ? userToBan : u
             ));
 
+            // Track ban activity
             trackUserActivity(userId, 'banned', {
                 reason,
                 by: adminUser.name,
                 timestamp: new Date().toISOString()
             });
 
+            // Add report if evidence provided
             if (evidence) {
                 addNewReport({
                     type: 'user',
@@ -339,6 +373,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                 });
             }
 
+            // Deselect user if currently selected
             if (selectedUser && selectedUser._id === userId) {
                 setActiveView("dashboard");
                 setSelectedUser(null);
@@ -350,6 +385,7 @@ const AdminPanel = ({ users: initialUsers }) => {
         }
     };
 
+    // Block or unblock a user, or ban/unban as needed
     const handleBlockUserAction = async (userId, action = "block", reason = null) => {
         const user = users.find(u => u._id === userId || u.id === userId);
         if (!user) {
@@ -361,6 +397,7 @@ const AdminPanel = ({ users: initialUsers }) => {
         const isBlocked = user.status === "blocked";
         const isBanned = user.status === "banned";
 
+        // Prompt for reason if blocking/banning
         if ((action === "block" && !isBlocked) || (action === "ban" && !isBanned)) {
             if (!reason) {
                 reason = prompt(`Enter reason for ${action === "block" ? "blocking" : "banning"} ${user.name}:`);
@@ -379,6 +416,8 @@ const AdminPanel = ({ users: initialUsers }) => {
             const updatedUser = { ...user };
 
             if (!isBlocked) {
+
+                // API call to block user
                 try {
                     await axios.post(`http://localhost:4000/api/v1/admin/block-user`, {
                         userId,
@@ -391,6 +430,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                     console.error("API error when blocking user:", apiError);
                 }
 
+                // Notify user about block
                 updatedUser.notifications.unshift({
                     id: `block-${Date.now()}`,
                     type: 'block',
@@ -404,6 +444,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                     actionTimestamp: new Date().toISOString()
                 });
 
+                // Notify via socket
                 if (socketRef.current) {
                     socketRef.current.emit("admin-block-user", {
                         userId,
@@ -422,12 +463,15 @@ const AdminPanel = ({ users: initialUsers }) => {
                 updatedUser.blockedAt = new Date().toISOString();
                 updatedUser.blockedBy = adminUser.name;
 
+                // Track block activity
                 trackUserActivity(userId, 'blocked', {
                     reason: reason || "Administrative action",
                     by: adminUser.name,
                     timestamp: new Date().toISOString()
                 });
             } else {
+
+                // API call to unblock user
                 try {
                     await axios.post(`http://localhost:4000/api/v1/admin/unblock-user`, {
                         userId
@@ -436,8 +480,10 @@ const AdminPanel = ({ users: initialUsers }) => {
                     });
                 }
                 catch (apiError) {
+                    // Ignore API error for demo
                 }
 
+                // Notify user about unblock
                 updatedUser.notifications.unshift({
                     id: `unblock-${Date.now()}`,
                     type: 'unblock',
@@ -451,6 +497,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                     actionTimestamp: new Date().toISOString()
                 });
 
+                // Track unblock activity
                 trackUserActivity(userId, 'unblocked', {
                     by: adminUser.name,
                     timestamp: new Date().toISOString()
@@ -463,6 +510,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                 (u._id === userId || u.id === userId) ? updatedUser : u
             ));
 
+            // Log block/unblock action
             logAdminActivity(`${isBlocked ? 'Unblocked' : 'Blocked'} user ${user.name}${!isBlocked ? ` for: ${reason || "Administrative action"}` : ""}`,
                 isBlocked ? 'standard' : 'warning');
             console.log(`User ${user.name} ${isBlocked ? 'unblocked' : 'blocked'} successfully`);
@@ -472,6 +520,8 @@ const AdminPanel = ({ users: initialUsers }) => {
             if (!isBanned) {
                 handleBanUser(userId, reason || "Policy violation");
             } else {
+
+                // API call to unban user
                 try {
                     await axios.post(`http://localhost:4000/api/v1/admin/unban-user`, {
                         userId
@@ -480,10 +530,12 @@ const AdminPanel = ({ users: initialUsers }) => {
                     });
                 }
                 catch (apiError) {
+                    // Ignore API error for demo
                 }
 
                 const updatedUser = { ...user, status: "online" };
 
+                // Notify user about unban
                 updatedUser.notifications.unshift({
                     id: `unban-${Date.now()}`,
                     type: 'unban',
@@ -501,6 +553,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                     (u._id === userId || u.id === userId) ? updatedUser : u
                 ));
 
+                // Track unban activity
                 trackUserActivity(userId, 'unbanned', {
                     by: adminUser.name,
                     timestamp: new Date().toISOString()
@@ -513,6 +566,7 @@ const AdminPanel = ({ users: initialUsers }) => {
         }
     };
 
+    // Log admin actions for activity sidebar
     const logAdminActivity = (action, type = 'standard') => {
         setAdminActivity(prev => [
             {
@@ -524,6 +578,7 @@ const AdminPanel = ({ users: initialUsers }) => {
         ]);
     };
 
+    // Report or unreport a user
     const handleReportUserAction = (userId, customReason = "") => {
         const user = users.find(u => u._id === userId || u.id === userId);
         if (!user) {
@@ -532,6 +587,7 @@ const AdminPanel = ({ users: initialUsers }) => {
             return;
         }
 
+        // Remove report if already reported and no new reason
         if (user.isReported && !customReason) {
             user.isReported = false;
             user.reportReason = null;
@@ -551,6 +607,7 @@ const AdminPanel = ({ users: initialUsers }) => {
             return;
         }
 
+        // Prompt for reason if not provided
         if (!customReason) {
             const reportReason = prompt("Please provide a reason for reporting this user:");
             if (!reportReason || reportReason.trim() === "") {
@@ -561,6 +618,7 @@ const AdminPanel = ({ users: initialUsers }) => {
             customReason = reportReason.trim();
         }
 
+        // Mark user as reported
         user.isReported = true;
         user.reportReason = customReason;
         user.reportedAt = new Date().toISOString();
@@ -571,6 +629,7 @@ const AdminPanel = ({ users: initialUsers }) => {
             user.notifications = [];
         }
 
+        // Notify user about report
         user.notifications.unshift({
             id: `report-${Date.now()}`,
             type: 'report',
@@ -585,6 +644,7 @@ const AdminPanel = ({ users: initialUsers }) => {
             actionTimestamp: new Date().toISOString()
         });
 
+        // Add report to reports list
         addNewReport({
             type: 'user',
             user: user,
@@ -595,6 +655,7 @@ const AdminPanel = ({ users: initialUsers }) => {
             reportedBy: adminUser.name
         });
 
+        // Track report activity
         trackUserActivity(userId, 'reported', {
             reason: customReason,
             by: adminUser.name,
@@ -605,6 +666,7 @@ const AdminPanel = ({ users: initialUsers }) => {
         toast.success(`User ${user.name} has been reported for "${customReason}"`);
     };
 
+    // Render admin navigation bar
     const renderAdminNav = () => (
         <div className="bg-white border-b border-gray-200 px-6 py-2.5 flex items-center space-x-4">
             <button
@@ -652,6 +714,7 @@ const AdminPanel = ({ users: initialUsers }) => {
         </div>
     );
 
+    // Render settings view for admin preferences
     const renderSettingsView = () => (
         <div className="flex-1 p-6 bg-gray-50 overflow-auto">
             <div className="mb-6">
@@ -769,21 +832,25 @@ const AdminPanel = ({ users: initialUsers }) => {
         </div>
     );
 
+    // Toggle sidebar visibility (for mobile)
     const handleToggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
     };
 
+    // View chat history for a user
     const handleViewUserChat = (user) => {
         setSelectedUser(user);
         setActiveView("chat");
         logAdminActivity(`Viewing ${user.name}'s chat history`);
     };
 
+    // View user profile (logs activity)
     const handleViewUserProfile = () => {
         if (!selectedUser) return;
         logAdminActivity(`Viewed ${selectedUser.name}'s profile`);
     };
 
+    // Fetch all users from backend and process for moderation
     const fetchUsers = async () => {
         setLoading(true);
         setError(null);
@@ -795,6 +862,7 @@ const AdminPanel = ({ users: initialUsers }) => {
 
             const userData = response.data.users || [];
 
+            // Enhance user objects with extra fields
             const enhancedUsers = userData.map(user => ({
                 ...user,
                 notifications: user.notifications || [],
@@ -814,6 +882,7 @@ const AdminPanel = ({ users: initialUsers }) => {
         }
     };
 
+    // Process users to find those with flagged messages
     const processUsersForModeration = (userList) => {
         const flaggedUserMap = {};
 
@@ -836,12 +905,14 @@ const AdminPanel = ({ users: initialUsers }) => {
         setFlaggedUsers(flaggedUserMap);
     };
 
+    // Refresh user list from backend
     const handleRefreshUsers = () => {
         fetchUsers();
         console.log("Refreshing user data...");
         toast.info("Refreshing user data...");
     };
 
+    // Add a new report to the reports list
     const addNewReport = (reportData) => {
         setReports(prev => [{
             id: `report-${Date.now()}`,
@@ -851,6 +922,7 @@ const AdminPanel = ({ users: initialUsers }) => {
         }, ...prev]);
     };
 
+    // Resolve a report (mark as resolved and log)
     const handleResolveReport = (reportId, action, reason) => {
         setReports(prev => prev.map(report =>
             report.id === reportId ? {
@@ -868,6 +940,7 @@ const AdminPanel = ({ users: initialUsers }) => {
         toast.success(`Report resolved with action: ${action}`);
     };
 
+    // Ignore a report (mark as ignored and log)
     const handleIgnoreReport = (reportId) => {
         setReports(prev => prev.map(report =>
             report.id === reportId ? {
@@ -883,6 +956,7 @@ const AdminPanel = ({ users: initialUsers }) => {
         toast.info(`Report marked as ignored`);
     };
 
+    // Render the live message queue for moderation
     const renderMessageQueue = () => {
         if (messageQueue.length === 0) {
             return (
@@ -1001,9 +1075,12 @@ const AdminPanel = ({ users: initialUsers }) => {
         }
     };
 
+    // Main render logic for AdminPanel
     return (
         <>
             <div className="flex-1 flex flex-col h-full">
+
+                {/* Header bar */}
                 <div className="bg-purple-100 p-3 flex items-center justify-between shadow-sm">
                     <div className="flex items-center gap-3">
                         <button
@@ -1029,8 +1106,10 @@ const AdminPanel = ({ users: initialUsers }) => {
                     </div>
                 </div>
 
+                {/* Admin navigation bar */}
                 {renderAdminNav()}
 
+                {/* Loading overlay */}
                 {loading && (
                     <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80 z-50">
                         <div className="text-center">
@@ -1040,6 +1119,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                     </div>
                 )}
 
+                {/* Error message */}
                 {error && (
                     <div className="bg-red-50 border-l-4 border-red-500 p-4 m-4">
                         <div className="flex">
@@ -1061,7 +1141,10 @@ const AdminPanel = ({ users: initialUsers }) => {
                     </div>
                 )}
 
+                {/* Main content area */}
                 <div className="flex flex-1 overflow-hidden">
+
+                    {/* Sidebar for chat view (responsive) */}
                     {(activeView === "chat" && (sidebarOpen || window.innerWidth > 1024)) && (
                         <ChatSidebar
                             users={users.filter(u => u.role !== "admin")}
@@ -1074,6 +1157,8 @@ const AdminPanel = ({ users: initialUsers }) => {
                         />
                     )}
                     <div className="flex-1 flex">
+
+                        {/* Dashboard view */}
                         {activeView === "dashboard" && (
                             <AdminDashboard
                                 users={users}
@@ -1091,6 +1176,8 @@ const AdminPanel = ({ users: initialUsers }) => {
                                 }}
                             />
                         )}
+
+                        {/* Chat view for selected user */}
                         {activeView === "chat" && (
                             <div className="flex-1 flex flex-col">
                                 <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-3">
@@ -1113,6 +1200,8 @@ const AdminPanel = ({ users: initialUsers }) => {
                                 />
                             </div>
                         )}
+
+                        {/* Reports view */}
                         {activeView === "reports" && (
                             <div className="flex-1 overflow-hidden">
                                 <ReportsView
@@ -1125,6 +1214,8 @@ const AdminPanel = ({ users: initialUsers }) => {
                                 />
                             </div>
                         )}
+
+                        {/* Live messages view */}
                         {activeView === "messages" && (
                             <div className="flex-1 p-6 bg-gray-50 overflow-auto">
                                 <div className="mb-6 flex justify-between items-center">
@@ -1158,9 +1249,12 @@ const AdminPanel = ({ users: initialUsers }) => {
                                 {renderMessageQueue()}
                             </div>
                         )}
+
+                        {/* Settings view */}
                         {activeView === "settings" && renderSettingsView()}
                     </div>
 
+                    {/* Admin activity log sidebar (not shown in chat view) */}
                     {activeView !== "chat" && (
                         <div className="w-[320px] bg-white border-l border-gray-200 overflow-auto hidden lg:block">
                             <div className="p-4 border-b bg-gray-50">
@@ -1189,6 +1283,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                                                     {activity.action}
                                                 </span>
 
+                                                {/* Action buttons for flagged messages */}
                                                 {activity.type === 'warning' && activity.messageId && (
                                                     <div className="mt-2 flex space-x-2">
                                                         <button

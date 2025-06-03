@@ -3,6 +3,7 @@ import axios from "axios";
 import { Context } from "../../main";
 import { generateAvatar, generateAdminAvatar } from "../../utils/avatarUtils";
 
+// ChatSidebar component handles the sidebar UI for chat users/admins
 const ChatSidebar = ({
     users,
     selectedUser,
@@ -14,11 +15,14 @@ const ChatSidebar = ({
     showAdminChat,
     notifications = []
 }) => {
+
+    // State for search input, online filter, and search results
     const [searchTerm, setSearchTerm] = useState("");
     const [showOnlineOnly, setShowOnlineOnly] = useState(false);
     const [searchResults, setSearchResults] = useState([]);
     const { user: currentUser } = useContext(Context);
 
+    // Effect: fetch users matching search term from backend
     useEffect(() => {
         if (searchTerm.trim() === "") {
             setSearchResults([]);
@@ -32,6 +36,7 @@ const ChatSidebar = ({
                     { withCredentials: true }
                 );
 
+                // Only include verified users whose name matches search
                 setSearchResults(res.data.users.filter(u =>
                     u.accountVerified &&
                     u.name &&
@@ -44,22 +49,27 @@ const ChatSidebar = ({
         fetchSearch();
     }, [searchTerm]);
 
+    // Filter users based on online status and admin/user context
     const filterUsers = (users) => {
         return users.filter(user => {
             const userId = user._id?.toString() || user.id?.toString();
             const currentId = currentUser?._id?.toString() || currentUser?.id?.toString();
             const matchesOnline = showOnlineOnly ? user.status === "online" : true;
 
-            if (isAdmin) return matchesOnline;
+            if (isAdmin) return matchesOnline; // Admin sees all except filtered by online
 
+            // Users don't see themselves
             return userId !== currentId && matchesOnline;
         });
     };
 
+    // Use search results if searching, otherwise show all verified users
     const baseUsers = searchTerm.trim() ? searchResults : users.filter(u => u.accountVerified);
 
+    // Final list of users to display
     let displayUsers = filterUsers(baseUsers);
 
+    // If admin chat is enabled, prepend admin support to the list
     if (showAdminChat) {
         displayUsers = [{
             _id: 'admin',
@@ -74,6 +84,8 @@ const ChatSidebar = ({
     return (
         <>
             <div className="w-[280px] lg:w-[320px] bg-white/95 border-r border-gray-200 flex flex-col h-full">
+
+                {/* Sidebar header with title and search */}
                 <div className="p-4 lg:p-6 border-b border-gray-200 bg-gradient-to-r from-blue-100 via-indigo-100 to-purple-200 ">
                     <h2 className="text-xl font-bold text-blue-700 mb-4 tracking-wide">
                         {isAdmin ? "User Management" : "Chats"}
@@ -88,6 +100,8 @@ const ChatSidebar = ({
                         />
                         <i className="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                     </div>
+
+                    {/* Online only filter and reset button */}
                     <div className="flex items-center mt-2 justify-between">
                         <label className="flex items-center text-sm text-gray-600 cursor-pointer hover:text-indigo-600 transition-colors group">
                             <input
@@ -108,6 +122,8 @@ const ChatSidebar = ({
                         </button>
                     </div>
                 </div>
+
+                {/* Loading spinner or user list */}
                 {loading ? (
                     <div className="flex-1 flex items-center justify-center">
                         <div className="flex flex-col items-center">
@@ -122,6 +138,7 @@ const ChatSidebar = ({
                                 {isAdmin ? "Manage Users" : "Recent Chats"}
                             </h3>
 
+                            {/* Show message if no users found */}
                             {displayUsers.length === 0 ? (
                                 <div className="text-center py-6 text-gray-500 bg-gray-50 rounded-lg m-2">
                                     <i className="fas fa-user-slash text-gray-400 text-2xl mb-2"></i>
@@ -129,13 +146,22 @@ const ChatSidebar = ({
                                 </div>
                             ) : (
                                 <ul>
+
+                                    {/* Render each user in the sidebar */}
                                     {displayUsers.map((user) => {
                                         const userId = user._id?.toString() || user.id?.toString();
                                         const selectedId = selectedUser?._id?.toString() || selectedUser?.id?.toString();
+
+                                        // Notifications for this user
                                         const userNotifications = notifications.filter(n => n.sender?._id === userId);
+
+                                        // Generate avatar (admin or user)
                                         const avatar = user.role === "admin" ? generateAdminAvatar(user) : generateAvatar(user);
+
+                                        // Highlight if selected
                                         const isSelected = selectedId === userId;
 
+                                        // Border color for reported/blocked/banned users
                                         let borderClass = "";
                                         if (user.isReported) borderClass = "border-l-4 border-yellow-500";
                                         else if (user.status === "blocked") borderClass = "border-l-4 border-red-400";
@@ -149,6 +175,8 @@ const ChatSidebar = ({
                                                     onClick={() => onSelectUser(user)}
                                                 >
                                                     <div className="relative">
+
+                                                        {/* Show avatar image or fallback initials */}
                                                         {avatar.imageUrl ? (
                                                             <img
                                                                 src={avatar.imageUrl}
@@ -171,11 +199,15 @@ const ChatSidebar = ({
                                                                 {avatar.initials}
                                                             </div>
                                                         )}
+
+                                                        {/* Notification badge for unread messages */}
                                                         {userNotifications.length > 0 && (
                                                             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 min-w-5 px-1 flex items-center justify-center">
                                                                 {userNotifications.length > 9 ? '9+' : userNotifications.length}
                                                             </span>
                                                         )}
+
+                                                        {/* Status indicator dot */}
                                                         <span
                                                             className={`absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full ${user.status === "online" ? "bg-green-500" :
                                                                 user.status === "blocked" ? "bg-red-500" :
@@ -187,6 +219,8 @@ const ChatSidebar = ({
                                                         <div className="flex justify-between items-center">
                                                             <h3 className="font-medium text-gray-800">
                                                                 {user.name}
+
+                                                                {/* Show admin, blocked, or banned badges */}
                                                                 {user.role === "admin" && (
                                                                     <span className="ml-1.5 bg-purple-100 text-purple-800 text-xs px-1.5 py-0.5 rounded-full">
                                                                         Admin
@@ -203,6 +237,8 @@ const ChatSidebar = ({
                                                                     </span>
                                                                 )}
                                                             </h3>
+
+                                                            {/* Admin controls: block, ban, report */}
                                                             {isAdmin && (
                                                                 <div className="flex gap-2">
                                                                     <button
@@ -238,17 +274,23 @@ const ChatSidebar = ({
                                                                 </div>
                                                             )}
                                                         </div>
+
+                                                        {/* Show last seen or status */}
                                                         <p className="text-xs text-gray-500 mt-0.5">
                                                             {user.status === "banned" ? "Banned by admin" :
                                                                 user.status === "blocked" ? "Blocked by admin" :
                                                                     user.lastSeen}
                                                         </p>
+
+                                                        {/* Admin: show last activity */}
                                                         {isAdmin && user.lastActivity && (
                                                             <p className="text-xs text-blue-600 mt-1">
                                                                 <i className="fas fa-history mr-1"></i>
                                                                 {user.lastActivity}
                                                             </p>
                                                         )}
+
+                                                        {/* Admin: show flagged words count */}
                                                         {isAdmin && user.flaggedWords && user.flaggedWords.length > 0 && (
                                                             <div className="flex mt-1 gap-1">
                                                                 <span className="text-xs bg-red-100 text-red-800 px-1.5 py-0.5 rounded">
@@ -268,6 +310,7 @@ const ChatSidebar = ({
                     </div>
                 )}
 
+                {/* Logout button at the bottom */}
                 <div className="p-4 border-t border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
                     <button
                         onClick={async () => {
