@@ -12,7 +12,7 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
     const [sortDirection, setSortDirection] = useState('asc');
 
     // Helper to count users based on a condition
-    const getUserCount = (condition) => users ? users.filter(condition).length : 0;
+    const getUserCount = (condition) => Array.isArray(users) ? users.filter(condition).length : 0;
 
     // Dashboard statistics
     const totalUsers = getUserCount(user => user.role !== 'admin');
@@ -23,7 +23,7 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
     const flaggedContent = getUserCount(user => (user.flaggedWords && user.flaggedWords.length > 0) || flaggedUsers[user._id || user.id]);
 
     // Show message if no users are found
-    if (!users || users.length === 0) {
+    if (!Array.isArray(users) || users.length === 0) {
         return (
             <div className="flex-1 p-6 bg-gray-50 flex flex-col items-center justify-center">
                 <div className="bg-white rounded-lg p-8 shadow text-center max-w-md">
@@ -40,7 +40,7 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
     }
 
     // Filter users based on filter and search term
-    let filteredUsers = [...users].filter(user => {
+    let filteredUsers = Array.isArray(users) ? [...users].filter(user => {
         if (user.role === 'admin') return false;
 
         // Define filter conditions
@@ -67,7 +67,7 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
         }
 
         return true;
-    });
+    }) : [];
 
     // Sort users based on selected column and direction
     filteredUsers.sort((a, b) => {
