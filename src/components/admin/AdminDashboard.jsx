@@ -22,7 +22,7 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
     const reportedUsers = getUserCount(user => user.isReported);
     const flaggedContent = getUserCount(user => (user.flaggedWords && user.flaggedWords.length > 0) || flaggedUsers[user._id || user.id]);
 
-    // Show message if no users are found
+    // Show message if no users are found or users is not an array
     if (!Array.isArray(users) || users.length === 0) {
         return (
             <div className="flex-1 p-6 bg-gray-50 flex flex-col items-center justify-center">
@@ -70,35 +70,37 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
     }) : [];
 
     // Sort users based on selected column and direction
-    filteredUsers.sort((a, b) => {
-        let compareA, compareB;
+    if (Array.isArray(filteredUsers)) {
+        filteredUsers.sort((a, b) => {
+            let compareA, compareB;
 
-        switch (sortBy) {
-            case 'name':
-                compareA = a.name || '';
-                compareB = b.name || '';
-                break;
-            case 'status':
-                compareA = a.status || '';
-                compareB = b.status || '';
-                break;
-            case 'activity':
-                compareA = a.lastActivityTime || '';
-                compareB = b.lastActivityTime || '';
-                break;
-            case 'flags':
-                const aFlags = (a.flaggedWords?.length || 0) + (flaggedUsers[a._id || a.id]?.length || 0);
-                const bFlags = (b.flaggedWords?.length || 0) + (flaggedUsers[b._id || b.id]?.length || 0);
-                compareA = aFlags;
-                compareB = bFlags;
-                break;
-            default:
-                compareA = a.name || '';
-                compareB = b.name || '';
-        }
+            switch (sortBy) {
+                case 'name':
+                    compareA = a.name || '';
+                    compareB = b.name || '';
+                    break;
+                case 'status':
+                    compareA = a.status || '';
+                    compareB = b.status || '';
+                    break;
+                case 'activity':
+                    compareA = a.lastActivityTime || '';
+                    compareB = b.lastActivityTime || '';
+                    break;
+                case 'flags':
+                    const aFlags = (a.flaggedWords?.length || 0) + (flaggedUsers[a._id || a.id]?.length || 0);
+                    const bFlags = (b.flaggedWords?.length || 0) + (flaggedUsers[b._id || b.id]?.length || 0);
+                    compareA = aFlags;
+                    compareB = bFlags;
+                    break;
+                default:
+                    compareA = a.name || '';
+                    compareB = b.name || '';
+            }
 
-        return sortDirection === 'asc' ? (compareA > compareB ? 1 : -1) : (compareA < compareB ? 1 : -1);
-    });
+            return sortDirection === 'asc' ? (compareA > compareB ? 1 : -1) : (compareA < compareB ? 1 : -1);
+        });
+    }
 
     // Handle sorting when column header is clicked
     const handleSortClick = (column) => {
