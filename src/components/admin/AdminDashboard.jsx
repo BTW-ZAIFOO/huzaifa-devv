@@ -3,7 +3,16 @@ import { toast } from 'react-toastify';
 import { getAvatarByRole } from '../../utils/avatarUtils';
 
 // AdminDashboard component for managing users and moderating content
-const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBanUser, flaggedUsers = {} }) => {
+const AdminDashboard = ({
+    users: usersProp,
+    onBlockUser,
+    onReportUser,
+    onViewUserChat,
+    onBanUser,
+    flaggedUsers = {}
+}) => {
+    // Ensure users is always an array
+    const users = Array.isArray(usersProp) ? usersProp : [];
 
     // State for filter, search, sorting
     const [filter, setFilter] = useState('all');
@@ -12,7 +21,7 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
     const [sortDirection, setSortDirection] = useState('asc');
 
     // Helper to count users based on a condition
-    const getUserCount = (condition) => Array.isArray(users) ? users.filter(condition).length : 0;
+    const getUserCount = (condition) => users.filter(condition).length;
 
     // Dashboard statistics
     const totalUsers = getUserCount(user => user.role !== 'admin');
@@ -40,7 +49,7 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
     }
 
     // Filter users based on filter and search term
-    let filteredUsers = Array.isArray(users) ? [...users].filter(user => {
+    let filteredUsers = users.filter(user => {
         if (user.role === 'admin') return false;
 
         // Define filter conditions
@@ -67,7 +76,7 @@ const AdminDashboard = ({ users, onBlockUser, onReportUser, onViewUserChat, onBa
         }
 
         return true;
-    }) : [];
+    });
 
     // Sort users based on selected column and direction
     if (Array.isArray(filteredUsers)) {
