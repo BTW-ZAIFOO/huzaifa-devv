@@ -13,7 +13,7 @@ const Register = () => {
     try {
 
       // Send registration data to backend API
-      const response = await axios.post("http://localhost:4000/api/v1/user/register", data, {
+      const response = await axios.post("https://huzaifa-devv-production.up.railway.app/api/v1/user/register", data, {
         withCredentials: true,
         headers: { "Content-Type": "application/json" },
       });

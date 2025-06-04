@@ -60,7 +60,7 @@ createRoot(
 
     // Throw an error if the root element is not found
     throw new Error("Root element not found! Make sure you have a div with id 'root' in your HTML file.");
-  })()
+  })
 ).render(
 
   // StrictMode helps highlight potential problems in an application

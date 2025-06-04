@@ -22,7 +22,7 @@ const ForgotPassword = () => {
 
       // Send POST request to backend to initiate password reset
       const res = await axios.post(
-        "http://localhost:4000/api/v1/user/password/forgot",
+        "https://huzaifa-devv-production.up.railway.app/api/v1/user/password/forgot",
         { email },
         {
           withCredentials: true,

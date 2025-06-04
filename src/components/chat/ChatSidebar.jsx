@@ -32,7 +32,7 @@ const ChatSidebar = ({
         const fetchSearch = async () => {
             try {
                 const res = await axios.get(
-                    `http://localhost:4000/api/v1/user/search?q=${encodeURIComponent(searchTerm)}`,
+                    `https://huzaifa-devv-production.up.railway.app/api/v1/user/search?q=${encodeURIComponent(searchTerm)}`,
                     { withCredentials: true }
                 );
 

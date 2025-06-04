@@ -29,7 +29,7 @@ const ResetPassword = () => {
 
       // Send PUT request to reset password endpoint with new password data
       const res = await axios.put(
-        `http://localhost:4000/api/v1/user/password/reset/${token}`,
+        `https://huzaifa-devv-production.up.railway.app/api/v1/user/password/reset/${token}`,
         { password, confirmPassword },
         {
           withCredentials: true,

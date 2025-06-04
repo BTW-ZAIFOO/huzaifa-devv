@@ -152,7 +152,7 @@ const ChatWindow = ({
             } else {
                 await axios({
                     method: 'DELETE',
-                    url: `http://localhost:4000/api/v1/message/${messageId}`,
+                    url: `https://huzaifa-devv-production.up.railway.app/api/v1/message/${messageId}`,
                     data: { permanent },
                     withCredentials: true
                 });

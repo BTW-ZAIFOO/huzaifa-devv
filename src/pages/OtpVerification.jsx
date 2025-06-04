@@ -67,7 +67,7 @@ const OtpVerification = () => {
   const handleResendOtp = async () => {
     try {
       await axios.post(
-        "http://localhost:4000/api/v1/user/resend-otp",
+        "https://huzaifa-devv-production.up.railway.app/api/v1/user/resend-otp",
         { email },
         { withCredentials: true }
       );
@@ -95,7 +95,7 @@ const OtpVerification = () => {
     };
 
     await axios
-      .post("http://localhost:4000/api/v1/user/otp-verification", data, {
+      .post("https://huzaifa-devv-production.up.railway.app/api/v1/user/otp-verification", data, {
         withCredentials: true,
         headers: { "Content-Type": "application/json" },
       })

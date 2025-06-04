@@ -27,7 +27,7 @@ const Login = () => {
 
       // Send login request to backend API
       const response = await axios.post(
-        "http://localhost:4000/api/v1/user/login",
+        "https://huzaifa-devv-production.up.railway.app/api/v1/user/login",
         data,
         {
           withCredentials: true,
