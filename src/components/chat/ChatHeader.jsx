@@ -260,22 +260,12 @@ const ChatHeader = ({ user, toggleSidebar, sidebarOpen, notifications = [] }) =>
 
                     {/* Profile link with avatar */}
                     <Link to="/profile" className="flex items-center gap-2 text-gray-600 hover:text-blue-600">
-                        {avatar?.imageUrl ? (
-
-                            // Show avatar image if available
-                            <div className="w-8 h-8 rounded-full overflow-hidden shadow-sm">
-                                <img src={avatar.imageUrl} alt={user?.name || "User"} className="w-full h-full object-cover" />
-                            </div>
-                        ) : (
-
-                            // Otherwise, show initials with background color
-                            <div
-                                className="w-8 h-8 rounded-full flex items-center justify-center text-white overflow-hidden shadow-sm"
-                                style={{ backgroundColor: avatar?.color || "#4f46e5" }}
-                            >
-                                <span className="font-medium text-sm">{avatar?.initials || user?.name?.charAt(0) || "?"}</span>
-                            </div>
-                        )}
+                        <div
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-white overflow-hidden shadow-sm"
+                            style={{ backgroundColor: avatar?.color || "#4f46e5" }}
+                        >
+                            <span className="font-medium text-sm">{avatar?.initials || user?.name?.charAt(0) || "?"}</span>
+                        </div>
 
                         {/* User name */}
                         <span className="hidden md:inline">{user?.name || "User"}</span>

@@ -295,18 +295,12 @@ const ChatWindow = ({
 
                     {/* Show avatar for other users */}
                     {!isMe && (
-                        avatar.imageUrl ?
-                            <img
-                                src={avatar.imageUrl}
-                                alt={selectedUser.name}
-                                className="w-10 h-10 rounded-full mt-1 mr-2 border-2 border-white shadow-sm"
-                            /> :
-                            <div
-                                className="w-10 h-10 rounded-full mt-1 mr-2 border-2 border-white shadow-sm flex items-center justify-center text-white text-sm font-medium"
-                                style={{ backgroundColor: avatar.color }}
-                            >
-                                {avatar.initials}
-                            </div>
+                        <div
+                            className="w-10 h-10 rounded-full mt-1 mr-2 border-2 border-white shadow-sm flex items-center justify-center text-white text-sm font-medium"
+                            style={{ backgroundColor: avatar.color }}
+                        >
+                            {avatar.initials}
+                        </div>
                     )}
 
                     <div
@@ -437,27 +431,24 @@ const ChatWindow = ({
                         <div className="relative">
                             {(() => {
                                 const avatar = generateAvatar(selectedUser);
-                                return avatar.imageUrl ? (
-                                    <img
-                                        src={avatar.imageUrl}
-                                        alt={selectedUser.name}
-                                        className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover mr-3 border-2 border-white shadow-sm"
-                                    />
-                                ) : (
+                                return (
                                     <div
                                         className="w-10 h-10 md:w-12 md:h-12 rounded-full mr-3 border-2 border-white shadow-sm flex items-center justify-center text-white font-medium"
                                         style={{ backgroundColor: avatar.color }}
+                                        onClick={onViewProfile}
+                                        title="View profile"
+                                        role="button"
                                     >
                                         {avatar.initials}
                                     </div>
                                 );
-                            })}
+                            })()}
 
-                            {/* Status dot */}
+                            {/* Status dot - gray dot for offline users */}
                             <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${selectedUser.status === "online" ? "bg-green-500" :
-                                selectedUser.status === "banned" ? "bg-black" :
-                                    selectedUser.status === "blocked" ? "bg-red-500" :
-                                        "bg-gray-400"
+                                    selectedUser.status === "banned" ? "bg-black" :
+                                        selectedUser.status === "blocked" ? "bg-red-500" :
+                                            "bg-gray-400" /* Gray for offline */
                                 }`}></span>
                         </div>
                     )}
@@ -469,11 +460,12 @@ const ChatWindow = ({
                         <span className="text-xs md:text-sm text-gray-500">
                             {selectedUser.status === "online" ? (
                                 <span className="flex items-center">
-                                    <span className="w-2 h-2 bg-green-500 rounded-full mr-1.5 animate-pulse"></span>
-                                    {isAdminChat ? "Always Available" : "Online"}
+                                    Online
                                 </span>
                             ) : (
-                                selectedUser.lastSeen
+                                <span className="flex items-center">
+                                    Offline {selectedUser.lastSeen ? `- ${selectedUser.lastSeen}` : ""}
+                                </span>
                             )}
                         </span>
                     </div>

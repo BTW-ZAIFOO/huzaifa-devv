@@ -26,6 +26,7 @@ const AdminDashboard = ({
     // Dashboard statistics
     const totalUsers = getUserCount(user => user.role !== 'admin');
     const onlineUsers = getUserCount(user => user.status === 'online' && user.role !== 'admin');
+    const offlineUsers = getUserCount(user => user.status !== 'online' && user.status !== 'blocked' && user.status !== 'banned' && user.role !== 'admin');
     const blockedUsers = getUserCount(user => user.status === 'blocked');
     const bannedUsers = getUserCount(user => user.status === 'banned');
     const reportedUsers = getUserCount(user => user.isReported);
@@ -54,8 +55,8 @@ const AdminDashboard = ({
 
         // Define filter conditions
         const filterConditions = {
-            'online': user.status === 'online',
-            'offline': user.status === 'offline',
+            'online': user.status === "online",
+            'offline': user.status !== "online" && user.status !== "blocked" && user.status !== "banned",
             'blocked': user.status === 'blocked',
             'banned': user.status === 'banned',
             'reported': user.isReported,
@@ -168,7 +169,7 @@ const AdminDashboard = ({
                 </div>
 
                 {/* Statistics cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
                     {[
                         {
                             title: "Total Users",
@@ -183,6 +184,13 @@ const AdminDashboard = ({
                             icon: "fa-circle",
                             color: "green",
                             filterName: "online"
+                        },
+                        {
+                            title: "Offline Users",
+                            value: offlineUsers,
+                            icon: "fa-circle",
+                            color: "gray",
+                            filterName: "offline"
                         },
                         {
                             title: "Blocked Users",
@@ -363,6 +371,12 @@ const AdminDashboard = ({
                                                     {(user.blockedBy || user.bannedBy) && (
                                                         <div className="text-xs text-gray-500 mt-1">
                                                             by {user.blockedBy || user.bannedBy}
+                                                        </div>
+                                                    )}
+                                                    {/* Show last active time for offline users */}
+                                                    {user.status === 'offline' && user.lastSeen && (
+                                                        <div className="text-xs text-gray-500 mt-1">
+                                                            Last seen: {user.lastSeen}
                                                         </div>
                                                     )}
                                                 </td>

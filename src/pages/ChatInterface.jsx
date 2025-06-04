@@ -292,6 +292,72 @@ const ChatInterface = ({ adminMode }) => {
             .catch(() => setLoading(false));
     }, [user]);
 
+    // Effect to periodically check and update user statuses
+    useEffect(() => {
+        // Initial fetch with status check
+        fetchUsersWithStatus();
+
+        // Set up interval to refresh user statuses periodically
+        const intervalId = setInterval(() => {
+            fetchUsersWithStatus(false); // false indicates a silent refresh
+        }, 15000); // Every 15 seconds
+
+        return () => clearInterval(intervalId);
+    }, []);
+
+    // Improved user fetcher with status verification
+    const fetchUsersWithStatus = async (showLoading = true) => {
+        if (showLoading) setLoading(true);
+
+        try {
+            const res = await axios.get("http://localhost:4000/api/v1/user/all", { withCredentials: true });
+
+            // Update users with verified status information
+            const usersWithVerifiedStatus = res.data.users.map(user => {
+                // Default to offline if status is missing
+                if (!user.status) {
+                    user.status = "offline";
+                }
+
+                // Check for cookie/auth related status (if not blocked or banned)
+                if (user.status !== "blocked" && user.status !== "banned") {
+                    // Get the last activity timestamp (if available)
+                    const lastActivity = new Date(user.lastSeen || 0);
+                    const now = new Date();
+                    const inactiveThreshold = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+                    // If last activity is more than the threshold ago, mark as offline
+                    if (now - lastActivity > inactiveThreshold) {
+                        user.status = "offline";
+                    }
+                }
+
+                return user;
+            });
+
+            setAllUsers(usersWithVerifiedStatus);
+
+            // Also update selected user if needed
+            if (selectedUser) {
+                const updatedSelectedUser = usersWithVerifiedStatus.find(u =>
+                    u._id === selectedUser._id || u.id === selectedUser._id
+                );
+
+                if (updatedSelectedUser) {
+                    setSelectedUser(prev => ({
+                        ...prev,
+                        status: updatedSelectedUser.status,
+                        lastSeen: updatedSelectedUser.lastSeen
+                    }));
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching users:", error);
+        } finally {
+            if (showLoading) setLoading(false);
+        }
+    };
+
     // Helper to add a notification to the user and show a toast
     const addUserNotification = (notification) => {
         const newNotification = {
@@ -377,6 +443,27 @@ const ChatInterface = ({ adminMode }) => {
             console.error("Failed to load conversation");
             toast.error("Failed to load conversation");
         }
+    };
+
+    // Handle view profile action
+    const handleViewProfile = () => {
+        if (!selectedUser) return;
+
+        // Add code to show user profile (this will be handled by the UserProfile component in ChatWindow)
+        const userProfileElement = document.getElementById('user-profile-sidebar');
+        if (userProfileElement) {
+            userProfileElement.style.transform = 'translateX(0)';
+        } else {
+            // Show profile sidebar
+            const userProfileEl = document.createElement('div');
+            userProfileEl.id = 'user-profile-sidebar';
+            document.body.appendChild(userProfileEl);
+        }
+
+        // You could also toggle a state to show/hide the profile sidebar
+        // setShowUserProfile(true);
+
+        logAdminActivity(`Viewed ${selectedUser.name}'s profile`);
     };
 
     // Clear selected chat and messages
@@ -726,6 +813,7 @@ const ChatInterface = ({ adminMode }) => {
                                     selectedUser={selectedChat.otherUser}
                                     messages={messages}
                                     onSendMessage={handleSendMessage}
+                                    onViewProfile={handleViewProfile}  // Pass the profile handler
                                     isAdmin={isAdmin}
                                     onDeleteMessage={isAdmin ? handleDeleteMessage : null}
                                     onDeleteOwnMessage={handleDeleteOwnMessage}

@@ -24,22 +24,12 @@ const AdminHeader = ({ user, onLogout }) => {
 
                 {/* User avatar and name */}
                 <div className="flex items-center gap-2">
-
-                    {/* If avatar has an image, display it; otherwise, show initials with background color */}
-                    {avatar.imageUrl ? (
-                        <img
-                            src={avatar.imageUrl}
-                            alt={user?.name}
-                            className="w-8 h-8 rounded-full"
-                        />
-                    ) : (
-                        <div
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm"
-                            style={{ backgroundColor: avatar.color }}
-                        >
-                            {avatar.initials}
-                        </div>
-                    )}
+                    <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm"
+                        style={{ backgroundColor: avatar.color }}
+                    >
+                        {avatar.initials}
+                    </div>
 
                     {/* Display the user's name or "Admin" as fallback */}
                     <span>{user?.name || "Admin"}</span>

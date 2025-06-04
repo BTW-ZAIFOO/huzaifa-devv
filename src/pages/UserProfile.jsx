@@ -71,9 +71,22 @@ const UserProfile = () => {
         setLoading(true);
 
         try {
+            // Create form data for avatar upload if available
+            const formDataToSend = new FormData();
+            if (formData.avatar) {
+                formDataToSend.append('avatar', formData.avatar);
+            }
+
+            // Add other form fields
+            formDataToSend.append('name', formData.name);
+            formDataToSend.append('bio', formData.bio);
+            formDataToSend.append('location', formData.location);
+            formDataToSend.append('interests', formData.interests);
 
             // Simulate API call with setTimeout
+            // In a real application, you would send the formDataToSend to your backend
             setTimeout(() => {
+                // Update user state with new information
                 setUser(prev => ({
                     ...prev,
                     name: formData.name,
@@ -82,6 +95,21 @@ const UserProfile = () => {
                     interests: formData.interests ? formData.interests.split(",").map(item => item.trim()) : [],
                     avatar: avatarPreview
                 }));
+
+                // Store updated profile in localStorage for persistence
+                try {
+                    const userData = JSON.parse(localStorage.getItem('user') || '{}');
+                    localStorage.setItem('user', JSON.stringify({
+                        ...userData,
+                        name: formData.name,
+                        bio: formData.bio,
+                        location: formData.location,
+                        interests: formData.interests ? formData.interests.split(",").map(item => item.trim()) : [],
+                        avatar: avatarPreview
+                    }));
+                } catch (storageError) {
+                    console.error("Failed to update local storage", storageError);
+                }
 
                 console.log("Profile updated successfully");
                 toast.success("Profile updated successfully");

@@ -54,12 +54,15 @@ const ChatSidebar = ({
         return users.filter(user => {
             const userId = user._id?.toString() || user.id?.toString();
             const currentId = currentUser?._id?.toString() || currentUser?.id?.toString();
-            const matchesOnline = showOnlineOnly ? user.status === "online" : true;
 
-            if (isAdmin) return matchesOnline; // Admin sees all except filtered by online
+            // Check if user should be shown based on online filter
+            const isOnlineUser = user.status === "online";
+            if (showOnlineOnly && !isOnlineUser) return false;
 
-            // Users don't see themselves
-            return userId !== currentId && matchesOnline;
+            if (isAdmin) return true; // Admins see all users that match online filter
+
+            // Regular users don't see themselves
+            return userId !== currentId;
         });
     };
 
@@ -71,15 +74,37 @@ const ChatSidebar = ({
 
     // If admin chat is enabled, prepend admin support to the list
     if (showAdminChat) {
-        displayUsers = [{
-            _id: 'admin',
-            name: "Admin Support",
-            avatar: null,
-            status: "online",
-            role: "admin",
-            lastSeen: "Always Available",
-        }, ...displayUsers];
+        // Always show admin support regardless of online filter
+        if (!showOnlineOnly || displayUsers.length > 0) {
+            displayUsers = [{
+                _id: 'admin',
+                name: "Admin Support",
+                avatar: null,
+                status: "online",
+                role: "admin",
+                lastSeen: "Always Available",
+            }, ...displayUsers];
+        }
     }
+
+    // Function to format last seen time
+    const formatLastSeen = (lastSeen) => {
+        if (!lastSeen) return "Some time ago";
+
+        const date = new Date(lastSeen);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMins / 60);
+        const diffDays = Math.floor(diffHours / 24);
+
+        if (diffMins < 1) return "Just now";
+        if (diffMins < 60) return `${diffMins}m ago`;
+        if (diffHours < 24) return `${diffHours}h ago`;
+        if (diffDays < 7) return `${diffDays}d ago`;
+
+        return date.toLocaleDateString();
+    };
 
     return (
         <>
@@ -186,7 +211,7 @@ const ChatSidebar = ({
                                                                     }`}
                                                                 onError={(e) => {
                                                                     e.target.onerror = null;
-                                                                    e.target.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=fallback";
+                                                                    e.target.src = avatar.fallbackUrl;
                                                                 }}
                                                             />
                                                         ) : (
@@ -207,11 +232,12 @@ const ChatSidebar = ({
                                                             </span>
                                                         )}
 
-                                                        {/* Status indicator dot */}
+                                                        {/* Status indicator dot - gray dot for offline users */}
                                                         <span
                                                             className={`absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full ${user.status === "online" ? "bg-green-500" :
                                                                 user.status === "blocked" ? "bg-red-500" :
-                                                                    user.status === "banned" ? "bg-black" : "bg-gray-400"
+                                                                    user.status === "banned" ? "bg-black" :
+                                                                        "bg-gray-400" /* Gray for offline */
                                                                 } border-2 border-white`}
                                                         ></span>
                                                     </div>
@@ -275,11 +301,12 @@ const ChatSidebar = ({
                                                             )}
                                                         </div>
 
-                                                        {/* Show last seen or status */}
+                                                        {/* Show last seen or status - clearly show offline for logged out users */}
                                                         <p className="text-xs text-gray-500 mt-0.5">
                                                             {user.status === "banned" ? "Banned by admin" :
                                                                 user.status === "blocked" ? "Blocked by admin" :
-                                                                    user.lastSeen}
+                                                                    user.status === "online" ? "Online" :
+                                                                        "Offline" + (user.lastSeen ? ` - ${formatLastSeen(user.lastSeen)}` : "")}
                                                         </p>
 
                                                         {/* Admin: show last activity */}
@@ -315,8 +342,24 @@ const ChatSidebar = ({
                     <button
                         onClick={async () => {
                             try {
-                                await axios.get('http://localhost:4000/api/v1/user/logout', { withCredentials: true });
-                                window.location.href = '/login';
+                                // First mark user as offline with explicit error handling
+                                try {
+                                    const statusResponse = await axios.post(
+                                        "http://localhost:4000/api/v1/user/status",
+                                        { status: "offline" },
+                                        { withCredentials: true }
+                                    );
+                                    console.log("Status updated to offline:", statusResponse.data);
+                                } catch (statusError) {
+                                    console.error('Failed to update status:', statusError);
+                                }
+
+                                // Then logout
+                                const logoutResponse = await axios.get('http://localhost:4000/api/v1/user/logout', { withCredentials: true });
+                                console.log("Logout successful:", logoutResponse.data);
+
+                                // Redirect to login page
+                                window.location.href = '/auth';
                             } catch (error) {
                                 console.error('Logout failed:', error);
                             }

@@ -1,6 +1,5 @@
 // Helper to prepare user data for avatar generation
 const prepareUserData = (user, defaultName) => {
-
     // Use _id or id if available, otherwise generate a random id
     const userId = user?._id || user?.id || Math.floor(Math.random() * 1000);
 
@@ -23,7 +22,6 @@ export const getUserInitials = (name) => {
     // Split name by whitespace
     const nameParts = name.split(/\s+/);
     if (nameParts.length === 1) {
-
         // Single word name: use first letter
         return nameParts[0].charAt(0).toUpperCase();
     }
@@ -51,14 +49,14 @@ export const getAvatarColor = (id, name) => {
     return colorPalette[hash % colorPalette.length];
 };
 
-// Generate avatar data for a user (color and initials or image)
+// Generate avatar data for a user (color and initials)
 export const generateAvatar = (user) => {
     if (!user) return { color: colorPalette[0], initials: '?' };
-    if (user?.avatar) return { imageUrl: user.avatar };
 
     // Prepare user id and name
     const { userId, userName } = prepareUserData(user, "User");
 
+    // Always use solid color with initials
     return {
         color: getAvatarColor(userId, userName),
         initials: getUserInitials(userName)
@@ -68,11 +66,11 @@ export const generateAvatar = (user) => {
 // Generate avatar for admin users (fixed color)
 export const generateAdminAvatar = (user) => {
     if (!user) return { color: "#9333ea", initials: 'A' };
-    if (user?.avatar) return { imageUrl: user.avatar };
 
     // Only use name for initials, color is fixed for admins
     const { userName } = prepareUserData(user, "Admin");
 
+    // Always use admin color with initials
     return {
         color: "#9333ea",
         initials: getUserInitials(userName)

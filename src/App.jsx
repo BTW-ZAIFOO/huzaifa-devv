@@ -58,12 +58,22 @@ const App = () => {
     (async () => {
       setIsAuthLoading(true); // Set loading state
       try {
-
         // Fetch current user info from backend
         const res = await axios.get("http://localhost:4000/api/v1/user/me", { withCredentials: true });
         if (isMounted) {
           setUser(res.data.user); // Set user data in context
           setIsAuthenticated(true); // Set authenticated flag
+
+          // Update user status to online when app loads and user is authenticated
+          try {
+            await axios.post(
+              "http://localhost:4000/api/v1/user/status",
+              { status: "online" },
+              { withCredentials: true }
+            );
+          } catch (statusErr) {
+            console.error("Failed to update status on app load:", statusErr);
+          }
         }
       }
       catch (err) {

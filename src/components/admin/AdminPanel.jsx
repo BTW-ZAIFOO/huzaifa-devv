@@ -1002,6 +1002,10 @@ const AdminPanel = ({ users: initialUsers }) => {
                                                             src={avatar.imageUrl}
                                                             alt={message.sender.name}
                                                             className="h-10 w-10 rounded-full"
+                                                            onError={(e) => {
+                                                                e.target.onerror = null;
+                                                                e.target.src = avatar.fallbackUrl;
+                                                            }}
                                                         />
                                                     ) : (
                                                         <div

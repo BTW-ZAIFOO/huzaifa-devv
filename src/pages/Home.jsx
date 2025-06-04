@@ -15,15 +15,30 @@ const Home = () => {
   // Logout function: Calls backend to logout, updates context, and shows toast
   const logout = async () => {
     try {
-      const res = await axios.get("http://localhost:4000/api/v1/user/logout", {
-        withCredentials: true,
-      });
-      toast.success(res.data.message); // Show success message
-      setUser(null); // Clear user info
-      setIsAuthenticated(false); // Set authentication to false
+      // First mark the user as offline in the database with proper error handling
+      try {
+        const statusResponse = await axios.post(
+          "http://localhost:4000/api/v1/user/status",
+          { status: "offline" },
+          { withCredentials: true }
+        );
+        console.log("Status updated:", statusResponse.data);
+      } catch (statusErr) {
+        console.error("Failed to update status", statusErr);
+      }
+
+      // Then proceed with logout with a slight delay to ensure status update completes
+      setTimeout(async () => {
+        const res = await axios.get("http://localhost:4000/api/v1/user/logout", {
+          withCredentials: true,
+        });
+        toast.success(res.data.message); // Show success message
+        setUser(null); // Clear user info
+        setIsAuthenticated(false); // Set authentication to false
+      }, 200);
     }
     catch (err) {
-      toast.error(err.response.data.message); // Show error message
+      toast.error(err.response?.data?.message || "Logout failed"); // Show error message
     }
   };
 
@@ -66,8 +81,12 @@ const Home = () => {
                 </Link>
               )}
 
-              {/* Profile link */}
-              <Link to="/profile" className="text-slate-700 font-medium hover:text-blue-600 transition-colors flex items-center">
+              {/* Profile link - updated to make it more clear it's clickable */}
+              <Link
+                to="/profile"
+                className="text-slate-700 font-medium hover:text-blue-600 transition-colors flex items-center hover:bg-gray-50 py-1 px-2 rounded-md"
+                title="View your profile"
+              >
                 <i className="fas fa-user-circle mr-1.5"></i> <span className="hidden md:inline">Profile</span>
               </Link>
 

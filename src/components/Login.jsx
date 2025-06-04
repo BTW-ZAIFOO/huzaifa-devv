@@ -24,7 +24,6 @@ const Login = () => {
   const handleLogin = async (data) => {
     setIsLoading(true); // Show loading spinner
     try {
-
       // Send login request to backend API
       const response = await axios.post(
         "http://localhost:4000/api/v1/user/login",
@@ -34,6 +33,17 @@ const Login = () => {
           headers: { "Content-Type": "application/json" },
         }
       );
+
+      // Update user status to online
+      try {
+        await axios.post(
+          "http://localhost:4000/api/v1/user/status",
+          { status: "online" },
+          { withCredentials: true }
+        );
+      } catch (statusErr) {
+        console.error("Failed to update status", statusErr);
+      }
 
       // On success, update user context and authentication state
       setUser(response.data.user);

@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useContext } from "react";
 import { getAvatarByRole } from "../../utils/avatarUtils";
+import { Context } from "../../context/ContextProvider";
 
 // UserProfile component displays user details in a sidebar/profile panel
 const UserProfile = ({ user, onClose, isAdmin, onBlockUser, onReportUser }) => {
@@ -10,12 +11,19 @@ const UserProfile = ({ user, onClose, isAdmin, onBlockUser, onReportUser }) => {
             case "online": return "bg-green-500";
             case "blocked": return "bg-red-500";
             case "banned": return "bg-black";
-            default: return "bg-gray-400";
+            default: return "bg-gray-400"; // Gray for offline
         }
     };
 
     // Get avatar info (image, initials, color) based on user role
     const avatar = getAvatarByRole(user);
+
+    // Get the latest user information from context if available
+    const { user: currentUser } = useContext(Context);
+    const isCurrentUser = currentUser?._id === user._id;
+
+    // Use context data if this is the current user's profile
+    const displayedUser = isCurrentUser ? currentUser : user;
 
     return (
         <>
@@ -35,7 +43,7 @@ const UserProfile = ({ user, onClose, isAdmin, onBlockUser, onReportUser }) => {
                         </button>
                     </div>
 
-                    {/* User avatar and basic info */}
+                    {/* User avatar and basic info - now using displayedUser */}
                     <div className="flex flex-col items-center">
                         <div className="relative mb-4">
 
@@ -43,8 +51,12 @@ const UserProfile = ({ user, onClose, isAdmin, onBlockUser, onReportUser }) => {
                             {avatar.imageUrl ? (
                                 <img
                                     src={avatar.imageUrl}
-                                    alt={user?.name || "User"}
+                                    alt={displayedUser?.name || "User"}
                                     className="w-24 h-24 rounded-full object-cover border-4 border-blue-100"
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = avatar.fallbackUrl;
+                                    }}
                                 />
                             ) : (
                                 <div
@@ -59,18 +71,32 @@ const UserProfile = ({ user, onClose, isAdmin, onBlockUser, onReportUser }) => {
                             <span className={`absolute bottom-1 right-1 w-4 h-4 rounded-full ${getStatusColor()} border-2 border-white`}></span>
                         </div>
 
-                        {/* User name */}
-                        <h2 className="text-xl font-semibold text-gray-800">{user.name}</h2>
+                        {/* User name - using displayedUser */}
+                        <h2 className="text-xl font-semibold text-gray-800">{displayedUser.name}</h2>
+
+                        {/* Show bio if available */}
+                        {displayedUser.bio && (
+                            <p className="text-gray-600 text-center mt-2 text-sm">
+                                {displayedUser.bio}
+                            </p>
+                        )}
+
+                        {/* Show location if available */}
+                        {displayedUser.location && (
+                            <p className="text-gray-500 mt-1 flex items-center text-sm">
+                                <i className="fas fa-map-marker-alt mr-1"></i> {displayedUser.location}
+                            </p>
+                        )}
 
                         {/* Show last seen or 'Active now' if online */}
-                        <p className="text-gray-500 mb-2">
-                            {user.status === "online" ? "Active now" : user.lastSeen}
+                        <p className="text-gray-500 mt-2">
+                            {displayedUser.status === "online" ? "Active now" : displayedUser.lastSeen}
                         </p>
 
                         {/* Show blocked/banned status if applicable */}
-                        {(user.status === "blocked" || user.status === "banned") && (
-                            <div className={`mb-4 px-3 py-1 rounded-full text-xs font-medium ${user.status === "blocked" ? "bg-red-100 text-red-800" : "bg-black text-white"}`}>
-                                {user.status === "blocked" ? "Blocked by admin" : "Banned by admin"}
+                        {(displayedUser.status === "blocked" || displayedUser.status === "banned") && (
+                            <div className={`mb-4 px-3 py-1 rounded-full text-xs font-medium ${displayedUser.status === "blocked" ? "bg-red-100 text-red-800" : "bg-black text-white"}`}>
+                                {displayedUser.status === "blocked" ? "Blocked by admin" : "Banned by admin"}
                             </div>
                         )}
 

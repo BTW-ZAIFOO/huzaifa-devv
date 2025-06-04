@@ -4,15 +4,18 @@ import { Navigate, Link } from "react-router-dom";
 import Register from "../components/Register";
 import Login from "../components/Login";
 import LoadingScreen from "../components/LoadingScreen";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 // Auth page component for handling user authentication (login/register)
 const Auth = () => {
 
   // Get authentication state and admin status from context
-  const { isAuthenticated, isAdmin, isAuthLoading } = useContext(Context);
+  const { isAuthenticated, isAdmin, isAuthLoading, setUser, setIsAuthenticated } = useContext(Context);
 
   // State to toggle between Login and Register forms
   const [isLogin, setIsLogin] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // If user is authenticated and not loading, redirect to appropriate page
   if (isAuthenticated && !isAuthLoading) {
@@ -21,6 +24,37 @@ const Auth = () => {
 
   // Show loading screen while authentication state is being determined
   if (isAuthLoading) return <LoadingScreen />;
+
+  // Handle user login
+  const handleLogin = async (data) => {
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/v1/user/login",
+        data,
+        { withCredentials: true }
+      );
+
+      // Set user status to online after successful login
+      try {
+        await axios.post(
+          "http://localhost:4000/api/v1/user/status",
+          { status: "online" },
+          { withCredentials: true }
+        );
+      } catch (statusError) {
+        console.error("Failed to update status:", statusError);
+      }
+
+      setUser(response.data.user);
+      setIsAuthenticated(true);
+      toast.success(response.data.message);
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("Login failed. Please try again.");
+    }
+    setLoading(false);
+  };
 
   // Main UI rendering
   return (
@@ -61,7 +95,7 @@ const Auth = () => {
           </div>
 
           {/* Render Login or Register component based on state */}
-          {isLogin ? <Login /> : <Register />}
+          {isLogin ? <Login onLogin={handleLogin} loading={loading} /> : <Register />}
 
           {/* Link for administrator access */}
           <div className="mt-8 pt-6 border-t border-slate-700 text-center">
