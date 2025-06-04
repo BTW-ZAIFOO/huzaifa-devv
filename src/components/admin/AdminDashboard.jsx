@@ -78,6 +78,9 @@ const AdminDashboard = ({
         return true;
     }) : [];
 
+    // Fallback: ensure filteredUsers is always an array
+    if (!Array.isArray(filteredUsers)) filteredUsers = [];
+
     // Sort users based on selected column and direction
     if (Array.isArray(filteredUsers)) {
         filteredUsers.sort((a, b) => {
