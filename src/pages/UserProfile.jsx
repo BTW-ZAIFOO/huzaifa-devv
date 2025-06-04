@@ -258,11 +258,14 @@ const UserProfile = () => {
                                             {tab.charAt(0).toUpperCase() + tab.slice(1)}
 
                                             {/* Notification badge for unread notifications */}
-                                            {tab === "notifications" && user?.notifications && user?.notifications.filter(n => !n.read).length > 0 && (
-                                                <span className="absolute top-3 right-3 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                                                    {user.notifications.filter(n => !n.read).length}
-                                                </span>
-                                            )}
+                                            {tab === "notifications" &&
+                                                user?.notifications &&
+                                                Array.isArray(user.notifications) &&
+                                                user.notifications.filter(n => !n.read).length > 0 && (
+                                                    <span className="absolute top-3 right-3 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                                                        {user.notifications.filter(n => !n.read).length}
+                                                    </span>
+                                                )}
                                         </button>
                                     ))}
                                 </div>
@@ -407,7 +410,7 @@ const UserProfile = () => {
                                     <h3 className="text-lg font-medium text-gray-900 mb-4">System Notifications</h3>
 
                                     {/* Show message if no notifications */}
-                                    {(!user?.notifications || user.notifications.length === 0) ? (
+                                    {(!user?.notifications || !Array.isArray(user.notifications) || user.notifications.length === 0) ? (
                                         <div className="text-center p-8 bg-gray-50 rounded-lg">
                                             <div className="text-gray-400 text-4xl mb-3"><i className="fas fa-bell-slash"></i></div>
                                             <p className="text-gray-600">You don't have any notifications</p>
