@@ -18,10 +18,10 @@ const ReportsView = ({
     const [selectedReport, setSelectedReport] = useState(null);
 
     // Filter reports based on selected filter
-    const filteredReports = reports.filter(report => {
+    const filteredReports = Array.isArray(reports) ? reports.filter(report => {
         if (filter === 'all') return true;
         return report.status === filter;
-    });
+    }) : [];
 
     // Handles actions taken to resolve a report (ban, block, warning, no_action)
     const handleResolveAction = (reportId, action) => {
@@ -93,7 +93,7 @@ const ReportsView = ({
                         Pending
 
                         {/* Show count of pending reports */}
-                        {reports.filter(r => r.status === 'pending').length > 0 && (
+                        {Array.isArray(reports) && reports.filter(r => r.status === 'pending').length > 0 && (
                             <span className="ml-1.5 bg-red-500 text-white text-xs rounded-full px-1.5">
                                 {reports.filter(r => r.status === 'pending').length}
                             </span>
@@ -150,7 +150,7 @@ const ReportsView = ({
                             </h3>
                         </div>
                         <ul className="divide-y divide-gray-200 max-h-[calc(100vh-300px)] overflow-y-auto">
-                            {filteredReports.map(report => (
+                            {Array.isArray(filteredReports) && filteredReports.map(report => (
                                 <li
                                     key={report.id}
                                     className={`p-4 hover:bg-gray-50 cursor-pointer ${selectedReport?.id === report.id ? 'bg-blue-50' : ''}`}

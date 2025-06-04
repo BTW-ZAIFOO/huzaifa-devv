@@ -684,7 +684,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                     "bg-purple-100 text-purple-700 hover:bg-purple-200"}`}
             >
                 <i className="fas fa-flag mr-1.5"></i> Reports
-                {reports.filter(r => r.status === 'pending').length > 0 && (
+                {Array.isArray(reports) && reports.filter(r => r.status === 'pending').length > 0 && (
                     <span className="ml-1.5 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                         {reports.filter(r => r.status === 'pending').length}
                     </span>
@@ -697,7 +697,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                     "bg-purple-100 text-purple-700 hover:bg-purple-200"}`}
             >
                 <i className="fas fa-comment-alt mr-1.5"></i> Live Messages
-                {messageQueue.length > 0 && (
+                {Array.isArray(messageQueue) && messageQueue.length > 0 && (
                     <span className="ml-1.5 bg-blue-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                         {messageQueue.length}
                     </span>

@@ -262,7 +262,7 @@ const AdminDashboard = ({
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {/* Render filtered users */}
-                                {filteredUsers.length > 0 ? (
+                                {Array.isArray(filteredUsers) && filteredUsers.length > 0 ? (
                                     filteredUsers.map((user) => {
                                         const userId = user._id || user.id;
                                         // Combine flagged words from user and flaggedUsers prop
