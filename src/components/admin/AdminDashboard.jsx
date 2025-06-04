@@ -21,7 +21,7 @@ const AdminDashboard = ({
     const [sortDirection, setSortDirection] = useState('asc');
 
     // Helper to count users based on a condition
-    const getUserCount = (condition) => users.filter(condition).length;
+    const getUserCount = (condition) => Array.isArray(users) ? users.filter(condition).length : 0;
 
     // Dashboard statistics
     const totalUsers = getUserCount(user => user.role !== 'admin');
@@ -49,7 +49,7 @@ const AdminDashboard = ({
     }
 
     // Filter users based on filter and search term
-    let filteredUsers = users.filter(user => {
+    let filteredUsers = Array.isArray(users) ? users.filter(user => {
         if (user.role === 'admin') return false;
 
         // Define filter conditions
@@ -76,7 +76,7 @@ const AdminDashboard = ({
         }
 
         return true;
-    });
+    }) : [];
 
     // Sort users based on selected column and direction
     if (Array.isArray(filteredUsers)) {
