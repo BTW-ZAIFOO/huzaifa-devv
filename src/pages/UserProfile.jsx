@@ -416,7 +416,7 @@ const UserProfile = () => {
                                         <div className="space-y-4">
 
                                             {/* Render each notification */}
-                                            {user.notifications.map((notification, index) => {
+                                            {Array.isArray(user.notifications) && user.notifications.map((notification, index) => {
                                                 const styles = getNotificationStyles(notification.type);
                                                 return (
                                                     <div
