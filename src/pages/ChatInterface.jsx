@@ -630,14 +630,12 @@ const ChatInterface = ({ adminMode }) => {
                         {user.status === "banned" ? "Account Banned" : "Account Blocked"}
                     </h2>
                     <p className="text-gray-600 mb-4">
-                        {user.status === "banned"
-                            ? "Your account has been banned by an administrator. You cannot use the chat."
-                            : "Your account has been blocked by an administrator. You cannot use the chat."}
+                        {user.status === "banned" ? "Your account has been banned by an administrator. You cannot use the chat." : "Your account has been blocked by an administrator. You cannot use the chat."}
                     </p>
-                    {user.bannedReason && (
+                    {user?.bannedReason && (
                         <div className="mb-2 text-red-700 text-sm">Reason: {user.bannedReason}</div>
                     )}
-                    {user.blockReason && (
+                    {user?.blockReason && (
                         <div className="mb-2 text-yellow-700 text-sm">Reason: {user.blockReason}</div>
                     )}
                 </div>

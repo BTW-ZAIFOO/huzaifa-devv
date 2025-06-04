@@ -216,7 +216,7 @@ const OtpVerification = () => {
                 </span>
               ) : (
                 <>
-                  <i className="fas fa-shield-check mr-2.5"></i>
+                  <i className="fas fa-shield-alt mr-2.5"></i>
                   Verify OTP
                 </>
               )}

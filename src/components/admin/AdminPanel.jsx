@@ -323,6 +323,11 @@ const AdminPanel = ({ users: initialUsers }) => {
                 actionTimestamp: new Date().toISOString()
             });
 
+            // Ensure notifications are properly initialized as an array
+            if (!Array.isArray(userToBan.notifications)) {
+                userToBan.notifications = [];
+            }
+
             // Notify via socket
             if (socketRef.current) {
                 socketRef.current.emit("admin-ban-user", {
