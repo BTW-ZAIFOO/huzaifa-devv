@@ -95,7 +95,7 @@ const OtpVerification = () => {
     };
 
     await axios
-      .post("https://huzaifa-devv-production.up.railway.app/api/v1/user/otp-verification", data, {
+      .post("http://localhost:4000/api/v1/user/otp-verification", data, {
         withCredentials: true,
         headers: { "Content-Type": "application/json" },
       })

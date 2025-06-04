@@ -60,7 +60,7 @@ const App = () => {
       try {
 
         // Fetch current user info from backend
-        const res = await axios.get("https://huzaifa-devv-production.up.railway.app/api/v1/user/me", { withCredentials: true });
+        const res = await axios.get("http://localhost:4000/api/v1/user/me", { withCredentials: true });
         if (isMounted) {
           setUser(res.data.user); // Set user data in context
           setIsAuthenticated(true); // Set authenticated flag

@@ -19,7 +19,7 @@ const AdminRegister = () => {
 
             // Send registration data to backend API
             const response = await axios.post(
-                "https://huzaifa-devv-production.up.railway.app/api/v1/user/register",
+                "http://localhost:4000/api/v1/user/register",
                 {
                     name: data.name,
                     email: data.email,

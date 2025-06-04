@@ -29,7 +29,7 @@ const ChatInterface = ({ adminMode }) => {
     const [reconnectAttempt, setReconnectAttempt] = useState(0);
     const socketRef = useRef(null);
     const heartbeatRef = useRef(null);
-    const SOCKET_URL = "https://huzaifa-devv-production.up.railway.app";
+    const SOCKET_URL = "http://localhost:4000";
 
     // Restore chat state from localStorage on mount
     useEffect(() => {
@@ -207,11 +207,11 @@ const ChatInterface = ({ adminMode }) => {
     // Join chat rooms for all users (except self) after socket connects
     useEffect(() => {
         if (!user || !socketConnected || !socketRef.current) return;
-        axios.get("https://huzaifa-devv-production.up.railway.app/api/v1/user/all", { withCredentials: true })
+        axios.get("http://localhost:4000/api/v1/user/all", { withCredentials: true })
             .then(res => {
                 res.data.users.forEach(u => {
                     if (u._id !== user._id) {
-                        axios.post("https://huzaifa-devv-production.up.railway.app/api/v1/chat/create",
+                        axios.post("http://localhost:4000/api/v1/chat/create",
                             { recipientId: u._id },
                             { withCredentials: true }
                         )
@@ -246,7 +246,7 @@ const ChatInterface = ({ adminMode }) => {
     useEffect(() => {
         if (!user) return;
         setLoading(true);
-        axios.get("https://huzaifa-devv-production.up.railway.app/api/v1/user/all", { withCredentials: true })
+        axios.get("http://localhost:4000/api/v1/user/all", { withCredentials: true })
             .then(res => {
                 setAllUsers(res.data.users);
                 setLoading(false);
@@ -332,7 +332,7 @@ const ChatInterface = ({ adminMode }) => {
         try {
             const userId = otherUser._id || otherUser.id;
             const chatRes = await axios.post(
-                "https://huzaifa-devv-production.up.railway.app/api/v1/chat/create",
+                "http://localhost:4000/api/v1/chat/create",
                 { recipientId: userId },
                 { withCredentials: true }
             );
@@ -366,7 +366,7 @@ const ChatInterface = ({ adminMode }) => {
 
             // Load messages for this chat
             const msgRes = await axios.get(
-                `https://huzaifa-devv-production.up.railway.app/api/v1/message/${chatRes.data.chat._id}`,
+                `http://localhost:4000/api/v1/message/${chatRes.data.chat._id}`,
                 { withCredentials: true }
             );
 
@@ -431,7 +431,7 @@ const ChatInterface = ({ adminMode }) => {
 
             // Send message to server
             const res = await axios.post(
-                "https://huzaifa-devv-production.up.railway.app/api/v1/message/send",
+                "http://localhost:4000/api/v1/message/send",
                 {
                     chatId: selectedChat.chat._id,
                     content: messageText,
@@ -456,7 +456,7 @@ const ChatInterface = ({ adminMode }) => {
     const fetchUsers = async () => {
         try {
             setLoading(true);
-            const res = await axios.get("https://huzaifa-devv-production.up.railway.app/api/v1/user/all", { withCredentials: true });
+            const res = await axios.get("http://localhost:4000/api/v1/user/all", { withCredentials: true });
             setAllUsers(res.data.users);
             setLoading(false);
         } catch {
@@ -469,7 +469,7 @@ const ChatInterface = ({ adminMode }) => {
         if (selectedChat && selectedChat.chat && selectedChat.chat._id) {
             try {
                 const res = await axios.get(
-                    `https://huzaifa-devv-production.up.railway.app/api/v1/message/${selectedChat.chat._id}`,
+                    `http://localhost:4000/api/v1/message/${selectedChat.chat._id}`,
                     { withCredentials: true }
                 );
                 setMessages(res.data.messages);
@@ -589,7 +589,7 @@ const ChatInterface = ({ adminMode }) => {
         try {
             await axios({
                 method: 'DELETE',
-                url: `https://huzaifa-devv-production.up.railway.app/api/v1/message/${messageId}`,
+                url: `http://localhost:4000/api/v1/message/${messageId}`,
                 data: { permanent },
                 withCredentials: true
             });

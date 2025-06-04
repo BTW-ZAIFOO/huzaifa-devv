@@ -15,7 +15,7 @@ const Home = () => {
   // Logout function: Calls backend to logout, updates context, and shows toast
   const logout = async () => {
     try {
-      const res = await axios.get("https://huzaifa-devv-production.up.railway.app/api/v1/user/logout", {
+      const res = await axios.get("http://localhost:4000/api/v1/user/logout", {
         withCredentials: true,
       });
       toast.success(res.data.message); // Show success message
