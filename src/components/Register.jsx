@@ -5,27 +5,23 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 const Register = () => {
-  const navigateTo = useNavigate(); // Hook to navigate programmatically
-  const { register, handleSubmit } = useForm(); // Initialize form handling
+  const navigateTo = useNavigate();
+  const { register, handleSubmit } = useForm();
 
-  // Function to handle form submission
   const handleRegister = async (data) => {
     try {
-
-      // Send registration data to backend API
-      const response = await axios.post("http://localhost:4000/api/v1/user/register", data, {
-        withCredentials: true,
-        headers: { "Content-Type": "application/json" },
-      });
-
-      // On success, show notification and navigate to OTP verification
+      const response = await axios.post(
+        "http://localhost:4000/api/v1/user/register",
+        data,
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
       console.log("Registration successful:", response.data);
       toast.success(response.data.message);
       navigateTo(`/otp-verification/${data.email}?role=user`);
-    }
-    catch (error) {
-
-      // On error, show error notification
+    } catch (error) {
       console.error("Registration failed:", error);
       toast.error(error.response.data.message);
     }
@@ -33,22 +29,22 @@ const Register = () => {
 
   return (
     <div className="py-6 px-4 font-sans max-w-md mx-auto">
-
-      {/* Registration form container */}
-      <h2 className="text-2xl font-bold mb-6 text-black text-center">Create Account</h2>
-      <form className="w-full border border-white/10" onSubmit={handleSubmit(handleRegister)}>
-
-        {/* Form fields */}
+      <h2 className="text-2xl font-bold mb-6 text-black text-center">
+        Create Account
+      </h2>
+      <form
+        className="w-full border border-white/10"
+        onSubmit={handleSubmit(handleRegister)}
+      >
         <div className="space-y-6">
-
-          {/* Name input */}
           <div className="space-y-2">
-            <label htmlFor="name" className="block text-sm font-medium text-black">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-black"
+            >
               Full Name
             </label>
             <div className="relative">
-
-              {/* User icon */}
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                 <i className="far fa-user text-indigo-300"></i>
               </div>
@@ -62,15 +58,14 @@ const Register = () => {
               />
             </div>
           </div>
-
-          {/* Email input */}
           <div className="space-y-2">
-            <label htmlFor="register-email" className="block text-sm font-medium text-black">
+            <label
+              htmlFor="register-email"
+              className="block text-sm font-medium text-black"
+            >
               Email Address
             </label>
             <div className="relative">
-
-              {/* Email icon */}
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                 <i className="far fa-envelope text-indigo-300"></i>
               </div>
@@ -84,15 +79,14 @@ const Register = () => {
               />
             </div>
           </div>
-
-          {/* Password input */}
           <div className="space-y-2">
-            <label htmlFor="register-password" className="block text-sm font-medium text-black">
+            <label
+              htmlFor="register-password"
+              className="block text-sm font-medium text-black"
+            >
               Password
             </label>
             <div className="relative">
-
-              {/* Lock icon */}
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                 <i className="fas fa-lock text-indigo-300"></i>
               </div>
@@ -106,8 +100,6 @@ const Register = () => {
               />
             </div>
           </div>
-
-          {/* Verification method selection */}
           <div className="space-y-2">
             <p className="text-sm font-medium text-black">
               Select Verification Method
@@ -123,14 +115,16 @@ const Register = () => {
                   className="h-5 w-5 accent-indigo-500"
                 />
                 <div>
-                  <span className="text-black font-medium">Email Verification</span>
-                  <p className="text-black text-xs mt-0.5 font-normal">We'll send a verification code to your email</p>
+                  <span className="text-black font-medium">
+                    Email Verification
+                  </span>
+                  <p className="text-black text-xs mt-0.5 font-normal">
+                    We'll send a verification code to your email
+                  </p>
                 </div>
               </label>
             </div>
           </div>
-
-          {/* Submit button */}
           <button
             type="submit"
             className="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white border-none rounded-xl text-base font-medium cursor-pointer transition-all duration-300 shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 flex items-center justify-center"
@@ -140,10 +134,13 @@ const Register = () => {
           </button>
         </div>
       </form>
-
-      {/* Link to sign in page */}
       <div className="text-center mt-4 text-sm">
-        <p className="text-sm text-black">Already have an account? <span className="toggle-login text-indigo-300 font-medium cursor-pointer hover:text-black">Sign in</span></p>
+        <p className="text-sm text-black">
+          Already have an account?{" "}
+          <span className="toggle-login text-indigo-300 font-medium cursor-pointer hover:text-black">
+            Sign in
+          </span>
+        </p>
       </div>
     </div>
   );
