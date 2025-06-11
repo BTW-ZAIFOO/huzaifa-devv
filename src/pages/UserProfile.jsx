@@ -39,7 +39,6 @@ const UserProfile = () => {
   }, [user]);
 
   if (isAuthLoading) return <LoadingScreen />;
-
   if (!isAuthenticated) return <Navigate to="/auth" />;
 
   const handleInputChange = (e) => {

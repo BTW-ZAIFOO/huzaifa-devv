@@ -242,7 +242,7 @@ const ChatSidebar = ({
                                   ? "bg-red-500"
                                   : user.status === "banned"
                                   ? "bg-black"
-                                  : "bg-gray-400" /* Gray for offline */
+                                  : "bg-gray-400"
                               } border-2 border-white`}
                             ></span>
                           </div>

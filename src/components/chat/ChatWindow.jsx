@@ -32,7 +32,6 @@ const ChatWindow = ({
   const isCurrentUserBlockedOrBanned =
     loggedInUser?.status === "blocked" || loggedInUser?.status === "banned";
   const isChatDisabled = isCurrentUserBlockedOrBanned;
-  // Generate avatar for the selected user
   const avatar = generateAvatar(selectedUser);
 
   useEffect(() => {

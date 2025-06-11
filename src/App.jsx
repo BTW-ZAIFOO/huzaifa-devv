@@ -49,7 +49,6 @@ const App = () => {
 
     let isMounted = true;
 
-    // Fix: Execute the async function immediately instead of just defining it
     const checkAuthStatus = async () => {
       setIsAuthLoading(true);
       try {
