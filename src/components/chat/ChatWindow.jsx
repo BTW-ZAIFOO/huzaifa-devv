@@ -493,8 +493,7 @@ const ChatWindow = ({
         <div className="flex items-center gap-3">
           <button
             className="p-2 md:p-2.5 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition-colors"
-            onClick={() => {
-            }}
+            onClick={() => {}}
             title="Group Info"
           >
             <i className="fas fa-info-circle text-lg md:text-xl"></i>

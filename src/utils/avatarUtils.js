@@ -37,7 +37,15 @@ export const generateAvatar = (user) => {
   ];
 
   const color = colors[colorHash % colors.length];
-  const initials = user.name ? user.name.charAt(0).toUpperCase() : "U";
+
+  const initials = user.name
+    ? user.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .substring(0, 2)
+    : "?";
 
   return {
     color,
@@ -51,21 +59,22 @@ export const generateAvatar = (user) => {
 
 export const generateDefaultAvatar = () => {
   return {
-    color: "#64748b",
+    color: "#9ca3af",
     initials: "?",
     imageUrl: null,
-    fallbackUrl: `https://ui-avatars.com/api/?name=User&background=64748b&color=fff`,
+    fallbackUrl:
+      "https://ui-avatars.com/api/?name=User&background=9ca3af&color=fff",
   };
 };
 
-const simpleHashFromString = (str) => {
+export const simpleHashFromString = (str) => {
   let hash = 0;
   if (!str || str.length === 0) return hash;
 
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
     hash = (hash << 5) - hash + char;
-    hash = hash & hash; // Convert to 32bit integer
+    hash = hash & hash;
   }
 
   return Math.abs(hash);

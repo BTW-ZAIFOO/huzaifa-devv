@@ -221,3 +221,35 @@ export const updateUserInArray = (users, updatedUser) => {
     return user;
   });
 };
+
+export const logProfileUpdate = (userId, userName, changes) => {
+  const logData = {
+    userId,
+    userName,
+    changes,
+    timestamp: new Date(),
+  };
+
+  const previousLogs = JSON.parse(
+    localStorage.getItem("profileUpdates") || "[]"
+  );
+
+  localStorage.setItem(
+    "profileUpdates",
+    JSON.stringify([logData, ...previousLogs])
+  );
+
+  return logData;
+};
+
+export const formatInterests = (interests) => {
+  if (!interests) return [];
+  if (Array.isArray(interests)) return interests;
+  if (typeof interests === "string") {
+    return interests
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+  return [];
+};
