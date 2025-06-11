@@ -109,7 +109,6 @@ const OtpVerification = () => {
         <p className="text-gray-600 mb-6 text-center">
           Enter the verification code sent to {email}
         </p>
-
         <form onSubmit={handleOtpVerification}>
           <div className="flex justify-center space-x-3 mb-6">
             {otp.map((digit, index) => (
@@ -125,7 +124,6 @@ const OtpVerification = () => {
               />
             ))}
           </div>
-
           <button
             type="submit"
             disabled={isLoading || otp.join("").length !== 5}
@@ -140,7 +138,6 @@ const OtpVerification = () => {
             )}
           </button>
         </form>
-
         <div className="mt-6 text-center">
           <p className="text-gray-600 mb-2">
             {countdown > 0

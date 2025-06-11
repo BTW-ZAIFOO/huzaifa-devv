@@ -90,7 +90,7 @@ const Home = () => {
                 <div className="flex items-center">
                   {user && (
                     <>
-                      {(() => {
+                      {() => {
                         const avatar = getAvatarByRole(user);
                         return avatar?.imageUrl ? (
                           <img
@@ -108,7 +108,7 @@ const Home = () => {
                             {avatar?.initials || user?.name?.charAt(0) || "?"}
                           </div>
                         );
-                      })()}
+                      }}
                     </>
                   )}
                   <span className="text-slate-700 font-medium">

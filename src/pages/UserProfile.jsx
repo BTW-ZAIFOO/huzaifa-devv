@@ -1,12 +1,11 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import { Context } from "../main";
-import { Navigate, Link, useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import LoadingScreen from "../components/LoadingScreen";
 import axios from "axios";
 import { formatInterests, logProfileUpdate } from "../utils/moderationUtils";
 import { getAvatarByRole } from "../utils/avatarUtils";
-import UserList from "../components/social/UserList";
 import PostCard from "../components/social/PostCard";
 
 const UserProfile = () => {
@@ -165,10 +164,6 @@ const UserProfile = () => {
     } catch (error) {
       toast.error(error.response?.data?.message || "Action failed");
     }
-  };
-
-  const handleFollowChange = (userId, isFollowed) => {
-    fetchUserProfile();
   };
 
   const handlePostDelete = (postId) => {
@@ -655,7 +650,6 @@ const UserProfile = () => {
                       Separate interests with commas
                     </p>
                   </div>
-
                   <div className="pt-6">
                     <button
                       type="submit"
@@ -732,7 +726,6 @@ const UserProfile = () => {
                       </div>
                     </div>
                   </div>
-
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">
                       New Password
@@ -769,7 +762,6 @@ const UserProfile = () => {
                       </div>
                     </div>
                   </div>
-
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">
                       Confirm New Password
@@ -806,7 +798,6 @@ const UserProfile = () => {
                       </div>
                     </div>
                   </div>
-
                   <div className="pt-6">
                     <button
                       type="submit"
@@ -846,10 +837,7 @@ const UserProfile = () => {
               )}
             </div>
           </div>
-
-          {/* Followers/Following/Posts Section */}
           <div className="px-6 py-4 border-t border-gray-200">
-            {/* Follow/Unfollow Button */}
             {!isOwnProfile && (
               <div className="flex justify-center mb-4">
                 <button
@@ -901,7 +889,6 @@ const UserProfile = () => {
               </div>
             )}
 
-            {/* Followers/Following Count */}
             <div className="flex justify-center space-x-8 mb-4">
               <div className="text-center">
                 <span className="block text-2xl font-bold text-gray-800">
@@ -916,8 +903,6 @@ const UserProfile = () => {
                 <span className="text-sm text-gray-500">Following</span>
               </div>
             </div>
-
-            {/* User Posts */}
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-4">
                 Posts

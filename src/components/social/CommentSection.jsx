@@ -81,7 +81,6 @@ const CommentSection = ({
 
   return (
     <div className="p-4">
-      {/* Comment form */}
       <form onSubmit={handleAddComment} className="flex gap-2 mb-4">
         <div className="flex-shrink-0">
           {user && getAvatarByRole(user)?.imageUrl ? (

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { getAvatarByRole } from "../../utils/avatarUtils";
-import ConfirmDialog from "../ConfirmDialog";
 
 const PostModerationPanel = () => {
   const [posts, setPosts] = useState([]);
@@ -128,7 +127,6 @@ const PostModerationPanel = () => {
         <p className="text-gray-600 mt-1">
           Manage reported and inappropriate content
         </p>
-
         <div className="flex mt-4 border-b">
           <button
             onClick={() => setActiveView("reported")}

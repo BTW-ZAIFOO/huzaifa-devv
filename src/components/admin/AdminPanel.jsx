@@ -1392,8 +1392,8 @@ const AdminPanel = ({ users: initialUsers }) => {
                 {renderMessageQueue()}
               </div>
             )}
+
             {activeView === "settings" && renderSettingsView()}
-            
             {activeView === "posts" && (
               <div className="flex-1 p-6 bg-gray-50 overflow-auto">
                 <div className="mb-6">

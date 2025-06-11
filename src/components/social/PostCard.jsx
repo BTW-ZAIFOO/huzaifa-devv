@@ -19,7 +19,6 @@ const PostCard = ({ post, onDelete, onUpdate, isAdmin = false }) => {
   const [loading, setLoading] = useState(false);
   const [showModActions, setShowModActions] = useState(false);
   const optionsRef = useRef(null);
-
   const isAuthor = post.author?._id === user?._id;
   const postedTime = new Date(post.createdAt);
   const timeAgo = formatTimeAgo(postedTime);
@@ -407,7 +406,6 @@ const PostCard = ({ post, onDelete, onUpdate, isAdmin = false }) => {
           )}
         </div>
       </div>
-
       <div className="px-5 py-2 border-t border-gray-100 flex">
         <button
           onClick={handleLike}
@@ -420,7 +418,6 @@ const PostCard = ({ post, onDelete, onUpdate, isAdmin = false }) => {
           <i className={`${liked ? "fas" : "far"} fa-thumbs-up`}></i>
           <span>{liked ? "Liked" : "Like"}</span>
         </button>
-
         <button
           onClick={() => setShowComments(!showComments)}
           className="flex-1 py-1.5 flex items-center justify-center gap-2 rounded-md text-gray-600 hover:bg-gray-50"
@@ -428,7 +425,6 @@ const PostCard = ({ post, onDelete, onUpdate, isAdmin = false }) => {
           <i className="far fa-comment"></i>
           <span>Comment</span>
         </button>
-
         <button className="flex-1 py-1.5 flex items-center justify-center gap-2 rounded-md text-gray-600 hover:bg-gray-50">
           <i className="far fa-share-square"></i>
           <span>Share</span>

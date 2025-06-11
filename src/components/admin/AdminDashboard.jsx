@@ -187,7 +187,6 @@ const AdminDashboard = ({
             Manage users, moderate content, and monitor chat activities
           </p>
         </div>
-
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
           {[
             {
@@ -251,7 +250,6 @@ const AdminDashboard = ({
             />
           ))}
         </div>
-
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-semibold text-gray-800">
@@ -481,7 +479,6 @@ const AdminDashboard = ({
                               }`}
                             ></i>
                           </button>
-                          {/* Ban/Unban button */}
                           <button
                             onClick={() => handleBanUserClick(userId)}
                             className={`${

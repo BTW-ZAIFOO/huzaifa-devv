@@ -9,7 +9,6 @@ const AuthVerification = () => {
   const [error, setError] = useState("");
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-
   const token = searchParams.get("token");
   const email = searchParams.get("email");
 

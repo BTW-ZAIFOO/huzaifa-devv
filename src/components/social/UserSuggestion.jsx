@@ -67,7 +67,6 @@ const UserSuggestion = ({ users = [] }) => {
                 )}
               </div>
             </Link>
-
             <button
               onClick={() => handleFollow(user._id)}
               className={`ml-2 px-3 py-1 text-xs rounded-full ${
