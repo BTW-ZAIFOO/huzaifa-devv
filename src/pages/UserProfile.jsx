@@ -40,7 +40,6 @@ const UserProfile = () => {
   }, [user]);
 
   useEffect(() => {
-    // Connect to socket for real-time updates
     if (user && window.io) {
       socketRef.current = window.io("http://localhost:4000", {
         withCredentials: true,
@@ -51,7 +50,6 @@ const UserProfile = () => {
       });
 
       socketRef.current.on("user-profile-updated", (updatedUserData) => {
-        // If this is our profile that was updated elsewhere, update local state
         if (updatedUserData.userId === user._id) {
           setUser((prevUser) => ({
             ...prevUser,
@@ -67,7 +65,6 @@ const UserProfile = () => {
             interests: updatedUserData.interests || prevUser.interests,
             avatar: updatedUserData.avatar || prevUser.avatar,
           }));
-
           toast.info("Your profile was updated from another device");
         }
       });
@@ -121,7 +118,6 @@ const UserProfile = () => {
       setUser(response.data.user);
       toast.success("Profile updated successfully!");
 
-      // Reset password fields if on security tab
       if (activeTab === "security") {
         setFormData({
           ...formData,

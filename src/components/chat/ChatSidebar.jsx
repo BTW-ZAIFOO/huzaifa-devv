@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { Context } from "../../main";
 import { generateAvatar, generateAdminAvatar } from "../../utils/avatarUtils";
-import GroupChatModal from "./GroupChatModal"; 
+import GroupChatModal from "./GroupChatModal";
 
 const ChatSidebar = ({
   users,
@@ -172,8 +172,6 @@ const ChatSidebar = ({
               View Users
             </button>
           </div>
-
-          {/* Add tabs for direct and group chats */}
           <div className="flex border-b border-gray-200 mt-4">
             <button
               className={`flex-1 py-2 text-center text-sm font-medium ${
@@ -453,7 +451,6 @@ const ChatSidebar = ({
                                   : "hover:bg-gray-50"
                               } transition-all`}
                               onClick={() => {
-                                // Create a specialized format for group selection
                                 const groupFormatted = {
                                   ...group,
                                   isGroupChat: true,

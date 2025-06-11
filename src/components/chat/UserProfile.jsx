@@ -9,12 +9,10 @@ const UserProfile = ({ user, onClose, isAdmin, onBlockUser, onReportUser }) => {
   const displayedUser = isCurrentUser ? currentUser : profileData;
 
   useEffect(() => {
-    // Update profile data when user prop changes
     setProfileData(user);
   }, [user]);
 
   useEffect(() => {
-    // Listen for profile updates
     const handleProfileUpdate = (updatedUserData) => {
       if (updatedUserData.userId === user._id) {
         setProfileData((prev) => ({

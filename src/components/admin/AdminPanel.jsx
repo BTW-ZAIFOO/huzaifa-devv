@@ -84,7 +84,6 @@ const AdminPanel = ({ users: initialUsers }) => {
       });
     });
 
-    // Add handler for user profile updates
     socketRef.current.on("user-profile-updated", (updatedUserData) => {
       setUsers((prevUsers) =>
         prevUsers.map((u) => {
@@ -107,7 +106,6 @@ const AdminPanel = ({ users: initialUsers }) => {
         })
       );
 
-      // If we're viewing this user's messages, update selected user
       if (selectedUser && selectedUser._id === updatedUserData.userId) {
         setSelectedUser((prev) => ({
           ...prev,
@@ -123,7 +121,6 @@ const AdminPanel = ({ users: initialUsers }) => {
         }));
       }
 
-      // Log the activity
       logAdminActivity(
         `User ${updatedUserData.name || "Unknown"} updated their profile`
       );

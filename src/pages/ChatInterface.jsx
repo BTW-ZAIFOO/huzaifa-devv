@@ -167,7 +167,6 @@ const ChatInterface = ({ adminMode }) => {
         );
       });
 
-      // Add handler for profile updates
       socketRef.current.on("user-profile-updated", (updatedUserData) => {
         setAllUsers((prevUsers) =>
           prevUsers.map((u) => {
@@ -191,7 +190,6 @@ const ChatInterface = ({ adminMode }) => {
           })
         );
 
-        // If selected user was updated, update that too
         if (selectedUser && selectedUser._id === updatedUserData.userId) {
           setSelectedUser((prev) => ({
             ...prev,

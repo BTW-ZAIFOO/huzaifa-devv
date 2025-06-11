@@ -178,7 +178,6 @@ const ReportsView = ({
                         {new Date(report.timestamp).toLocaleString()}
                       </span>
                     </div>
-
                     <div className="mt-2">
                       <div className="flex items-center">
                         {report.type === "user" && (
@@ -244,7 +243,6 @@ const ReportsView = ({
                       : "Ignored"}
                   </span>
                 </div>
-
                 <div className="p-6">
                   <div className="mb-6">
                     <div className="text-sm">
