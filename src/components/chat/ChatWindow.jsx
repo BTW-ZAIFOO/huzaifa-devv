@@ -313,6 +313,10 @@ const ChatWindow = ({
     const isDeleted = message.isDeleted;
     const isPermanentlyDeleted = message.permanentlyDeleted;
 
+    const senderName =
+      message.sender?.name ||
+      selectedUser?.participants?.find((p) => p._id === senderId)?.name;
+
     return (
       <div
         key={message._id || message.id}
@@ -341,6 +345,12 @@ const ChatWindow = ({
                 : "bg-gray-100 text-gray-800 rounded-tl-none shadow"
             }`}
           >
+            {!isMe && (
+              <div className="text-xs font-semibold text-blue-600 mb-1">
+                {senderName}
+              </div>
+            )}
+
             {isMessageFlagged && !isDeleted && (
               <div className="absolute -top-6 right-0 bg-red-100 text-red-800 text-xs px-2 py-1 rounded-md shadow-sm">
                 <i className="fas fa-flag mr-1"></i> Flagged content
@@ -452,75 +462,43 @@ const ChatWindow = ({
     );
   }
 
-  return (
-    <div className="flex-1 flex flex-col bg-white/90 rounded-br-3xl shadow-inner overflow-hidden">
+  const isGroupChat = selectedUser?.isGroupChat;
+
+  const renderGroupHeader = () => {
+    if (!isGroupChat) return null;
+
+    const group = selectedUser;
+    const memberCount = group.participants ? group.participants.length : 0;
+
+    return (
       <div
-        className={`py-3 md:py-5 px-4 md:px-8 border-b flex justify-between items-center shadow-sm ${
-          isAdminChat
-            ? "bg-purple-50"
-            : isBannedUser
-            ? "bg-red-50"
-            : isBlockedUser
-            ? "bg-yellow-50"
-            : "bg-gradient-to-r from-blue-50 to-indigo-50"
-        }`}
+        className={`py-3 md:py-5 px-4 md:px-8 border-b flex justify-between items-center shadow-sm bg-gradient-to-r from-blue-50 to-indigo-50`}
       >
         <div className="flex items-center">
-          {isAdminChat ? (
-            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center mr-3 shadow-md">
-              <i className="fas fa-headset text-white text-lg"></i>
-            </div>
-          ) : (
-            <div className="relative">
-              <div
-                className="w-10 h-10 md:w-12 md:h-12 rounded-full mr-3 border-2 border-white shadow-sm flex items-center justify-center text-white font-medium"
-                style={{ backgroundColor: avatar.color }}
-                onClick={onViewProfile}
-                title="View profile"
-                role="button"
-              >
-                {avatar.initials}
-              </div>
-              <span
-                className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
-                  selectedUser.status === "online"
-                    ? "bg-green-500"
-                    : selectedUser.status === "banned"
-                    ? "bg-black"
-                    : selectedUser.status === "blocked"
-                    ? "bg-red-500"
-                    : "bg-gray-400"
-                }`}
-              ></span>
-            </div>
-          )}
+          <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center mr-3 shadow-md text-white">
+            <i className="fas fa-users"></i>
+          </div>
           <div>
             <h3 className="font-medium text-base md:text-lg flex items-center">
-              {selectedUser.name}
-              {renderUserStatusBadge()}
+              {group.groupName || group.name}
+              <span className="ml-2 bg-blue-100 text-blue-800 text-xs px-1.5 py-0.5 rounded-full">
+                Group
+              </span>
             </h3>
             <span className="text-xs md:text-sm text-gray-500">
-              {selectedUser.status === "online" ? (
-                <span className="flex items-center">Online</span>
-              ) : (
-                <span className="flex items-center">
-                  Offline{" "}
-                  {selectedUser.lastSeen ? `- ${selectedUser.lastSeen}` : ""}
-                </span>
-              )}
+              {memberCount} {memberCount === 1 ? "member" : "members"}
             </span>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          {!isAdminChat && (
-            <button
-              className="p-2 md:p-2.5 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition-colors"
-              onClick={onViewProfile}
-              title="View Profile"
-            >
-              <i className="far fa-user-circle text-lg md:text-xl"></i>
-            </button>
-          )}
+          <button
+            className="p-2 md:p-2.5 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition-colors"
+            onClick={() => {
+            }}
+            title="Group Info"
+          >
+            <i className="fas fa-info-circle text-lg md:text-xl"></i>
+          </button>
           {onCloseChat && (
             <button
               className="p-2 md:p-2.5 bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 transition-colors"
@@ -532,6 +510,94 @@ const ChatWindow = ({
           )}
         </div>
       </div>
+    );
+  };
+
+  return (
+    <div className="flex-1 flex flex-col bg-white/90 rounded-br-3xl shadow-inner overflow-hidden">
+      {isGroupChat ? (
+        renderGroupHeader()
+      ) : (
+        <div
+          className={`py-3 md:py-5 px-4 md:px-8 border-b flex justify-between items-center shadow-sm ${
+            isAdminChat
+              ? "bg-purple-50"
+              : isBannedUser
+              ? "bg-red-50"
+              : isBlockedUser
+              ? "bg-yellow-50"
+              : "bg-gradient-to-r from-blue-50 to-indigo-50"
+          }`}
+        >
+          <div className="flex items-center">
+            {isAdminChat ? (
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center mr-3 shadow-md">
+                <i className="fas fa-headset text-white text-lg"></i>
+              </div>
+            ) : (
+              <div className="relative">
+                <div
+                  className="w-10 h-10 md:w-12 md:h-12 rounded-full mr-3 border-2 border-white shadow-sm flex items-center justify-center text-white font-medium"
+                  style={{ backgroundColor: avatar.color }}
+                  onClick={onViewProfile}
+                  title="View profile"
+                  role="button"
+                >
+                  {avatar.initials}
+                </div>
+                <span
+                  className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
+                    selectedUser.status === "online"
+                      ? "bg-green-500"
+                      : selectedUser.status === "banned"
+                      ? "bg-black"
+                      : selectedUser.status === "blocked"
+                      ? "bg-red-500"
+                      : "bg-gray-400"
+                  }`}
+                ></span>
+              </div>
+            )}
+            <div>
+              <h3 className="font-medium text-base md:text-lg flex items-center">
+                {selectedUser.name}
+                {renderUserStatusBadge()}
+              </h3>
+              <span className="text-xs md:text-sm text-gray-500">
+                {selectedUser.status === "online" ? (
+                  <span className="flex items-center">Online</span>
+                ) : (
+                  <span className="flex items-center">
+                    Offline{" "}
+                    {selectedUser.lastSeen ? `- ${selectedUser.lastSeen}` : ""}
+                  </span>
+                )}
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            {!isAdminChat && (
+              <button
+                className="p-2 md:p-2.5 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition-colors"
+                onClick={onViewProfile}
+                title="View Profile"
+              >
+                <i className="far fa-user-circle text-lg md:text-xl"></i>
+              </button>
+            )}
+            {onCloseChat && (
+              <button
+                className="p-2 md:p-2.5 bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 transition-colors"
+                onClick={onCloseChat}
+                title="Close Chat"
+              >
+                <i className="fas fa-times text-lg md:text-xl"></i>
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       <div
         className={`flex-1 p-4 md:p-8 overflow-y-auto ${
           isAdminChat
@@ -551,7 +617,6 @@ const ChatWindow = ({
         {renderMessages()}
         <div ref={messagesEndRef} className="h-4" />
       </div>
-
       <form
         onSubmit={handleSendMessage}
         className="p-4 md:p-6 border-t flex items-end gap-3 bg-white/95 shadow-lg"

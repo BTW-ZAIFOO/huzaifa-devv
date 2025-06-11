@@ -84,6 +84,51 @@ const AdminPanel = ({ users: initialUsers }) => {
       });
     });
 
+    // Add handler for user profile updates
+    socketRef.current.on("user-profile-updated", (updatedUserData) => {
+      setUsers((prevUsers) =>
+        prevUsers.map((u) => {
+          if (u._id === updatedUserData.userId) {
+            return {
+              ...u,
+              name: updatedUserData.name || u.name,
+              bio:
+                updatedUserData.bio !== undefined ? updatedUserData.bio : u.bio,
+              location:
+                updatedUserData.location !== undefined
+                  ? updatedUserData.location
+                  : u.location,
+              interests: updatedUserData.interests || u.interests,
+              avatar: updatedUserData.avatar || u.avatar,
+              updatedAt: updatedUserData.updatedAt,
+            };
+          }
+          return u;
+        })
+      );
+
+      // If we're viewing this user's messages, update selected user
+      if (selectedUser && selectedUser._id === updatedUserData.userId) {
+        setSelectedUser((prev) => ({
+          ...prev,
+          name: updatedUserData.name || prev.name,
+          bio:
+            updatedUserData.bio !== undefined ? updatedUserData.bio : prev.bio,
+          location:
+            updatedUserData.location !== undefined
+              ? updatedUserData.location
+              : prev.location,
+          interests: updatedUserData.interests || prev.interests,
+          avatar: updatedUserData.avatar || prev.avatar,
+        }));
+      }
+
+      // Log the activity
+      logAdminActivity(
+        `User ${updatedUserData.name || "Unknown"} updated their profile`
+      );
+    });
+
     return () => {
       if (socketRef.current) {
         socketRef.current.disconnect();

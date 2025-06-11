@@ -166,6 +166,49 @@ const ChatInterface = ({ adminMode }) => {
           notification.message || "You have a new notification from admin."
         );
       });
+
+      // Add handler for profile updates
+      socketRef.current.on("user-profile-updated", (updatedUserData) => {
+        setAllUsers((prevUsers) =>
+          prevUsers.map((u) => {
+            if (u._id === updatedUserData.userId) {
+              return {
+                ...u,
+                name: updatedUserData.name || u.name,
+                bio:
+                  updatedUserData.bio !== undefined
+                    ? updatedUserData.bio
+                    : u.bio,
+                location:
+                  updatedUserData.location !== undefined
+                    ? updatedUserData.location
+                    : u.location,
+                interests: updatedUserData.interests || u.interests,
+                avatar: updatedUserData.avatar || u.avatar,
+              };
+            }
+            return u;
+          })
+        );
+
+        // If selected user was updated, update that too
+        if (selectedUser && selectedUser._id === updatedUserData.userId) {
+          setSelectedUser((prev) => ({
+            ...prev,
+            name: updatedUserData.name || prev.name,
+            bio:
+              updatedUserData.bio !== undefined
+                ? updatedUserData.bio
+                : prev.bio,
+            location:
+              updatedUserData.location !== undefined
+                ? updatedUserData.location
+                : prev.location,
+            interests: updatedUserData.interests || prev.interests,
+            avatar: updatedUserData.avatar || prev.avatar,
+          }));
+        }
+      });
     };
 
     setupSocket();
@@ -410,16 +453,31 @@ const ChatInterface = ({ adminMode }) => {
 
   const handleUserSelect = async (otherUser) => {
     try {
-      const userId = otherUser._id || otherUser.id;
-      const chatRes = await axios.post(
-        "http://localhost:4000/api/v1/chat/create",
-        { recipientId: userId },
-        { withCredentials: true }
-      );
+      let chatRes;
+
+      if (otherUser.isGroupChat) {
+        chatRes = {
+          data: {
+            chat: {
+              _id: otherUser._id,
+              isGroupChat: true,
+              groupName: otherUser.groupName || otherUser.name,
+            },
+          },
+        };
+      } else {
+        const userId = otherUser._id || otherUser.id;
+        chatRes = await axios.post(
+          "http://localhost:4000/api/v1/chat/create",
+          { recipientId: userId },
+          { withCredentials: true }
+        );
+      }
 
       const newSelectedChat = {
         chat: chatRes.data.chat,
         otherUser,
+        isGroupChat: otherUser.isGroupChat || false,
       };
 
       setSelectedChat(newSelectedChat);

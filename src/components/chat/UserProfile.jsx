@@ -1,10 +1,50 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { getAvatarByRole } from "../../utils/avatarUtils";
 import { Context } from "../../context/ContextProvider";
 
 const UserProfile = ({ user, onClose, isAdmin, onBlockUser, onReportUser }) => {
+  const [profileData, setProfileData] = useState(user);
+  const { user: currentUser } = useContext(Context);
+  const isCurrentUser = currentUser?._id === user._id;
+  const displayedUser = isCurrentUser ? currentUser : profileData;
+
+  useEffect(() => {
+    // Update profile data when user prop changes
+    setProfileData(user);
+  }, [user]);
+
+  useEffect(() => {
+    // Listen for profile updates
+    const handleProfileUpdate = (updatedUserData) => {
+      if (updatedUserData.userId === user._id) {
+        setProfileData((prev) => ({
+          ...prev,
+          name: updatedUserData.name || prev.name,
+          bio:
+            updatedUserData.bio !== undefined ? updatedUserData.bio : prev.bio,
+          location:
+            updatedUserData.location !== undefined
+              ? updatedUserData.location
+              : prev.location,
+          interests: updatedUserData.interests || prev.interests,
+          avatar: updatedUserData.avatar || prev.avatar,
+        }));
+      }
+    };
+
+    if (window.socket) {
+      window.socket.on("user-profile-updated", handleProfileUpdate);
+    }
+
+    return () => {
+      if (window.socket) {
+        window.socket.off("user-profile-updated", handleProfileUpdate);
+      }
+    };
+  }, [user._id]);
+
   const getStatusColor = () => {
-    switch (user.status) {
+    switch (displayedUser.status) {
       case "online":
         return "bg-green-500";
       case "blocked":
@@ -15,10 +55,8 @@ const UserProfile = ({ user, onClose, isAdmin, onBlockUser, onReportUser }) => {
         return "bg-gray-400";
     }
   };
-  const avatar = getAvatarByRole(user);
-  const { user: currentUser } = useContext(Context);
-  const isCurrentUser = currentUser?._id === user._id;
-  const displayedUser = isCurrentUser ? currentUser : user;
+
+  const avatar = getAvatarByRole(displayedUser);
 
   return (
     <>

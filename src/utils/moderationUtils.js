@@ -196,3 +196,28 @@ export const getUserModerationHistory = (userId) => {
   );
   return deletedMessages.filter((log) => log.senderId === userId);
 };
+
+export const updateUserInArray = (users, updatedUser) => {
+  if (!users || !Array.isArray(users)) return users;
+
+  return users.map((user) => {
+    if (user._id === updatedUser.userId) {
+      return {
+        ...user,
+        name: updatedUser.name || user.name,
+        bio: updatedUser.bio !== undefined ? updatedUser.bio : user.bio,
+        location:
+          updatedUser.location !== undefined
+            ? updatedUser.location
+            : user.location,
+        interests:
+          updatedUser.interests !== undefined
+            ? updatedUser.interests
+            : user.interests,
+        avatar: updatedUser.avatar || user.avatar,
+        updatedAt: updatedUser.updatedAt || new Date(),
+      };
+    }
+    return user;
+  });
+};

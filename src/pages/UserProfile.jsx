@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import { Context } from "../main";
 import { Navigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -10,6 +10,7 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [activeTab, setActiveTab] = useState("profile");
+  const socketRef = useRef(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -37,6 +38,47 @@ const UserProfile = () => {
       });
     }
   }, [user]);
+
+  useEffect(() => {
+    // Connect to socket for real-time updates
+    if (user && window.io) {
+      socketRef.current = window.io("http://localhost:4000", {
+        withCredentials: true,
+      });
+
+      socketRef.current.on("connect", () => {
+        console.log("Socket connected for profile updates");
+      });
+
+      socketRef.current.on("user-profile-updated", (updatedUserData) => {
+        // If this is our profile that was updated elsewhere, update local state
+        if (updatedUserData.userId === user._id) {
+          setUser((prevUser) => ({
+            ...prevUser,
+            name: updatedUserData.name || prevUser.name,
+            bio:
+              updatedUserData.bio !== undefined
+                ? updatedUserData.bio
+                : prevUser.bio,
+            location:
+              updatedUserData.location !== undefined
+                ? updatedUserData.location
+                : prevUser.location,
+            interests: updatedUserData.interests || prevUser.interests,
+            avatar: updatedUserData.avatar || prevUser.avatar,
+          }));
+
+          toast.info("Your profile was updated from another device");
+        }
+      });
+
+      return () => {
+        if (socketRef.current) {
+          socketRef.current.disconnect();
+        }
+      };
+    }
+  }, [user, setUser]);
 
   if (isAuthLoading) return <LoadingScreen />;
   if (!isAuthenticated) return <Navigate to="/auth" />;
@@ -78,6 +120,16 @@ const UserProfile = () => {
 
       setUser(response.data.user);
       toast.success("Profile updated successfully!");
+
+      // Reset password fields if on security tab
+      if (activeTab === "security") {
+        setFormData({
+          ...formData,
+          oldPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+      }
     } catch (error) {
       console.error("Profile update failed:", error);
       toast.error(error.response?.data?.message || "Profile update failed");

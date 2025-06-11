@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { Context } from "../../main";
 import { generateAvatar, generateAdminAvatar } from "../../utils/avatarUtils";
+import GroupChatModal from "./GroupChatModal"; 
 
 const ChatSidebar = ({
   users,
@@ -17,7 +18,11 @@ const ChatSidebar = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
+  const [groupChats, setGroupChats] = useState([]);
+  const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
+  const [activeTab, setActiveTab] = useState("direct"); // 'direct' or 'group'
   const { user: currentUser } = useContext(Context);
+
   useEffect(() => {
     if (searchTerm.trim() === "") {
       setSearchResults([]);
@@ -47,6 +52,29 @@ const ChatSidebar = ({
     };
     fetchSearch();
   }, [searchTerm]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const fetchGroupChats = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:4000/api/v1/chat/group/list",
+          { withCredentials: true }
+        );
+        setGroupChats(res.data.groupChats || []);
+      } catch (err) {
+        console.error("Error fetching group chats:", err);
+      }
+    };
+
+    fetchGroupChats();
+  }, [currentUser]);
+
+  const handleGroupCreated = (newGroup) => {
+    setGroupChats((prev) => [newGroup, ...prev]);
+    setActiveTab("group");
+  };
 
   const filterUsers = (users) => {
     return users.filter((user) => {
@@ -144,217 +172,321 @@ const ChatSidebar = ({
               View Users
             </button>
           </div>
+
+          {/* Add tabs for direct and group chats */}
+          <div className="flex border-b border-gray-200 mt-4">
+            <button
+              className={`flex-1 py-2 text-center text-sm font-medium ${
+                activeTab === "direct"
+                  ? "text-blue-600 border-b-2 border-blue-500"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+              onClick={() => setActiveTab("direct")}
+            >
+              <i className="fas fa-user mr-2"></i> Direct
+            </button>
+            <button
+              className={`flex-1 py-2 text-center text-sm font-medium ${
+                activeTab === "group"
+                  ? "text-blue-600 border-b-2 border-blue-500"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+              onClick={() => setActiveTab("group")}
+            >
+              <i className="fas fa-users mr-2"></i> Groups
+            </button>
+          </div>
         </div>
         {loading ? (
           <div className="flex-1 flex items-center justify-center">
             <div className="flex flex-col items-center">
               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
-              <p className="mt-3 text-gray-500">Loading users...</p>
+              <p className="mt-3 text-gray-500">Loading...</p>
             </div>
           </div>
         ) : (
           <div className="flex-1 overflow-y-auto bg-white/90">
             <div className="p-2">
-              <h3 className="px-3 py-2 text-xs font-semibold uppercase text-gray-500 tracking-wider">
-                {isAdmin ? "Manage Users" : "Recent Chats"}
-              </h3>
-              {displayUsers.length === 0 ? (
-                <div className="text-center py-6 text-gray-500 bg-gray-50 rounded-lg m-2">
-                  <i className="fas fa-user-slash text-gray-400 text-2xl mb-2"></i>
-                  <p>No users found</p>
-                </div>
-              ) : (
-                <ul>
-                  {displayUsers.map((user) => {
-                    const userId = user._id?.toString() || user.id?.toString();
-                    const selectedId =
-                      selectedUser?._id?.toString() ||
-                      selectedUser?.id?.toString();
-                    const userNotifications = notifications.filter(
-                      (n) => n.sender?._id === userId
-                    );
-                    const avatar =
-                      user.role === "admin"
-                        ? generateAdminAvatar(user)
-                        : generateAvatar(user);
-                    const isSelected = selectedId === userId;
-                    let borderClass = "";
-                    if (user.isReported)
-                      borderClass = "border-l-4 border-yellow-500";
-                    else if (user.status === "blocked")
-                      borderClass = "border-l-4 border-red-400";
-                    else if (user.status === "banned")
-                      borderClass = "border-l-4 border-black";
+              {activeTab === "direct" ? (
+                <>
+                  <h3 className="px-3 py-2 text-xs font-semibold uppercase text-gray-500 tracking-wider">
+                    {isAdmin ? "Manage Users" : "Direct Messages"}
+                  </h3>
+                  {displayUsers.length === 0 ? (
+                    <div className="text-center py-6 text-gray-500 bg-gray-50 rounded-lg m-2">
+                      <i className="fas fa-user-slash text-gray-400 text-2xl mb-2"></i>
+                      <p>No users found</p>
+                    </div>
+                  ) : (
+                    <ul>
+                      {displayUsers.map((user) => {
+                        const userId =
+                          user._id?.toString() || user.id?.toString();
+                        const selectedId =
+                          selectedUser?._id?.toString() ||
+                          selectedUser?.id?.toString();
+                        const userNotifications = notifications.filter(
+                          (n) => n.sender?._id === userId
+                        );
+                        const avatar =
+                          user.role === "admin"
+                            ? generateAdminAvatar(user)
+                            : generateAvatar(user);
+                        const isSelected = selectedId === userId;
+                        let borderClass = "";
+                        if (user.isReported)
+                          borderClass = "border-l-4 border-yellow-500";
+                        else if (user.status === "blocked")
+                          borderClass = "border-l-4 border-red-400";
+                        else if (user.status === "banned")
+                          borderClass = "border-l-4 border-black";
 
-                    return (
-                      <li key={userId} className="mb-1">
-                        <button
-                          className={`w-full flex items-center px-3 py-2.5 rounded-xl ${
-                            isSelected
-                              ? "bg-gradient-to-r from-blue-50 to-blue-100 shadow-sm"
-                              : "hover:bg-gray-50"
-                          } transition-all ${borderClass}`}
-                          onClick={() => onSelectUser(user)}
-                        >
-                          <div className="relative">
-                            {avatar.imageUrl ? (
-                              <img
-                                src={avatar.imageUrl}
-                                alt={user.name || "User"}
-                                className={`w-12 h-12 rounded-full object-cover border border-gray-200 shadow-sm ${
-                                  user.status === "blocked"
-                                    ? "opacity-75"
-                                    : user.status === "banned"
-                                    ? "opacity-60 grayscale"
-                                    : ""
-                                }`}
-                                onError={(e) => {
-                                  e.target.onerror = null;
-                                  e.target.src = avatar.fallbackUrl;
-                                }}
-                              />
-                            ) : (
-                              <div
-                                className={`w-12 h-12 rounded-full border border-gray-200 shadow-sm flex items-center justify-center text-white font-medium text-lg ${
-                                  user.status === "blocked"
-                                    ? "opacity-75"
-                                    : user.status === "banned"
-                                    ? "opacity-60 grayscale"
-                                    : ""
-                                }`}
-                                style={{ backgroundColor: avatar.color }}
-                              >
-                                {avatar.initials}
-                              </div>
-                            )}
-                            {userNotifications.length > 0 && (
-                              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 min-w-5 px-1 flex items-center justify-center">
-                                {userNotifications.length > 9
-                                  ? "9+"
-                                  : userNotifications.length}
-                              </span>
-                            )}
-                            <span
-                              className={`absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full ${
-                                user.status === "online"
-                                  ? "bg-green-500"
-                                  : user.status === "blocked"
-                                  ? "bg-red-500"
-                                  : user.status === "banned"
-                                  ? "bg-black"
-                                  : "bg-gray-400"
-                              } border-2 border-white`}
-                            ></span>
-                          </div>
-                          <div className="ml-3 flex-1 text-left">
-                            <div className="flex justify-between items-center">
-                              <h3 className="font-medium text-gray-800">
-                                {user.name}
-                                {user.role === "admin" && (
-                                  <span className="ml-1.5 bg-purple-100 text-purple-800 text-xs px-1.5 py-0.5 rounded-full">
-                                    Admin
-                                  </span>
-                                )}
-                                {user.status === "blocked" && !isAdmin && (
-                                  <span className="ml-1.5 bg-red-100 text-red-800 text-xs px-1.5 py-0.5 rounded-full">
-                                    Blocked
-                                  </span>
-                                )}
-                                {user.status === "banned" && !isAdmin && (
-                                  <span className="ml-1.5 bg-gray-800 text-white text-xs px-1.5 py-0.5 rounded-full">
-                                    Banned
-                                  </span>
-                                )}
-                              </h3>
-                              {isAdmin && (
-                                <div className="flex gap-2">
-                                  <button
-                                    className="text-gray-400 hover:text-red-500"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      onBlockUser(user.id, "block");
-                                    }}
-                                    title={
+                        return (
+                          <li key={userId} className="mb-1">
+                            <button
+                              className={`w-full flex items-center px-3 py-2.5 rounded-xl ${
+                                isSelected
+                                  ? "bg-gradient-to-r from-blue-50 to-blue-100 shadow-sm"
+                                  : "hover:bg-gray-50"
+                              } transition-all ${borderClass}`}
+                              onClick={() => onSelectUser(user)}
+                            >
+                              <div className="relative">
+                                {avatar.imageUrl ? (
+                                  <img
+                                    src={avatar.imageUrl}
+                                    alt={user.name || "User"}
+                                    className={`w-12 h-12 rounded-full object-cover border border-gray-200 shadow-sm ${
                                       user.status === "blocked"
-                                        ? "Unblock User"
-                                        : "Block User"
-                                    }
-                                  >
-                                    <i
-                                      className={`fas ${
-                                        user.status === "blocked"
-                                          ? "fa-unlock"
-                                          : "fa-ban"
-                                      } text-xs`}
-                                    ></i>
-                                  </button>
-                                  <button
-                                    className="text-gray-400 hover:text-black"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      onBlockUser(user.id, "ban");
+                                        ? "opacity-75"
+                                        : user.status === "banned"
+                                        ? "opacity-60 grayscale"
+                                        : ""
+                                    }`}
+                                    onError={(e) => {
+                                      e.target.onerror = null;
+                                      e.target.src = avatar.fallbackUrl;
                                     }}
-                                    title={
-                                      user.status === "banned"
-                                        ? "Unban User"
-                                        : "Ban User"
-                                    }
+                                  />
+                                ) : (
+                                  <div
+                                    className={`w-12 h-12 rounded-full border border-gray-200 shadow-sm flex items-center justify-center text-white font-medium text-lg ${
+                                      user.status === "blocked"
+                                        ? "opacity-75"
+                                        : user.status === "banned"
+                                        ? "opacity-60 grayscale"
+                                        : ""
+                                    }`}
+                                    style={{ backgroundColor: avatar.color }}
                                   >
-                                    <i
-                                      className={`fas ${
-                                        user.status === "banned"
-                                          ? "fa-user-check"
-                                          : "fa-user-slash"
-                                      } text-xs`}
-                                    ></i>
-                                  </button>
-                                  <button
-                                    className="text-gray-400 hover:text-yellow-500"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      onReportUser(user.id);
-                                    }}
-                                    title="Report User"
-                                  >
-                                    <i className="fas fa-flag text-xs"></i>
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                            <p className="text-xs text-gray-500 mt-0.5">
-                              {user.status === "banned"
-                                ? "Banned by admin"
-                                : user.status === "blocked"
-                                ? "Blocked by admin"
-                                : user.status === "online"
-                                ? "Online"
-                                : "Offline" +
-                                  (user.lastSeen
-                                    ? ` - ${formatLastSeen(user.lastSeen)}`
-                                    : "")}
-                            </p>
-                            {isAdmin && user.lastActivity && (
-                              <p className="text-xs text-blue-600 mt-1">
-                                <i className="fas fa-history mr-1"></i>
-                                {user.lastActivity}
-                              </p>
-                            )}
-                            {isAdmin &&
-                              user.flaggedWords &&
-                              user.flaggedWords.length > 0 && (
-                                <div className="flex mt-1 gap-1">
-                                  <span className="text-xs bg-red-100 text-red-800 px-1.5 py-0.5 rounded">
-                                    <i className="fas fa-exclamation-circle mr-1"></i>
-                                    {user.flaggedWords.length} flagged
+                                    {avatar.initials}
+                                  </div>
+                                )}
+                                {userNotifications.length > 0 && (
+                                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 min-w-5 px-1 flex items-center justify-center">
+                                    {userNotifications.length > 9
+                                      ? "9+"
+                                      : userNotifications.length}
                                   </span>
+                                )}
+                                <span
+                                  className={`absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full ${
+                                    user.status === "online"
+                                      ? "bg-green-500"
+                                      : user.status === "blocked"
+                                      ? "bg-red-500"
+                                      : user.status === "banned"
+                                      ? "bg-black"
+                                      : "bg-gray-400"
+                                  } border-2 border-white`}
+                                ></span>
+                              </div>
+                              <div className="ml-3 flex-1 text-left">
+                                <div className="flex justify-between items-center">
+                                  <h3 className="font-medium text-gray-800">
+                                    {user.name}
+                                    {user.role === "admin" && (
+                                      <span className="ml-1.5 bg-purple-100 text-purple-800 text-xs px-1.5 py-0.5 rounded-full">
+                                        Admin
+                                      </span>
+                                    )}
+                                    {user.status === "blocked" && !isAdmin && (
+                                      <span className="ml-1.5 bg-red-100 text-red-800 text-xs px-1.5 py-0.5 rounded-full">
+                                        Blocked
+                                      </span>
+                                    )}
+                                    {user.status === "banned" && !isAdmin && (
+                                      <span className="ml-1.5 bg-gray-800 text-white text-xs px-1.5 py-0.5 rounded-full">
+                                        Banned
+                                      </span>
+                                    )}
+                                  </h3>
+                                  {isAdmin && (
+                                    <div className="flex gap-2">
+                                      <button
+                                        className="text-gray-400 hover:text-red-500"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          onBlockUser(user.id, "block");
+                                        }}
+                                        title={
+                                          user.status === "blocked"
+                                            ? "Unblock User"
+                                            : "Block User"
+                                        }
+                                      >
+                                        <i
+                                          className={`fas ${
+                                            user.status === "blocked"
+                                              ? "fa-unlock"
+                                              : "fa-ban"
+                                          } text-xs`}
+                                        ></i>
+                                      </button>
+                                      <button
+                                        className="text-gray-400 hover:text-black"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          onBlockUser(user.id, "ban");
+                                        }}
+                                        title={
+                                          user.status === "banned"
+                                            ? "Unban User"
+                                            : "Ban User"
+                                        }
+                                      >
+                                        <i
+                                          className={`fas ${
+                                            user.status === "banned"
+                                              ? "fa-user-check"
+                                              : "fa-user-slash"
+                                          } text-xs`}
+                                        ></i>
+                                      </button>
+                                      <button
+                                        className="text-gray-400 hover:text-yellow-500"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          onReportUser(user.id);
+                                        }}
+                                        title="Report User"
+                                      >
+                                        <i className="fas fa-flag text-xs"></i>
+                                      </button>
+                                    </div>
+                                  )}
                                 </div>
-                              )}
-                          </div>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
+                                <p className="text-xs text-gray-500 mt-0.5">
+                                  {user.status === "banned"
+                                    ? "Banned by admin"
+                                    : user.status === "blocked"
+                                    ? "Blocked by admin"
+                                    : user.status === "online"
+                                    ? "Online"
+                                    : "Offline" +
+                                      (user.lastSeen
+                                        ? ` - ${formatLastSeen(user.lastSeen)}`
+                                        : "")}
+                                </p>
+                                {isAdmin && user.lastActivity && (
+                                  <p className="text-xs text-blue-600 mt-1">
+                                    <i className="fas fa-history mr-1"></i>
+                                    {user.lastActivity}
+                                  </p>
+                                )}
+                                {isAdmin &&
+                                  user.flaggedWords &&
+                                  user.flaggedWords.length > 0 && (
+                                    <div className="flex mt-1 gap-1">
+                                      <span className="text-xs bg-red-100 text-red-800 px-1.5 py-0.5 rounded">
+                                        <i className="fas fa-exclamation-circle mr-1"></i>
+                                        {user.flaggedWords.length} flagged
+                                      </span>
+                                    </div>
+                                  )}
+                              </div>
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="flex justify-between items-center px-3 py-2">
+                    <h3 className="text-xs font-semibold uppercase text-gray-500 tracking-wider">
+                      Group Chats
+                    </h3>
+                    <button
+                      onClick={() => setShowCreateGroupModal(true)}
+                      className="text-blue-600 hover:text-blue-800"
+                      title="Create New Group"
+                    >
+                      <i className="fas fa-plus-circle"></i>
+                    </button>
+                  </div>
+
+                  {groupChats.length === 0 ? (
+                    <div className="text-center py-6 text-gray-500 bg-gray-50 rounded-lg m-2">
+                      <i className="fas fa-users text-gray-400 text-2xl mb-2"></i>
+                      <p>No group chats yet</p>
+                      <button
+                        onClick={() => setShowCreateGroupModal(true)}
+                        className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+                      >
+                        Create a group
+                      </button>
+                    </div>
+                  ) : (
+                    <ul>
+                      {groupChats.map((group) => {
+                        const isSelected =
+                          selectedUser && selectedUser._id === group._id;
+
+                        return (
+                          <li key={group._id} className="mb-1">
+                            <button
+                              className={`w-full flex items-center px-3 py-2.5 rounded-xl ${
+                                isSelected
+                                  ? "bg-gradient-to-r from-blue-50 to-blue-100 shadow-sm"
+                                  : "hover:bg-gray-50"
+                              } transition-all`}
+                              onClick={() => {
+                                // Create a specialized format for group selection
+                                const groupFormatted = {
+                                  ...group,
+                                  isGroupChat: true,
+                                  name: group.groupName,
+                                };
+                                onSelectUser(groupFormatted);
+                              }}
+                            >
+                              <div className="relative">
+                                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white font-medium">
+                                  {group.groupName?.charAt(0) || "G"}
+                                </div>
+                              </div>
+                              <div className="ml-3 flex-1 text-left">
+                                <div className="flex justify-between items-center">
+                                  <h3 className="font-medium text-gray-800 flex items-center">
+                                    {group.groupName}
+                                    <span className="ml-1.5 bg-blue-100 text-blue-800 text-xs px-1.5 py-0.5 rounded-full">
+                                      Group
+                                    </span>
+                                  </h3>
+                                </div>
+                                <p className="text-xs text-gray-500 mt-0.5">
+                                  {group.participants?.length || 0} members
+                                </p>
+                              </div>
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -393,6 +525,14 @@ const ChatSidebar = ({
           </button>
         </div>
       </div>
+
+      {showCreateGroupModal && (
+        <GroupChatModal
+          isOpen={showCreateGroupModal}
+          onClose={() => setShowCreateGroupModal(false)}
+          onGroupCreated={handleGroupCreated}
+        />
+      )}
     </>
   );
 };
