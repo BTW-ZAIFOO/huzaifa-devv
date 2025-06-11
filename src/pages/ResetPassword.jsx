@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import axios from "axios";
-import { Navigate, useParams } from "react-router-dom";
+import { Navigate, useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Context } from "../main";
 
@@ -8,32 +8,44 @@ const ResetPassword = () => {
   const { isAuthenticated, setIsAuthenticated, user, setUser } =
     useContext(Context);
   const { token } = useParams();
+  const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
+
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
       const res = await axios.put(
         `http://localhost:4000/api/v1/user/password/reset/${token}`,
-        { password, confirmPassword },
+        { password },
         {
           withCredentials: true,
           headers: { "Content-Type": "application/json" },
         }
       );
 
-      toast.success(res.data.message);
+      toast.success(res.data.message || "Password reset successfully");
       setIsAuthenticated(true);
       setUser(res.data.user);
 
       window.location.href =
         res.data.user.role === "admin" ? "/admin" : "/chat";
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Failed to reset password");
     } finally {
       setIsLoading(false);
     }

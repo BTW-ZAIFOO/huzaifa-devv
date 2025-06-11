@@ -5,6 +5,7 @@ import AdminDashboard from "./AdminDashboard";
 import ChatWindow from "../chat/ChatWindow";
 import ChatSidebar from "../chat/ChatSidebar";
 import ReportsView from "./ReportsView";
+import PostModerationPanel from "./PostModerationPanel.jsx";
 import { Context } from "../../main";
 import {
   extractInappropriateWords,
@@ -755,6 +756,16 @@ const AdminPanel = ({ users: initialUsers }) => {
           )}
       </button>
       <button
+        onClick={() => setActiveView("posts")}
+        className={`px-3 py-1.5 rounded-md transition-colors flex items-center ${
+          activeView === "posts"
+            ? "bg-purple-700 text-white"
+            : "bg-purple-100 text-purple-700 hover:bg-purple-200"
+        }`}
+      >
+        <i className="fas fa-file-alt mr-1.5"></i> Posts
+      </button>
+      <button
         onClick={() => setActiveView("messages")}
         className={`px-3 py-1.5 rounded-md transition-colors flex items-center ${
           activeView === "messages"
@@ -1382,6 +1393,20 @@ const AdminPanel = ({ users: initialUsers }) => {
               </div>
             )}
             {activeView === "settings" && renderSettingsView()}
+            
+            {activeView === "posts" && (
+              <div className="flex-1 p-6 bg-gray-50 overflow-auto">
+                <div className="mb-6">
+                  <h2 className="text-xl font-bold text-gray-800 mb-2">
+                    Post Management
+                  </h2>
+                  <p className="text-gray-600">
+                    Monitor, review, and moderate user posts
+                  </p>
+                </div>
+                <PostModerationPanel />
+              </div>
+            )}
           </div>
 
           {activeView !== "chat" && (

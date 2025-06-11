@@ -3,6 +3,7 @@ import axios from "axios";
 import { Context } from "../../main";
 import { generateAvatar, generateAdminAvatar } from "../../utils/avatarUtils";
 import GroupChatModal from "./GroupChatModal";
+import { Link } from "react-router-dom";
 
 const ChatSidebar = ({
   users,
@@ -193,6 +194,13 @@ const ChatSidebar = ({
             >
               <i className="fas fa-users mr-2"></i> Groups
             </button>
+            <Link
+              to="/feed"
+              className="text-slate-700 font-medium hover:text-blue-600 transition-colors flex items-center"
+            >
+              <i className="fas fa-newspaper mr-1.5"></i>{" "}
+              <span className="hidden md:inline">Feed</span>
+            </Link>
           </div>
         </div>
         {loading ? (

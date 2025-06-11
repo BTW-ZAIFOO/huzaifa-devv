@@ -17,7 +17,17 @@ const DebugConsole = () => {
           ...prev,
           {
             type,
-            content: args.map((arg) => JSON.stringify(arg)).join(" "),
+            content: args
+              .map((arg) => {
+                try {
+                  return typeof arg === "object"
+                    ? JSON.stringify(arg)
+                    : String(arg);
+                } catch (e) {
+                  return String(arg);
+                }
+              })
+              .join(" "),
             timestamp: new Date(),
           },
         ]);

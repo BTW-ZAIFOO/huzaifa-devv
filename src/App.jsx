@@ -16,6 +16,10 @@ import ResetPassword from "./pages/ResetPassword";
 import ChatInterface from "./pages/ChatInterface";
 import UserProfile from "./pages/UserProfile";
 import OtpVerification from "./pages/OtpVerification";
+import Feed from "./pages/Feed";
+import NotFound from "./pages/NotFound";
+import AuthVerification from "./pages/AuthVerification";
+import { Toaster } from "react-hot-toast";
 import "./App.css";
 
 const AdminRoute = ({ children }) => {
@@ -130,8 +134,27 @@ const App = () => {
               </AdminRoute>
             }
           />
+          <Route
+            path="/feed"
+            element={
+              <ProtectedRoute>
+                <Feed />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/:userId"
+            element={
+              <ProtectedRoute>
+                <UserProfile />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/verify" element={<AuthVerification />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
-        <ToastContainer theme="colored" />
+        <Toaster position="top-center" toastOptions={{ duration: 3000 }} />
+        <ToastContainer position="bottom-right" />
       </div>
     </Router>
   );
