@@ -25,11 +25,9 @@ const AdminLogin = () => {
       if (response.data.user.role === "admin") {
         setUser(response.data.user);
         setIsAuthenticated(true);
-        state;
         console.log("Admin login successfull:", response.data.user);
         toast.success("Admin login successfull!");
         navigateTo("/admin");
-        dashboard;
       } else {
         console.error("This account doesn't have admin privileges");
         toast.error("This account doesn't have admin privileges");

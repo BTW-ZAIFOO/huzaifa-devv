@@ -203,33 +203,52 @@ const ChatHeader = ({
                       </div>
                     );
                   })}
-                  {incomingNotifications.map((notification, index) => (
-                    <div key={`msg-${index}`} className="p-3 hover:bg-gray-50">
-                      <div className="flex items-start">
-                        <img
-                          src={
-                            notification.sender.avatar ||
-                            getAvatarByRole(notification.sender)
-                          }
-                          className="w-8 h-8 rounded-full mr-3 mt-1"
-                          alt={notification.sender.name}
-                        />
-                        <div>
-                          <p className="font-medium text-sm">
-                            {notification.sender.name}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {notification.content.length > 40
-                              ? `${notification.content.substring(0, 40)}...`
-                              : notification.content}
-                          </p>
-                          <p className="text-xs text-gray-400 mt-1">
-                            {new Date(notification.createdAt).toLocaleString()}
-                          </p>
+                  {incomingNotifications.map((notification, index) => {
+                    const senderAvatar = getAvatarByRole(notification.sender);
+                    return (
+                      <div
+                        key={`msg-${index}`}
+                        className="p-3 hover:bg-gray-50"
+                      >
+                        <div className="flex items-start">
+                          {senderAvatar?.imageUrl ? (
+                            <img
+                              src={senderAvatar.imageUrl}
+                              className="w-8 h-8 rounded-full mr-3 mt-1"
+                              alt={notification.sender.name}
+                            />
+                          ) : (
+                            <div
+                              className="w-8 h-8 rounded-full mr-3 mt-1 flex items-center justify-center text-white text-sm"
+                              style={{
+                                backgroundColor:
+                                  senderAvatar?.color || "#4f46e5",
+                              }}
+                            >
+                              {senderAvatar?.initials ||
+                                notification.sender.name?.charAt(0) ||
+                                "?"}
+                            </div>
+                          )}
+                          <div>
+                            <p className="font-medium text-sm">
+                              {notification.sender.name}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {notification.content.length > 40
+                                ? `${notification.content.substring(0, 40)}...`
+                                : notification.content}
+                            </p>
+                            <p className="text-xs text-gray-400 mt-1">
+                              {new Date(
+                                notification.createdAt
+                              ).toLocaleString()}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -242,14 +261,24 @@ const ChatHeader = ({
             to="/profile"
             className="flex items-center gap-2 text-gray-600 hover:text-blue-600"
           >
-            <div
-              className="w-8 h-8 rounded-full flex items-center justify-center text-white overflow-hidden shadow-sm"
-              style={{ backgroundColor: avatar?.color || "#4f46e5" }}
-            >
-              <span className="font-medium text-sm">
-                {avatar?.initials || user?.name?.charAt(0) || "?"}
-              </span>
-            </div>
+            {user && (
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center text-white overflow-hidden shadow-sm"
+                style={{ backgroundColor: avatar?.color || "#4f46e5" }}
+              >
+                {avatar?.imageUrl ? (
+                  <img
+                    src={avatar.imageUrl}
+                    alt={user?.name || "User"}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="font-medium text-sm">
+                    {avatar?.initials || user?.name?.charAt(0) || "?"}
+                  </span>
+                )}
+              </div>
+            )}
             <span className="hidden md:inline">{user?.name || "User"}</span>
           </Link>
         </div>

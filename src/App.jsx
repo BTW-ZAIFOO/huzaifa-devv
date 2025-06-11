@@ -49,7 +49,8 @@ const App = () => {
 
     let isMounted = true;
 
-    async () => {
+    // Fix: Execute the async function immediately instead of just defining it
+    const checkAuthStatus = async () => {
       setIsAuthLoading(true);
       try {
         const res = await axios.get("http://localhost:4000/api/v1/user/me", {
@@ -81,10 +82,12 @@ const App = () => {
       }
     };
 
+    checkAuthStatus();
+
     return () => {
       isMounted = false;
-      const link = document.querySelector('link[href*="font-awesome"]');
-      if (link) document.head.appendChild(link);
+      const linkElement = document.querySelector('link[href*="font-awesome"]');
+      if (linkElement) document.head.removeChild(linkElement);
     };
   }, [setIsAuthenticated, setUser, setIsAuthLoading]);
 

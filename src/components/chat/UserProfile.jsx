@@ -42,19 +42,22 @@ const UserProfile = ({ user, onClose, isAdmin, onBlockUser, onReportUser }) => {
                   className="w-24 h-24 rounded-full object-cover border-4 border-blue-100"
                   onError={(e) => {
                     e.target.onerror = null;
-                    e.target.src = avatar.fallbackUrl;
+                    e.target.src =
+                      avatar.fallbackUrl ||
+                      "https://ui-avatars.com/api/?name=" +
+                        (displayedUser?.name || "User");
                   }}
                 />
               ) : (
                 <div
                   className="w-24 h-24 rounded-full border-4 border-blue-100 flex items-center justify-center text-white text-3xl font-bold"
-                  style={{ backgroundColor: avatar.color }}
+                  style={{ backgroundColor: avatar.color || "#4f46e5" }}
                 >
-                  {avatar.initials}
+                  {avatar.initials || displayedUser?.name?.charAt(0) || "?"}
                 </div>
               )}
               <span
-                className={`absolute bottom-1 right-1 w-4 h-4 rounded-full ${getStatusColor()} border-2 border-white`}
+                className={`absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full ${getStatusColor()} border-2 border-white`}
               ></span>
             </div>
             <h2 className="text-xl font-semibold text-gray-800">

@@ -32,6 +32,9 @@ const ChatWindow = ({
   const isCurrentUserBlockedOrBanned =
     loggedInUser?.status === "blocked" || loggedInUser?.status === "banned";
   const isChatDisabled = isCurrentUserBlockedOrBanned;
+  // Generate avatar for the selected user
+  const avatar = generateAvatar(selectedUser);
+
   useEffect(() => {
     initializeSpeechRecognition();
     return () => recognition?.stop();
@@ -310,7 +313,6 @@ const ChatWindow = ({
       containsInappropriateContent(messageText, flaggedWords);
     const isDeleted = message.isDeleted;
     const isPermanentlyDeleted = message.permanentlyDeleted;
-    const avatar = generateAvatar(message.sender);
 
     return (
       <div
@@ -471,20 +473,15 @@ const ChatWindow = ({
             </div>
           ) : (
             <div className="relative">
-              {() => {
-                const avatar = generateAvatar(selectedUser);
-                return (
-                  <div
-                    className="w-10 h-10 md:w-12 md:h-12 rounded-full mr-3 border-2 border-white shadow-sm flex items-center justify-center text-white font-medium"
-                    style={{ backgroundColor: avatar.color }}
-                    onClick={onViewProfile}
-                    title="View profile"
-                    role="button"
-                  >
-                    {avatar.initials}
-                  </div>
-                );
-              }}
+              <div
+                className="w-10 h-10 md:w-12 md:h-12 rounded-full mr-3 border-2 border-white shadow-sm flex items-center justify-center text-white font-medium"
+                style={{ backgroundColor: avatar.color }}
+                onClick={onViewProfile}
+                title="View profile"
+                role="button"
+              >
+                {avatar.initials}
+              </div>
               <span
                 className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
                   selectedUser.status === "online"

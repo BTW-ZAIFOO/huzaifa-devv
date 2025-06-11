@@ -88,23 +88,29 @@ const Home = () => {
               </Link>
               <div className="hidden md:block border-l pl-4 ml-2 border-gray-200">
                 <div className="flex items-center">
-                  {() => {
-                    const avatar = getAvatarByRole(user);
-                    return avatar?.imageUrl ? (
-                      <img
-                        src={avatar.imageUrl}
-                        alt={user?.name}
-                        className="w-8 h-8 rounded-full mr-2"
-                      />
-                    ) : (
-                      <div
-                        className="w-8 h-8 rounded-full mr-2 flex items-center justify-center text-white text-sm"
-                        style={{ backgroundColor: avatar?.color || "#4f46e5" }}
-                      >
-                        {avatar?.initials || user?.name?.charAt(0) || "?"}
-                      </div>
-                    );
-                  }}
+                  {user && (
+                    <>
+                      {(() => {
+                        const avatar = getAvatarByRole(user);
+                        return avatar?.imageUrl ? (
+                          <img
+                            src={avatar.imageUrl}
+                            alt={user?.name}
+                            className="w-8 h-8 rounded-full mr-2"
+                          />
+                        ) : (
+                          <div
+                            className="w-8 h-8 rounded-full mr-2 flex items-center justify-center text-white text-sm"
+                            style={{
+                              backgroundColor: avatar?.color || "#4f46e5",
+                            }}
+                          >
+                            {avatar?.initials || user?.name?.charAt(0) || "?"}
+                          </div>
+                        );
+                      })()}
+                    </>
+                  )}
                   <span className="text-slate-700 font-medium">
                     Welcome, {user?.name}
                   </span>
