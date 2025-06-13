@@ -16,12 +16,10 @@ const UserSuggestion = ({ users = [] }) => {
         { withCredentials: true }
       );
 
-      // Update follow status in UI
       if (currentUser?.following) {
         currentUser.following.push(userId);
       }
 
-      // Emit follow event via socket if available
       if (window.io && window.io.connected) {
         try {
           window.io.emit("follow-user", {

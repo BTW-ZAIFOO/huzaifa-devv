@@ -175,7 +175,6 @@ const PostCard = ({ post, onDelete, onUpdate, isAdmin = false }) => {
       post.content.length > 50 ? "..." : ""
     }`;
 
-    // Handle errors gracefully
     try {
       let url;
       switch (platform) {

@@ -1,12 +1,6 @@
-/**
- * Simple utility to check server connectivity
- * Run with: node serverCheck.js in the terminal
- */
-
 const checkServerStatus = () => {
   console.log("Checking server connectivity...");
 
-  // Use the browser's fetch API instead of importing axios
   fetch("http://localhost:4000/api/health", {
     method: "GET",
     headers: { "Content-Type": "application/json" },
@@ -48,7 +42,6 @@ const checkServerStatus = () => {
     });
 };
 
-// This function can be used in the browser console or as a module
 if (typeof window !== "undefined") {
   window.checkServerStatus = checkServerStatus;
   console.log(

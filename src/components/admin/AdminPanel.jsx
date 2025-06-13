@@ -1254,6 +1254,7 @@ const AdminPanel = ({ users: initialUsers }) => {
             </button>
           </div>
         </div>
+
         {renderAdminNav()}
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80 z-50">
@@ -1263,6 +1264,7 @@ const AdminPanel = ({ users: initialUsers }) => {
             </div>
           </div>
         )}
+
         {error && (
           <div className="bg-red-50 border-l-4 border-red-500 p-4 m-4">
             <div className="flex">
@@ -1283,6 +1285,7 @@ const AdminPanel = ({ users: initialUsers }) => {
             </div>
           </div>
         )}
+
         <div className="flex flex-1 overflow-hidden">
           {activeView === "chat" &&
             (sidebarOpen || window.innerWidth > 1024) && (
@@ -1296,6 +1299,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                 loading={loading}
               />
             )}
+
           <div className="flex-1 flex">
             {activeView === "dashboard" && (
               <AdminDashboard
@@ -1314,6 +1318,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                 }}
               />
             )}
+
             {activeView === "chat" && (
               <div className="flex-1 flex flex-col">
                 <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-3">
@@ -1336,6 +1341,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                 />
               </div>
             )}
+
             {activeView === "reports" && (
               <div className="flex-1 overflow-hidden">
                 <ReportsView
@@ -1348,6 +1354,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                 />
               </div>
             )}
+
             {activeView === "messages" && (
               <div className="flex-1 p-6 bg-gray-50 overflow-auto">
                 <div className="mb-6 flex justify-between items-center">
@@ -1394,6 +1401,7 @@ const AdminPanel = ({ users: initialUsers }) => {
             )}
 
             {activeView === "settings" && renderSettingsView()}
+
             {activeView === "posts" && (
               <div className="flex-1 p-6 bg-gray-50 overflow-auto">
                 <div className="mb-6">
@@ -1407,6 +1415,7 @@ const AdminPanel = ({ users: initialUsers }) => {
                 <PostModerationPanel />
               </div>
             )}
+            
           </div>
 
           {activeView !== "chat" && (

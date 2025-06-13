@@ -26,7 +26,7 @@ const CommentSection = ({
     try {
       const res = await axios.post(
         `http://localhost:4000/api/v1/post/${postId}/comment`,
-        { text: newComment }, // Using 'text' to match server expectation
+        { text: newComment }, 
         { withCredentials: true }
       );
 

@@ -105,6 +105,7 @@ const ChatHeader = ({
               }}
             >
               <i className="fas fa-bell text-lg md:text-xl"></i>
+
               {hasNotifications && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   {incomingNotifications.length +
@@ -116,6 +117,7 @@ const ChatHeader = ({
                 </span>
               )}
             </button>
+
             {showNotifications && (
               <div className="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg z-50 max-h-96 overflow-y-auto">
                 <div className="p-3 border-b flex justify-between items-center">
@@ -134,6 +136,7 @@ const ChatHeader = ({
                         No notifications
                       </div>
                     )}
+
                   {systemNotifications.map((notification, index) => {
                     const badgeClass = getNotificationBadgeClass(
                       notification.type
@@ -203,6 +206,7 @@ const ChatHeader = ({
                       </div>
                     );
                   })}
+
                   {incomingNotifications.map((notification, index) => {
                     const senderAvatar = getAvatarByRole(notification.sender);
                     return (

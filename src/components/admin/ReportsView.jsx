@@ -116,6 +116,7 @@ const ReportsView = ({
           </button>
         </div>
       </div>
+
       {filteredReports.length === 0 ? (
         <div className="bg-white rounded-lg shadow-sm p-10 text-center">
           <div className="text-5xl text-gray-300 mb-4">
@@ -259,6 +260,7 @@ const ReportsView = ({
                         {new Date(selectedReport.timestamp).toLocaleString()}
                       </span>
                     </div>
+
                     {selectedReport.reportedBy && (
                       <div className="text-sm mt-1">
                         <span className="text-gray-500">Reported by:</span>{" "}
@@ -267,6 +269,7 @@ const ReportsView = ({
                         </span>
                       </div>
                     )}
+
                     {selectedReport.flaggedWords &&
                       selectedReport.flaggedWords.length > 0 && (
                         <div className="mt-2">
@@ -286,6 +289,7 @@ const ReportsView = ({
                         </div>
                       )}
                   </div>
+
                   {selectedReport.user && (
                     <div className="mb-6 bg-gray-50 p-4 rounded-lg">
                       <div className="flex items-center">
@@ -316,6 +320,7 @@ const ReportsView = ({
                       </div>
                     </div>
                   )}
+
                   <div className="mb-6">
                     <h4 className="text-sm font-medium text-gray-700 mb-2">
                       Report Details
@@ -326,6 +331,7 @@ const ReportsView = ({
                       </p>
                     </div>
                   </div>
+
                   {selectedReport.status === "resolved" && (
                     <div className="mb-6">
                       <h4 className="text-sm font-medium text-gray-700 mb-2">
@@ -338,12 +344,14 @@ const ReportsView = ({
                             {selectedReport.resolution}
                           </span>
                         </div>
+
                         {selectedReport.resolutionReason && (
                           <div className="text-sm mt-1">
                             <span className="text-gray-600">Reason:</span>{" "}
                             <span>{selectedReport.resolutionReason}</span>
                           </div>
                         )}
+
                         <div className="text-sm mt-1">
                           <span className="text-gray-600">Resolved by:</span>{" "}
                           <span>{selectedReport.resolvedBy}</span> on{" "}
@@ -352,6 +360,7 @@ const ReportsView = ({
                       </div>
                     </div>
                   )}
+
                   {selectedReport.status === "pending" && (
                     <div className="pt-4 border-t border-gray-200">
                       <div className="flex flex-wrap gap-2">

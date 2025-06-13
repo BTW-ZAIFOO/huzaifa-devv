@@ -72,9 +72,11 @@ const AdminRegister = () => {
                 className="pl-11 pr-4 py-3 h-12 w-full bg-white border border-white/20 rounded-xl text-black transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:outline-none font-normal text-base shadow-sm"
               />
             </div>
+
             {errors.name && (
               <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
             )}
+
           </div>
           <div className="space-y-2">
             <label
@@ -101,11 +103,13 @@ const AdminRegister = () => {
                 className="pl-11 pr-4 py-3 h-12 w-full bg-white border border-white/20 rounded-xl text-black transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:outline-none font-normal text-base shadow-sm"
               />
             </div>
+
             {errors.email && (
               <p className="text-red-500 text-xs mt-1">
                 {errors.email.message}
               </p>
             )}
+
           </div>
           <div className="space-y-2">
             <label
@@ -132,11 +136,13 @@ const AdminRegister = () => {
                 className="pl-11 pr-4 py-3 h-12 w-full bg-white border border-white/20 rounded-xl text-black transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:outline-none font-normal text-base shadow-sm"
               />
             </div>
+
             {errors.password && (
               <p className="text-red-500 text-xs mt-1">
                 {errors.password.message}
               </p>
             )}
+            
           </div>
           <button
             type="submit"

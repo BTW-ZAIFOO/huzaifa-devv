@@ -101,6 +101,7 @@ const AdminLogin = () => {
                 className="pl-11 pr-4 py-3 h-12 w-full bg-white border border-white/20 rounded-xl text-black transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:outline-none font-normal text-base shadow-sm"
               />
             </div>
+
             {errors.email && (
               <p className="text-red-500 text-xs mt-1">
                 {errors.email.message}
@@ -126,11 +127,13 @@ const AdminLogin = () => {
                 className="pl-11 pr-4 py-3 h-12 w-full bg-white border border-white/20 rounded-xl text-black transition-all focus:ring-2 focus:ring-pink-500 focus:border-transparent focus:outline-none font-normal text-base shadow-sm"
               />
             </div>
+
             {errors.password && (
               <p className="text-red-500 text-xs mt-1">
                 {errors.password.message}
               </p>
             )}
+
           </div>
           <div className="text-right text-sm">
             <Link
@@ -145,6 +148,7 @@ const AdminLogin = () => {
             disabled={isLoading}
             className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white border-none rounded-xl text-base font-medium cursor-pointer transition-all duration-300 shadow-lg hover:shadow-pink-500/30 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center"
           >
+
             {isLoading ? (
               <LoadingSpinner />
             ) : (
@@ -153,6 +157,7 @@ const AdminLogin = () => {
                 Admin Sign In
               </>
             )}
+            
           </button>
         </div>
         <div className="mt-6 text-black text-center">

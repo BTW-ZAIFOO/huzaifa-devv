@@ -18,7 +18,7 @@ const Feed = () => {
   const [loading, setLoading] = useState(true);
   const [suggestedUsers, setSuggestedUsers] = useState([]);
   const [trendingTopics, setTrendingTopics] = useState([]);
-  const [filter, setFilter] = useState("all"); // all, following, trending
+  const [filter, setFilter] = useState("all"); 
   const [searchResults, setSearchResults] = useState(null);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -28,7 +28,7 @@ const Feed = () => {
   const lastPostRef = useRef(null);
 
   useEffect(() => {
-    if (!user) return; // Only try to connect if user exists
+    if (!user) return; 
 
     let socket = null;
     let connectionAttempts = 0;
@@ -39,7 +39,6 @@ const Feed = () => {
       try {
         console.log("Attempting to connect to socket server...");
 
-        // Disconnect existing socket if any
         if (socketRef.current) {
           socketRef.current.disconnect();
         }
@@ -54,7 +53,7 @@ const Feed = () => {
 
         socket.on("connect", () => {
           console.log("Socket connection successful");
-          connectionAttempts = 0; // Reset connection attempts on success
+          connectionAttempts = 0; 
         });
 
         socket.on("connect_error", (error) => {
@@ -65,7 +64,6 @@ const Feed = () => {
             error
           );
 
-          // Try to reconnect manually if within attempt limits
           if (connectionAttempts < MAX_ATTEMPTS) {
             connectionAttempts++;
             setTimeout(connectSocket, RETRY_DELAY);
@@ -73,11 +71,9 @@ const Feed = () => {
             console.error(
               "Max reconnection attempts reached. Proceeding without socket connection."
             );
-            // Don't block the rest of the application - continue without real-time features
           }
         });
 
-        // Set up other event listeners
         socket.on("new-post", (newPost) => {
           if (filter !== "trending") {
             setPosts((prevPosts) => [newPost, ...prevPosts]);
@@ -234,7 +230,6 @@ const Feed = () => {
     } catch (error) {
       console.error("Failed to fetch posts:", error);
 
-      // Fallback to all posts if the specific filter endpoint fails
       if (filter === "following" || filter === "trending") {
         try {
           console.log("Trying fallback to all posts");
@@ -256,7 +251,6 @@ const Feed = () => {
           setPage(pageNum);
           setHasMore(fallbackPosts.length === 10);
 
-          // Notify the user about the fallback
           toast.info("Showing all posts instead of filtered view");
         } catch (fallbackError) {
           console.error("Fallback also failed:", fallbackError);
@@ -301,7 +295,6 @@ const Feed = () => {
       setTrendingTopics(res.data.topics || []);
     } catch (error) {
       console.error("Failed to fetch trending topics:", error);
-      // Set default trending topics as fallback
       setTrendingTopics([
         { name: "AI", postCount: 125 },
         { name: "Technology", postCount: 98 },

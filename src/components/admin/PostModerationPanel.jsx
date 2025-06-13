@@ -248,11 +248,13 @@ const PostModerationPanel = () => {
                       <div className="text-sm text-gray-900 line-clamp-2">
                         {post.content}
                       </div>
+
                       {post.media && (
                         <div className="text-xs text-blue-600 mt-1">
                           [Contains media]
                         </div>
                       )}
+
                       {post.isReported && post.reportReason && (
                         <div className="text-xs text-red-600 mt-1">
                           <span className="font-semibold">Report reason:</span>{" "}

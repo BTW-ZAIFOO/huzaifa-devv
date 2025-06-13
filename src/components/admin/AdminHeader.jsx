@@ -20,6 +20,7 @@ const AdminHeader = ({ user, onLogout }) => {
           </div>
           <span>{user?.name || "Admin"}</span>
         </div>
+
         {onLogout && (
           <button
             onClick={onLogout}
@@ -28,6 +29,7 @@ const AdminHeader = ({ user, onLogout }) => {
             <i className="fas fa-sign-out-alt mr-1"></i> Logout
           </button>
         )}
+        
       </div>
     </div>
   );
