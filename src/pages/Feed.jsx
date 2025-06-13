@@ -7,7 +7,6 @@ import LoadingScreen from "../components/LoadingScreen";
 import PostForm from "../components/social/PostForm";
 import PostCard from "../components/social/PostCard";
 import UserSuggestion from "../components/social/UserSuggestion";
-import TrendingTopics from "../components/social/TrendingTopics";
 import UserProfileSidebar from "../components/social/UserProfileSidebar";
 import SearchBar from "../components/social/SearchBar";
 import io from "socket.io-client";
@@ -18,7 +17,7 @@ const Feed = () => {
   const [loading, setLoading] = useState(true);
   const [suggestedUsers, setSuggestedUsers] = useState([]);
   const [trendingTopics, setTrendingTopics] = useState([]);
-  const [filter, setFilter] = useState("all"); 
+  const [filter, setFilter] = useState("all");
   const [searchResults, setSearchResults] = useState(null);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -28,7 +27,7 @@ const Feed = () => {
   const lastPostRef = useRef(null);
 
   useEffect(() => {
-    if (!user) return; 
+    if (!user) return;
 
     let socket = null;
     let connectionAttempts = 0;
@@ -53,7 +52,7 @@ const Feed = () => {
 
         socket.on("connect", () => {
           console.log("Socket connection successful");
-          connectionAttempts = 0; 
+          connectionAttempts = 0;
         });
 
         socket.on("connect_error", (error) => {
@@ -423,19 +422,16 @@ const Feed = () => {
           </div>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">
-        <div className="flex flex-col lg:flex-row gap-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+        <div className="flex flex-col lg:flex-row gap-6 relative">
           <div className="lg:w-1/4 hidden lg:block">
-            <UserProfileSidebar user={user} />
-            <div className="bg-white rounded-xl shadow-sm p-5 mt-6 sticky top-24">
-              <h2 className="font-bold text-lg text-gray-800 mb-4 flex items-center">
-                <i className="fas fa-fire-alt text-orange-500 mr-2"></i>{" "}
-                Trending Topics
-              </h2>
-              <TrendingTopics topics={trendingTopics} />
+            <div className="fixed w-[calc(25%-1.5rem)] max-w-[280px]">
+              <div className="space-y-6">
+                <UserProfileSidebar user={user} />
+              </div>
             </div>
           </div>
-          <div className="lg:w-1/2 space-y-6">
+          <div className="lg:w-1/2 space-y-6 min-h-[calc(100vh-80px)]">
             <div className="bg-white rounded-xl shadow-sm p-5">
               <PostForm onPostCreated={handleCreatePost} />
             </div>
@@ -474,127 +470,134 @@ const Feed = () => {
               </div>
             </div>
 
-            {searchResults && (
-              <div className="bg-white rounded-xl shadow-sm p-5">
-                <h2 className="text-xl font-bold mb-4">
-                  Search Results for "{searchQuery}"
-                </h2>
+            {/* Scrollable post content */}
+            <div className="space-y-6 overflow-y-auto">
+              {searchResults && (
+                <div className="bg-white rounded-xl shadow-sm p-5">
+                  <h2 className="text-xl font-bold mb-4">
+                    Search Results for "{searchQuery}"
+                  </h2>
 
-                {searchResults.users.length > 0 && (
-                  <div className="mb-6">
-                    <h3 className="text-lg font-semibold mb-2">Users</h3>
-                    <div className="space-y-2">
-                      {searchResults.users.map((user) => (
-                        <Link
-                          key={user._id}
-                          to={`/profile/${user._id}`}
-                          className="flex items-center p-2 hover:bg-gray-50 rounded-lg"
-                        >
-                          <img
-                            src={
-                              user.avatar || "https://via.placeholder.com/40"
-                            }
-                            alt={user.name}
-                            className="w-10 h-10 rounded-full mr-3 object-cover"
+                  {searchResults.users.length > 0 && (
+                    <div className="mb-6">
+                      <h3 className="text-lg font-semibold mb-2">Users</h3>
+                      <div className="space-y-2">
+                        {searchResults.users.map((user) => (
+                          <Link
+                            key={user._id}
+                            to={`/profile/${user._id}`}
+                            className="flex items-center p-2 hover:bg-gray-50 rounded-lg"
+                          >
+                            <img
+                              src={
+                                user.avatar || "https://via.placeholder.com/40"
+                              }
+                              alt={user.name}
+                              className="w-10 h-10 rounded-full mr-3 object-cover"
+                            />
+                            <div>
+                              <h4 className="font-medium">{user.name}</h4>
+                              {user.bio && (
+                                <p className="text-sm text-gray-500 truncate">
+                                  {user.bio}
+                                </p>
+                              )}
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {searchResults.posts.length > 0 ? (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2">Posts</h3>
+                      <div className="space-y-4">
+                        {searchResults.posts.map((post) => (
+                          <PostCard
+                            key={post._id}
+                            post={post}
+                            onDelete={handlePostDelete}
+                            onUpdate={handlePostUpdate}
+                            isAdmin={isAdmin}
                           />
-                          <div>
-                            <h4 className="font-medium">{user.name}</h4>
-                            {user.bio && (
-                              <p className="text-sm text-gray-500 truncate">
-                                {user.bio}
-                              </p>
-                            )}
-                          </div>
-                        </Link>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    searchResults.users.length === 0 && (
+                      <p className="text-gray-500 text-center py-4">
+                        No results found
+                      </p>
+                    )
+                  )}
 
-                {searchResults.posts.length > 0 ? (
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">Posts</h3>
-                    <div className="space-y-4">
-                      {searchResults.posts.map((post) => (
-                        <PostCard
-                          key={post._id}
-                          post={post}
-                          onDelete={handlePostDelete}
-                          onUpdate={handlePostUpdate}
-                          isAdmin={isAdmin}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  searchResults.users.length === 0 && (
-                    <p className="text-gray-500 text-center py-4">
-                      No results found
-                    </p>
-                  )
-                )}
-
-                <button
-                  onClick={() => setSearchResults(null)}
-                  className="mt-4 text-blue-600 hover:text-blue-800"
-                >
-                  Clear search results
-                </button>
-              </div>
-            )}
-
-            {loading && posts.length === 0 ? (
-              <div className="flex justify-center py-10">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-              </div>
-            ) : posts.length > 0 ? (
-              <div className="space-y-6">
-                {posts.map((post, index) => (
-                  <div
-                    key={post._id}
-                    ref={index === posts.length - 1 ? lastPostRef : null}
+                  <button
+                    onClick={() => setSearchResults(null)}
+                    className="mt-4 text-blue-600 hover:text-blue-800"
                   >
-                    <PostCard
-                      post={post}
-                      onDelete={handlePostDelete}
-                      onUpdate={handlePostUpdate}
-                      isAdmin={isAdmin}
-                    />
-                  </div>
-                ))}
-
-                {loading && (
-                  <div className="flex justify-center py-4">
-                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="bg-white rounded-xl shadow-sm p-10 text-center">
-                <div className="text-6xl text-gray-300 mb-4">
-                  <i className="far fa-newspaper"></i>
+                    Clear search results
+                  </button>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                  No posts yet
-                </h3>
-                <p className="text-gray-500 mb-4">
-                  {filter === "following"
-                    ? "Follow more people to see their posts here!"
-                    : "Be the first to create a post!"}
-                </p>
-              </div>
-            )}
+              )}
+
+              {loading && posts.length === 0 ? (
+                <div className="flex justify-center py-10">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                </div>
+              ) : posts.length > 0 ? (
+                <div className="space-y-6">
+                  {posts.map((post, index) => (
+                    <div
+                      key={post._id}
+                      ref={index === posts.length - 1 ? lastPostRef : null}
+                    >
+                      <PostCard
+                        post={post}
+                        onDelete={handlePostDelete}
+                        onUpdate={handlePostUpdate}
+                        isAdmin={isAdmin}
+                      />
+                    </div>
+                  ))}
+
+                  {loading && (
+                    <div className="flex justify-center py-4">
+                      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="bg-white rounded-xl shadow-sm p-10 text-center">
+                  <div className="text-6xl text-gray-300 mb-4">
+                    <i className="far fa-newspaper"></i>
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                    No posts yet
+                  </h3>
+                  <p className="text-gray-500 mb-4">
+                    {filter === "following"
+                      ? "Follow more people to see their posts here!"
+                      : "Be the first to create a post!"}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
+
+          {/* Right Sidebar - Fixed */}
           <div className="lg:w-1/4 hidden lg:block">
-            <div className="bg-white rounded-xl shadow-sm p-5 sticky top-24">
-              <h2 className="font-bold text-lg text-gray-800 mb-4">
-                Suggested Users
-              </h2>
-              <UserSuggestion
-                users={suggestedUsers}
-                currentUser={user}
-                onFollowChange={handleFollowChange}
-              />
+            <div className="fixed w-[calc(25%-1.5rem)] max-w-[280px]">
+              <div className="bg-white rounded-xl shadow-sm p-5">
+                <h2 className="font-bold text-lg text-gray-800 mb-4">
+                  Suggested Users
+                </h2>
+                <UserSuggestion
+                  users={suggestedUsers}
+                  currentUser={user}
+                  onFollowChange={handleFollowChange}
+                />
+              </div>
             </div>
           </div>
         </div>
