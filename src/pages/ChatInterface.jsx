@@ -171,6 +171,14 @@ const ChatInterface = ({ adminMode }) => {
         setAllUsers((prevUsers) =>
           prevUsers.map((u) => {
             if (u._id === updatedUserData.userId) {
+              let updatedAvatar = updatedUserData.avatar || u.avatar;
+              if (updatedAvatar) {
+                const timestamp = new Date().getTime();
+                updatedAvatar = updatedAvatar.includes("?")
+                  ? `${updatedAvatar}&t=${timestamp}`
+                  : `${updatedAvatar}?t=${timestamp}`;
+              }
+
               return {
                 ...u,
                 name: updatedUserData.name || u.name,
@@ -183,7 +191,7 @@ const ChatInterface = ({ adminMode }) => {
                     ? updatedUserData.location
                     : u.location,
                 interests: updatedUserData.interests || u.interests,
-                avatar: updatedUserData.avatar || u.avatar,
+                avatar: updatedAvatar,
               };
             }
             return u;
@@ -191,6 +199,14 @@ const ChatInterface = ({ adminMode }) => {
         );
 
         if (selectedUser && selectedUser._id === updatedUserData.userId) {
+          let updatedAvatar = updatedUserData.avatar || selectedUser.avatar;
+          if (updatedAvatar) {
+            const timestamp = new Date().getTime();
+            updatedAvatar = updatedAvatar.includes("?")
+              ? `${updatedAvatar}&t=${timestamp}`
+              : `${updatedAvatar}?t=${timestamp}`;
+          }
+
           setSelectedUser((prev) => ({
             ...prev,
             name: updatedUserData.name || prev.name,
@@ -203,7 +219,7 @@ const ChatInterface = ({ adminMode }) => {
                 ? updatedUserData.location
                 : prev.location,
             interests: updatedUserData.interests || prev.interests,
-            avatar: updatedUserData.avatar || prev.avatar,
+            avatar: updatedAvatar,
           }));
         }
       });

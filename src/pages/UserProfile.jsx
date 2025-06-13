@@ -290,13 +290,24 @@ const UserProfile = () => {
         ) {
           changes.interests = formatInterests(formData.interests);
         }
-        if (formData.avatar) changes.avatar = "Updated profile picture";
+        if (formData.avatar) {
+          changes.avatar = "Updated profile picture";
+          toast.success("Profile picture updated successfully!");
+        }
 
         logProfileUpdate(user._id, user.name, changes);
       }
 
       setUser(response.data.user);
       toast.success(response.data.message || "Profile updated successfully!");
+
+      if (formData.avatar && response.data.user.avatar) {
+        const timestamp = new Date().getTime();
+        const avatarUrl = response.data.user.avatar.includes("?")
+          ? `${response.data.user.avatar}&t=${timestamp}`
+          : `${response.data.user.avatar}?t=${timestamp}`;
+        setAvatarPreview(avatarUrl);
+      }
 
       if (activeTab === "security") {
         setFormData({
@@ -422,6 +433,7 @@ const UserProfile = () => {
                 <span className="text-gray-500 text-sm">{user.location}</span>
               </div>
             )}
+
             <div className="flex justify-center space-x-12 mt-6 pt-5 border-t border-gray-100">
               <div className="text-center group cursor-pointer">
                 <div className="text-2xl font-semibold text-gray-700 group-hover:text-blue-600 transition-colors">
@@ -450,6 +462,7 @@ const UserProfile = () => {
               </div>
             </div>
           </div>
+
           {user?.bio && (
             <div className="px-8 py-4">
               <p className="text-gray-700 leading-relaxed">{user.bio}</p>

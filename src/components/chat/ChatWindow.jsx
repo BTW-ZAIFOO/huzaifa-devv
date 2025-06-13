@@ -226,16 +226,14 @@ const ChatWindow = ({
     }
 
     return (
-      <>
-        <div className="space-y-6">
-          {renderStatusNotification()}
-          {messages.map((message) =>
-            message.isSystemMessage
-              ? renderSystemMessage(message)
-              : renderChatMessage(message)
-          )}
-        </div>
-      </>
+      <div className="space-y-6">
+        {renderStatusNotification()}
+        {messages.map((message) =>
+          message.isSystemMessage
+            ? renderSystemMessage(message)
+            : renderChatMessage(message)
+        )}
+      </div>
     );
   }
 

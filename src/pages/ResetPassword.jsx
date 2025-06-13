@@ -8,7 +8,6 @@ const ResetPassword = () => {
   const { isAuthenticated, setIsAuthenticated, user, setUser } =
     useContext(Context);
   const { token } = useParams();
-  const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);

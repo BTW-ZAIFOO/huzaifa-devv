@@ -26,7 +26,7 @@ const CommentSection = ({
     try {
       const res = await axios.post(
         `http://localhost:4000/api/v1/post/${postId}/comment`,
-        { content: newComment },
+        { text: newComment }, // Using 'text' to match server expectation
         { withCredentials: true }
       );
 
@@ -159,7 +159,9 @@ const CommentSection = ({
                     <div className="font-medium text-gray-800">
                       {comment.author?.name}
                     </div>
-                    <div className="text-gray-700">{comment.content}</div>
+                    <div className="text-gray-700">
+                      {comment.text || comment.content}
+                    </div>
                   </div>
                   <div className="text-xs text-gray-500 mt-1 flex items-center">
                     <span className="mr-3">

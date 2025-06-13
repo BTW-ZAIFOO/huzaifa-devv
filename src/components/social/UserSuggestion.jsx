@@ -16,6 +16,23 @@ const UserSuggestion = ({ users = [] }) => {
         { withCredentials: true }
       );
 
+      // Update follow status in UI
+      if (currentUser?.following) {
+        currentUser.following.push(userId);
+      }
+
+      // Emit follow event via socket if available
+      if (window.io && window.io.connected) {
+        try {
+          window.io.emit("follow-user", {
+            followerId: currentUser?._id,
+            followedId: userId,
+          });
+        } catch (socketErr) {
+          console.warn("Socket emit error:", socketErr);
+        }
+      }
+
       toast.success("User followed successfully");
     } catch (error) {
       console.error("Failed to follow user:", error);
@@ -25,8 +42,8 @@ const UserSuggestion = ({ users = [] }) => {
 
   if (users.length === 0) {
     return (
-      <div className="text-center py-3 text-gray-500">
-        No suggested users at the moment
+      <div className="text-center py-4">
+        <p className="text-gray-500">No suggestions available</p>
       </div>
     );
   }

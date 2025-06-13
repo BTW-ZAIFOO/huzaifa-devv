@@ -18,6 +18,7 @@ const PostCard = ({ post, onDelete, onUpdate, isAdmin = false }) => {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showModActions, setShowModActions] = useState(false);
+  const [showShareOptions, setShowShareOptions] = useState(false);
   const optionsRef = useRef(null);
   const isAuthor = post.author?._id === user?._id;
   const postedTime = new Date(post.createdAt);
@@ -159,6 +160,62 @@ const PostCard = ({ post, onDelete, onUpdate, isAdmin = false }) => {
     } finally {
       setLoading(false);
       setShowModActions(false);
+    }
+  };
+
+  const handleShare = () => {
+    setShowShareOptions(!showShareOptions);
+  };
+
+  const shareToSocialMedia = (platform) => {
+    let shareUrl = window.location.origin + `/post/${post._id}`;
+    let shareText = `Check out this post from ${
+      post.author?.name
+    }: ${post.content.substring(0, 50)}${
+      post.content.length > 50 ? "..." : ""
+    }`;
+
+    // Handle errors gracefully
+    try {
+      let url;
+      switch (platform) {
+        case "facebook":
+          url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+            shareUrl
+          )}`;
+          break;
+        case "twitter":
+          url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+            shareText
+          )}&url=${encodeURIComponent(shareUrl)}`;
+          break;
+        case "linkedin":
+          url = `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(
+            shareUrl
+          )}&title=${encodeURIComponent(
+            "Shared Post"
+          )}&summary=${encodeURIComponent(shareText)}`;
+          break;
+        case "copy":
+          navigator.clipboard
+            .writeText(shareUrl)
+            .then(() => toast.success("Link copied to clipboard!"))
+            .catch((err) => {
+              console.error("Clipboard error:", err);
+              toast.error("Failed to copy link");
+            });
+          setShowShareOptions(false);
+          return;
+      }
+
+      if (url) {
+        window.open(url, "_blank", "width=600,height=400");
+        setShowShareOptions(false);
+      }
+    } catch (error) {
+      console.error("Share error:", error);
+      toast.error("Failed to share post");
+      setShowShareOptions(false);
     }
   };
 
@@ -425,9 +482,53 @@ const PostCard = ({ post, onDelete, onUpdate, isAdmin = false }) => {
           <i className="far fa-comment"></i>
           <span>Comment</span>
         </button>
-        <button className="flex-1 py-1.5 flex items-center justify-center gap-2 rounded-md text-gray-600 hover:bg-gray-50">
+        <button
+          onClick={handleShare}
+          className="flex-1 py-1.5 flex items-center justify-center gap-2 rounded-md text-gray-600 hover:bg-gray-50 relative"
+        >
           <i className="far fa-share-square"></i>
           <span>Share</span>
+
+          {showShareOptions && (
+            <div className="absolute bottom-full mb-2 left-0 bg-white rounded-lg shadow-md border border-gray-200 py-2 px-1 z-10">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  shareToSocialMedia("facebook");
+                }}
+                className="flex items-center w-full text-left px-3 py-2 hover:bg-gray-100 rounded-md"
+              >
+                <i className="fab fa-facebook text-blue-600 mr-2"></i> Facebook
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  shareToSocialMedia("twitter");
+                }}
+                className="flex items-center w-full text-left px-3 py-2 hover:bg-gray-100 rounded-md"
+              >
+                <i className="fab fa-twitter text-blue-400 mr-2"></i> Twitter
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  shareToSocialMedia("linkedin");
+                }}
+                className="flex items-center w-full text-left px-3 py-2 hover:bg-gray-100 rounded-md"
+              >
+                <i className="fab fa-linkedin text-blue-700 mr-2"></i> LinkedIn
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  shareToSocialMedia("copy");
+                }}
+                className="flex items-center w-full text-left px-3 py-2 hover:bg-gray-100 rounded-md"
+              >
+                <i className="far fa-copy text-gray-600 mr-2"></i> Copy Link
+              </button>
+            </div>
+          )}
         </button>
       </div>
 

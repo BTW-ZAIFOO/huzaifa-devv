@@ -3,6 +3,7 @@ import { Context } from "../../main";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { getAvatarByRole } from "../../utils/avatarUtils";
+import EmojiPicker from "emoji-picker-react";
 
 const PostForm = ({ onPostCreated }) => {
   const { user } = useContext(Context);
@@ -16,13 +17,18 @@ const PostForm = ({ onPostCreated }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/gif"];
+      if (!validTypes.includes(file.type)) {
+        toast.error("Only JPG, PNG and GIF images are allowed");
+        return;
+      }
+
       if (file.size > 5 * 1024 * 1024) {
         toast.error("Image size should be less than 5MB");
         return;
       }
 
       setImage(file);
-
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
@@ -34,6 +40,11 @@ const PostForm = ({ onPostCreated }) => {
   const removeImage = () => {
     setImage(null);
     setImagePreview(null);
+  };
+
+  const handleEmojiSelect = (emojiData) => {
+    setContent((prev) => prev + emojiData.emoji);
+    setShowEmoji(false);
   };
 
   const handleSubmit = async (e) => {
@@ -50,7 +61,7 @@ const PostForm = ({ onPostCreated }) => {
       const formData = new FormData();
       formData.append("content", content);
       if (image) {
-        formData.append("image", image);
+        formData.append("media", image);
       }
 
       const res = await axios.post(
@@ -129,12 +140,12 @@ const PostForm = ({ onPostCreated }) => {
             )}
 
             <div className="flex justify-between items-center mt-3">
-              <div className="flex space-x-2">
+              <div className="flex space-x-2 relative">
                 <label className="cursor-pointer text-gray-500 hover:text-blue-500 transition-colors p-2 rounded-full hover:bg-blue-50">
                   <i className="far fa-image"></i>
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/jpg,image/gif"
                     className="hidden"
                     onChange={handleImageChange}
                   />
@@ -146,6 +157,15 @@ const PostForm = ({ onPostCreated }) => {
                 >
                   <i className="far fa-smile"></i>
                 </button>
+                {showEmoji && (
+                  <div className="absolute top-10 left-0 z-10">
+                    <EmojiPicker
+                      onEmojiClick={handleEmojiSelect}
+                      disableAutoFocus={true}
+                      lazyLoadEmojis={true}
+                    />
+                  </div>
+                )}
                 <span className="text-xs text-gray-400 self-center ml-2">
                   {content.length}/500
                 </span>
