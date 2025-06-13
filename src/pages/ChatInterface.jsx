@@ -590,24 +590,57 @@ const ChatInterface = ({ adminMode }) => {
       };
 
       setMessages((prev) => [...prev, optimisticMessage]);
-      const res = await axios.post(
-        "http://localhost:4000/api/v1/message/send",
-        {
-          chatId: selectedChat.chat._id,
-          content: messageText,
-          isVoice,
-        },
-        { withCredentials: true }
-      );
+
+      if (isVoice) {
+        toast.info("Processing voice message...", { autoClose: 2000 });
+      }
+
+      let res;
+
+      if (isVoice) {
+        const formData = new FormData();
+        formData.append("chatId", selectedChat.chat._id);
+        formData.append("isVoice", "true");
+
+        if (messageText instanceof Blob || messageText instanceof File) {
+          formData.append("voiceData", messageText, "voice-message.webm");
+        } else {
+          formData.append("content", messageText);
+        }
+
+        res = await axios.post(
+          "http://localhost:4000/api/v1/message/send",
+          formData,
+          {
+            withCredentials: true,
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+      } else {
+        res = await axios.post(
+          "http://localhost:4000/api/v1/message/send",
+          {
+            chatId: selectedChat.chat._id,
+            content: messageText,
+          },
+          { withCredentials: true }
+        );
+      }
 
       setMessages((prev) =>
         prev.map((msg) =>
           msg._id === optimisticMessage._id ? res.data.message : msg
         )
       );
+
+      if (isVoice) {
+        toast.success("Voice message sent successfully");
+      }
     } catch (err) {
-      toast.error("Failed to send message");
-      console.error("Failed to send message");
+      console.error("Failed to send message:", err);
+      toast.error(err.response?.data?.message || "Failed to send message");
       setMessages((prev) => prev.filter((msg) => !msg.isOptimistic));
     }
   };

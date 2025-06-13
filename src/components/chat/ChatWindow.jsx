@@ -98,21 +98,50 @@ const ChatWindow = ({
       toast.error("Speech recognition is not supported in your browser");
       return;
     }
-    isRecording ? stopRecording() : startRecording();
+
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then(() => {
+        isRecording ? stopRecording() : startRecording();
+      })
+      .catch((err) => {
+        console.error("Microphone permission denied:", err);
+        toast.error("Please allow microphone access to record voice messages");
+      });
   };
 
   const startRecording = () => {
-    setMessageText("");
-    recognition.start();
-    setIsRecording(true);
+    try {
+      setMessageText("");
+      recognition.start();
+      setIsRecording(true);
+      toast.info("Recording started... Speak now");
+    } catch (error) {
+      console.error("Failed to start recording:", error);
+      toast.error("Failed to start recording. Please try again.");
+      setIsRecording(false);
+    }
   };
 
   const stopRecording = () => {
-    recognition.stop();
-    setIsRecording(false);
-    if (messageText.trim()) {
-      onSendMessage(messageText, true);
-      setMessageText("");
+    try {
+      recognition.stop();
+      setIsRecording(false);
+
+      // Delay sending a bit to ensure transcript is complete
+      setTimeout(() => {
+        if (messageText.trim()) {
+          onSendMessage(messageText, true);
+          toast.success("Voice message processed");
+          setMessageText("");
+        } else {
+          toast.warn("No speech detected. Please try again.");
+        }
+      }, 300);
+    } catch (error) {
+      console.error("Failed to stop recording:", error);
+      toast.error("Failed to process voice message");
+      setIsRecording(false);
     }
   };
 

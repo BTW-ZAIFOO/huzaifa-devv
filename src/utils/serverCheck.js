@@ -39,10 +39,13 @@ const checkServerStatus = () => {
       console.log(
         "4. Ensure the server is configured to accept connections from your client"
       );
+      console.log(
+        "5. Check if the OpenAI API key is correctly set in your .env file"
+      );
     });
 };
 
-if (typeof window !== "undefined") {
+if (process.env.NODE_ENV === "development" && typeof window !== "undefined") {
   window.checkServerStatus = checkServerStatus;
   console.log(
     "Server check utility loaded. Run checkServerStatus() to test server connection."
