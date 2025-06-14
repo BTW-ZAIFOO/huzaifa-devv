@@ -227,28 +227,28 @@ const ChatInterface = ({ adminMode }) => {
 
     setupSocket();
 
-    if (socketRef.current) {
-      socketRef.current.on("new-message", (message) => {
-        if (
-          message.sender._id !== user._id &&
-          (!selectedChat || message.chat !== selectedChat.chat._id)
-        ) {
-          setNotifications((prev) => [
-            {
-              chatId: message.chat,
-              sender: message.sender,
-              content: message.content,
-              createdAt: message.createdAt,
-            },
-            ...prev,
-          ]);
-        }
+    socketRef.current.on("new-message", (message) => {
+      if (selectedChat && message.chat === selectedChat.chat._id) {
+        setMessages((prev) => [...prev, message]);
 
-        if (selectedChat && message.chat === selectedChat.chat._id) {
-          setMessages((prev) => [...prev, message]);
+        if (message.sender._id !== user._id) {
+          socketRef.current.emit("message-received", {
+            chatId: selectedChat.chat._id,
+            messageId: message._id,
+          });
         }
-      });
-    }
+      } else if (message.sender._id !== user._id) {
+        setNotifications((prev) => [
+          {
+            chatId: message.chat,
+            sender: message.sender,
+            content: message.content,
+            createdAt: message.createdAt,
+          },
+          ...prev,
+        ]);
+      }
+    });
 
     return () => {
       if (socketRef.current) {
@@ -261,7 +261,7 @@ const ChatInterface = ({ adminMode }) => {
         heartbeatRef.current = null;
       }
     };
-  }, [user, reconnectAttempt]);
+  }, [user, reconnectAttempt, selectedChat]);
 
   useEffect(() => {
     if (!user || !socketConnected || !socketRef.current) return;
@@ -608,25 +608,43 @@ const ChatInterface = ({ adminMode }) => {
           formData.append("content", messageText);
         }
 
-        res = await axios.post(
-          "http://localhost:4000/api/v1/message/send",
-          formData,
-          {
-            withCredentials: true,
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        try {
+          res = await axios.post(
+            "http://localhost:4000/api/v1/message/send",
+            formData,
+            {
+              withCredentials: true,
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+        } catch (err) {
+          console.error("Failed to send voice message:", err);
+          toast.error("Failed to send voice message. Please try again.");
+          setMessages((prev) =>
+            prev.filter((msg) => msg._id !== optimisticMessage._id)
+          );
+          return;
+        }
       } else {
-        res = await axios.post(
-          "http://localhost:4000/api/v1/message/send",
-          {
-            chatId: selectedChat.chat._id,
-            content: messageText,
-          },
-          { withCredentials: true }
-        );
+        try {
+          res = await axios.post(
+            "http://localhost:4000/api/v1/message/send",
+            {
+              chatId: selectedChat.chat._id,
+              content: messageText,
+            },
+            { withCredentials: true }
+          );
+        } catch (err) {
+          console.error("Failed to send message:", err);
+          toast.error("Failed to send message. Please try again.");
+          setMessages((prev) =>
+            prev.filter((msg) => msg._id !== optimisticMessage._id)
+          );
+          return;
+        }
       }
 
       setMessages((prev) =>
