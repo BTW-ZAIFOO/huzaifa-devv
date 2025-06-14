@@ -563,7 +563,7 @@ const ChatWindow = ({
             ) : (
               <div className="relative">
                 <div
-                  className="w-10 h-10 md:w-12 md:h-12 rounded-full mr-3 border-2 border-white shadow-sm flex items-center justify-center text-white font-medium"
+                  className="w-10 h-10 md:w-12 md:h-12 rounded-full mr-3 border-2 border-white shadow-sm flex items-center justify-center text-white font-medium cursor-pointer"
                   style={{ backgroundColor: avatar.color }}
                   onClick={onViewProfile}
                   title="View profile"
@@ -589,6 +589,11 @@ const ChatWindow = ({
                 {selectedUser.name}
                 {renderUserStatusBadge()}
               </h3>
+              {selectedUser.email && (
+                <span className="text-xs md:text-sm text-gray-500 block">
+                  {selectedUser.email}
+                </span>
+              )}
               <span className="text-xs md:text-sm text-gray-500">
                 {selectedUser.status === "online" ? (
                   <span className="flex items-center">Online</span>

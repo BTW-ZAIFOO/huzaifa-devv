@@ -15,6 +15,7 @@ import {
   extractInappropriateWords,
 } from "../utils/moderationUtils";
 import LoadingScreen from "../components/LoadingScreen";
+import UserProfile from "../components/chat/UserProfile";
 
 const ChatInterface = ({ adminMode }) => {
   const { isAuthenticated, user, isAdmin, setUser, isAuthLoading } =
@@ -28,6 +29,7 @@ const ChatInterface = ({ adminMode }) => {
   const [notifications, setNotifications] = useState([]);
   const [socketConnected, setSocketConnected] = useState(false);
   const [reconnectAttempt, setReconnectAttempt] = useState(0);
+  const [showProfileSidebar, setShowProfileSidebar] = useState(false);
   const socketRef = useRef(null);
   const heartbeatRef = useRef(null);
   const SOCKET_URL = "http://localhost:4000";
@@ -521,6 +523,7 @@ const ChatInterface = ({ adminMode }) => {
 
       setMessages(msgRes.data.messages);
       setSelectedUser(otherUser);
+      setShowProfileSidebar(false);
     } catch (err) {
       console.error("Failed to load conversation");
       toast.error("Failed to load conversation");
@@ -529,23 +532,14 @@ const ChatInterface = ({ adminMode }) => {
 
   const handleViewProfile = () => {
     if (!selectedUser) return;
-
-    const userProfileElement = document.getElementById("user-profile-sidebar");
-    if (userProfileElement) {
-      userProfileElement.style.transform = "translateX(0)";
-    } else {
-      const userProfileEl = document.createElement("div");
-      userProfileEl.id = "user-profile-sidebar";
-      document.body.appendChild(userProfileEl);
-    }
-
-    logAdminActivity(`Viewed ${selectedUser.name}'s profile`);
+    setShowProfileSidebar(!showProfileSidebar);
   };
 
   const clearSelectedChat = () => {
     setSelectedChat(null);
     setSelectedUser(null);
     setMessages([]);
+    setShowProfileSidebar(false);
     if (user) {
       localStorage.removeItem(`chat_state_${user._id}`);
     }
@@ -933,20 +927,31 @@ const ChatInterface = ({ adminMode }) => {
             </div>
           )}
 
-          <div className="flex-1 flex flex-col bg-gradient-to-br from-white via-blue-50 to-indigo-50 h-full overflow-hidden">
+          <div className="flex-1 flex flex-col bg-gradient-to-br from-white via-blue-50 to-indigo-50 h-full overflow-hidden relative">
             <div className="flex-1 flex flex-col h-full overflow-hidden">
               {selectedChat ? (
-                <ChatWindow
-                  selectedUser={selectedChat.otherUser}
-                  messages={messages}
-                  onSendMessage={handleSendMessage}
-                  onViewProfile={handleViewProfile}
-                  isAdmin={isAdmin}
-                  onDeleteMessage={isAdmin ? handleDeleteMessage : null}
-                  onDeleteOwnMessage={handleDeleteOwnMessage}
-                  onBanUser={isAdmin ? handleBanUser : null}
-                  onCloseChat={clearSelectedChat}
-                />
+                <>
+                  <ChatWindow
+                    selectedUser={selectedChat.otherUser}
+                    messages={messages}
+                    onSendMessage={handleSendMessage}
+                    onViewProfile={handleViewProfile}
+                    isAdmin={isAdmin}
+                    onDeleteMessage={isAdmin ? handleDeleteMessage : null}
+                    onDeleteOwnMessage={handleDeleteOwnMessage}
+                    onBanUser={isAdmin ? handleBanUser : null}
+                    onCloseChat={clearSelectedChat}
+                  />
+                  {showProfileSidebar && selectedUser && (
+                    <UserProfile
+                      user={selectedUser}
+                      onClose={() => setShowProfileSidebar(false)}
+                      isAdmin={isAdmin}
+                      onBlockUser={isAdmin ? handleBlockUser : null}
+                      onReportUser={isAdmin ? handleReportUser : null}
+                    />
+                  )}
+                </>
               ) : (
                 <EmptyState setSidebarOpen={setSidebarOpen} />
               )}

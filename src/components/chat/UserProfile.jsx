@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { getAvatarByRole } from "../../utils/avatarUtils";
-import { Context } from "../../context/ContextProvider";
+import { Context } from "../../main";
+import { Link } from "react-router-dom";
 
 const UserProfile = ({ user, onClose, isAdmin, onBlockUser, onReportUser }) => {
   const [profileData, setProfileData] = useState(user);
@@ -99,6 +100,11 @@ const UserProfile = ({ user, onClose, isAdmin, onBlockUser, onReportUser }) => {
             <h2 className="text-xl font-semibold text-gray-800">
               {displayedUser.name}
             </h2>
+            {displayedUser.email && (
+              <p className="text-gray-600 mt-1 mb-2 text-sm flex items-center">
+                <i className="far fa-envelope mr-2"></i> {displayedUser.email}
+              </p>
+            )}
             {displayedUser.bio && (
               <p className="text-gray-600 text-center mt-2 text-sm">
                 {displayedUser.bio}
@@ -110,11 +116,6 @@ const UserProfile = ({ user, onClose, isAdmin, onBlockUser, onReportUser }) => {
                 {displayedUser.location}
               </p>
             )}
-            <p className="text-gray-500 mt-2">
-              {displayedUser.status === "online"
-                ? "Active now"
-                : displayedUser.lastSeen}
-            </p>
             {(displayedUser.status === "blocked" ||
               displayedUser.status === "banned") && (
               <div
@@ -129,6 +130,7 @@ const UserProfile = ({ user, onClose, isAdmin, onBlockUser, onReportUser }) => {
                   : "Banned by admin"}
               </div>
             )}
+
             {isAdmin && onBlockUser && onReportUser && (
               <div className="flex gap-2 mb-6">
                 <button
@@ -164,6 +166,36 @@ const UserProfile = ({ user, onClose, isAdmin, onBlockUser, onReportUser }) => {
               </div>
             )}
           </div>
+
+          {displayedUser.interests && displayedUser.interests.length > 0 && (
+            <div className="mb-5 p-3 bg-gray-50 rounded-lg">
+              <h4 className="text-xs uppercase text-gray-500 font-medium mb-2">
+                Interests
+              </h4>
+              <div className="flex flex-wrap gap-1">
+                {Array.isArray(displayedUser.interests)
+                  ? displayedUser.interests.map((interest, index) => (
+                      <span
+                        key={index}
+                        className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full"
+                      >
+                        {interest}
+                      </span>
+                    ))
+                  : displayedUser.interests
+                      .split(",")
+                      .map((interest, index) => (
+                        <span
+                          key={index}
+                          className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full"
+                        >
+                          {interest.trim()}
+                        </span>
+                      ))}
+              </div>
+            </div>
+          )}
+
           {user.lastActivity && (
             <div className="mb-5 p-3 bg-gray-50 rounded-lg">
               <h4 className="text-xs uppercase text-gray-500 font-medium mb-2">
