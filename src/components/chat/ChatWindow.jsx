@@ -128,7 +128,6 @@ const ChatWindow = ({
       recognition.stop();
       setIsRecording(false);
 
-      // Delay sending a bit to ensure transcript is complete
       setTimeout(() => {
         if (messageText.trim()) {
           onSendMessage(messageText, true);
@@ -499,7 +498,7 @@ const ChatWindow = ({
 
     return (
       <div
-        className={`py-3 md:py-5 px-4 md:px-8 border-b flex justify-between items-center shadow-sm bg-gradient-to-r from-blue-50 to-indigo-50`}
+        className={`py-3 md:py-5 px-4 md:px-8 flex justify-between items-center bg-gradient-to-r from-blue-50 to-indigo-50`}
       >
         <div className="flex items-center">
           <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center mr-3 shadow-md text-white">
@@ -650,7 +649,7 @@ const ChatWindow = ({
       </div>
       <form
         onSubmit={handleSendMessage}
-        className="p-4 md:p-6 border-t flex items-end gap-3 bg-white/95 shadow-lg"
+        className="p-4 md:p-6 flex items-end gap-3 bg-white/95 shadow-lg"
       >
         <div className="flex-1 relative items-center">
           <textarea

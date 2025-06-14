@@ -470,7 +470,6 @@ const Feed = () => {
               </div>
             </div>
 
-            {/* Scrollable post content */}
             <div className="space-y-6 overflow-y-auto">
               {searchResults && (
                 <div className="bg-white rounded-xl shadow-sm p-5">
@@ -585,7 +584,6 @@ const Feed = () => {
             </div>
           </div>
 
-          {/* Right Sidebar - Fixed */}
           <div className="lg:w-1/4 hidden lg:block">
             <div className="fixed w-[calc(25%-1.5rem)] max-w-[280px]">
               <div className="bg-white rounded-xl shadow-sm p-5">

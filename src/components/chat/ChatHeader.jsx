@@ -104,7 +104,10 @@ const ChatHeader = ({
                 }
               }}
             >
-              <i className="fas fa-bell text-lg md:text-xl"></i>
+              <div className="flex items-center gap-1">
+                <i className="fas fa-bell text-lg md:text-xl"></i>
+                <h2>Notifications</h2>
+              </div>
 
               {hasNotifications && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -120,7 +123,7 @@ const ChatHeader = ({
 
             {showNotifications && (
               <div className="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg z-50 max-h-96 overflow-y-auto">
-                <div className="p-3 border-b flex justify-between items-center">
+                <div className="p-3 flex justify-between items-center">
                   <h3 className="font-medium">Notifications</h3>
                   <button
                     onClick={() => markNotificationsAsRead()}
@@ -257,10 +260,6 @@ const ChatHeader = ({
               </div>
             )}
           </div>
-          <Link to="/" className="text-gray-600 hover:text-blue-600 relative">
-            <i className="fas fa-home text-xl"></i>
-            <span className="hidden md:inline ml-2">Home</span>
-          </Link>
           <Link
             to="/profile"
             className="flex items-center gap-2 text-gray-600 hover:text-blue-600"

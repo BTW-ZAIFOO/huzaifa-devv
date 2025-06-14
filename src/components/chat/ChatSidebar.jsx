@@ -145,7 +145,7 @@ const ChatSidebar = ({
             />
             <i className="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
           </div>
-          <div className="flex items-center mt-2 justify-between">
+          <div className="flex items-center justify-center">
             <label className="flex items-center text-sm text-gray-600 cursor-pointer hover:text-indigo-600 transition-colors group">
               <input
                 type="checkbox"
@@ -162,16 +162,6 @@ const ChatSidebar = ({
                 }`}
               ></span>
             </label>
-            <button
-              type="button"
-              onClick={() => {
-                setSearchTerm("");
-                setShowOnlineOnly(false);
-              }}
-              className="ml-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-xs font-medium"
-            >
-              View Users
-            </button>
           </div>
           <div className="flex border-b border-gray-200 mt-4">
             <button

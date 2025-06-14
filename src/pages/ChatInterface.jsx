@@ -1041,12 +1041,6 @@ const EmptyState = ({ setSidebarOpen }) => (
       <p className="text-gray-500 mb-6">
         Choose a user from the list to start chatting
       </p>
-      <button
-        onClick={() => setSidebarOpen(true)}
-        className="px-5 py-2.5 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors shadow-sm flex items-center gap-2"
-      >
-        <i className="fas fa-users"></i> View Users
-      </button>
     </div>
   </div>
 );
