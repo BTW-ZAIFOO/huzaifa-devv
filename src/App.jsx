@@ -14,13 +14,14 @@ import AdminAuth from "./pages/AdminAuth";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import ChatInterface from "./pages/ChatInterface";
-import UserProfile from "./pages/UserProfile";
+
 import OtpVerification from "./pages/OtpVerification";
 import Feed from "./pages/Feed";
 import NotFound from "./pages/NotFound";
 import AuthVerification from "./pages/AuthVerification";
 import { Toaster } from "react-hot-toast";
 import "./App.css";
+import UserProfile from "./components/UserProfile";
 
 const AdminRoute = ({ children }) => {
   const { isAuthenticated, isAdmin, isAuthLoading } = useContext(Context);

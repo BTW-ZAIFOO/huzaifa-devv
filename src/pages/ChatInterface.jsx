@@ -15,7 +15,7 @@ import {
   extractInappropriateWords,
 } from "../utils/moderationUtils";
 import LoadingScreen from "../components/LoadingScreen";
-import UserProfile from "../components/chat/UserProfile";
+import UserProfile from "../components/UserProfile";
 import GroupProfileSidebar from "../components/chat/GroupProfileSidebar";
 
 const ChatInterface = ({ adminMode }) => {
