@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { getAvatarByRole } from "../../utils/avatarUtils";
 import { Context } from "../../main";
-import { Link } from "react-router-dom";
 
 const UserProfile = ({ user, onClose, isAdmin, onBlockUser, onReportUser }) => {
   const [profileData, setProfileData] = useState(user);
@@ -101,8 +100,13 @@ const UserProfile = ({ user, onClose, isAdmin, onBlockUser, onReportUser }) => {
               {displayedUser.name}
             </h2>
             {displayedUser.email && (
-              <p className="text-gray-600 mt-1 mb-2 text-sm flex items-center">
+              <p className="text-gray-600 mt-1 mb-2 text-sm flex items-center bg-gray-50 px-3 py-1.5 rounded-lg">
                 <i className="far fa-envelope mr-2"></i> {displayedUser.email}
+              </p>
+            )}
+            {!displayedUser.email && (
+              <p className="text-gray-400 mt-1 mb-2 text-sm flex items-center italic">
+                <i className="far fa-envelope mr-2"></i> No email available
               </p>
             )}
             {displayedUser.bio && (

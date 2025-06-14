@@ -507,7 +507,7 @@ const ChatWindow = ({
           </div>
           <div>
             <h3 className="font-medium text-base md:text-lg flex items-center">
-              {group.groupName || group.name}
+              {group.groupName || group.name || "Group Chat"}
               <span className="ml-2 bg-blue-100 text-blue-800 text-xs px-1.5 py-0.5 rounded-full">
                 Group
               </span>
@@ -520,7 +520,7 @@ const ChatWindow = ({
         <div className="flex items-center gap-3">
           <button
             className="p-2 md:p-2.5 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition-colors"
-            onClick={() => {}}
+            onClick={onViewProfile}
             title="Group Info"
           >
             <i className="fas fa-info-circle text-lg md:text-xl"></i>

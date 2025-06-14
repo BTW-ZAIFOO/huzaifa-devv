@@ -16,6 +16,7 @@ import {
 } from "../utils/moderationUtils";
 import LoadingScreen from "../components/LoadingScreen";
 import UserProfile from "../components/chat/UserProfile";
+import GroupProfileSidebar from "../components/chat/GroupProfileSidebar";
 
 const ChatInterface = ({ adminMode }) => {
   const { isAuthenticated, user, isAdmin, setUser, isAuthLoading } =
@@ -30,6 +31,8 @@ const ChatInterface = ({ adminMode }) => {
   const [socketConnected, setSocketConnected] = useState(false);
   const [reconnectAttempt, setReconnectAttempt] = useState(0);
   const [showProfileSidebar, setShowProfileSidebar] = useState(false);
+  const [showGroupProfileSidebar, setShowGroupProfileSidebar] = useState(false);
+  const [setSelectedMember] = useState(null);
   const socketRef = useRef(null);
   const heartbeatRef = useRef(null);
   const SOCKET_URL = "http://localhost:4000";
@@ -531,8 +534,19 @@ const ChatInterface = ({ adminMode }) => {
   };
 
   const handleViewProfile = () => {
-    if (!selectedUser) return;
-    setShowProfileSidebar(!showProfileSidebar);
+    if (selectedChat && selectedChat.chat && selectedChat.chat.isGroupChat) {
+      console.log("Opening group profile sidebar", selectedChat.chat);
+      setShowGroupProfileSidebar(true);
+    } else {
+      setShowProfileSidebar(true);
+    }
+  };
+
+  const handleViewGroupMemberProfile = (member) => {
+    const fullMemberData = allUsers.find((u) => u._id === member._id) || member;
+    setSelectedMember(fullMemberData);
+    setShowGroupProfileSidebar(false);
+    setShowProfileSidebar(true);
   };
 
   const clearSelectedChat = () => {
@@ -951,6 +965,15 @@ const ChatInterface = ({ adminMode }) => {
                       onReportUser={isAdmin ? handleReportUser : null}
                     />
                   )}
+                  {showGroupProfileSidebar &&
+                    selectedChat &&
+                    selectedChat.chat && (
+                      <GroupProfileSidebar
+                        group={selectedChat.chat}
+                        onClose={() => setShowGroupProfileSidebar(false)}
+                        onViewMemberProfile={handleViewGroupMemberProfile}
+                      />
+                    )}
                 </>
               ) : (
                 <EmptyState setSidebarOpen={setSidebarOpen} />
