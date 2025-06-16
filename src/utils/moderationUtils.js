@@ -214,7 +214,10 @@ export const updateUserInArray = (users, updatedUser) => {
           updatedUser.interests !== undefined
             ? updatedUser.interests
             : user.interests,
-        avatar: updatedUser.avatar || user.avatar,
+        avatar:
+          typeof updatedUser.avatar === "string" && updatedUser.avatar
+            ? updatedUser.avatar
+            : user.avatar,
         updatedAt: updatedUser.updatedAt || new Date(),
       };
     }

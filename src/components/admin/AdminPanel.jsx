@@ -99,7 +99,11 @@ const AdminPanel = ({ users: initialUsers }) => {
                   ? updatedUserData.location
                   : u.location,
               interests: updatedUserData.interests || u.interests,
-              avatar: updatedUserData.avatar || u.avatar,
+              avatar:
+                typeof updatedUserData.avatar === "string" &&
+                updatedUserData.avatar
+                  ? updatedUserData.avatar
+                  : u.avatar,
               updatedAt: updatedUserData.updatedAt,
             };
           }
@@ -118,7 +122,10 @@ const AdminPanel = ({ users: initialUsers }) => {
               ? updatedUserData.location
               : prev.location,
           interests: updatedUserData.interests || prev.interests,
-          avatar: updatedUserData.avatar || prev.avatar,
+          avatar:
+            typeof updatedUserData.avatar === "string" && updatedUserData.avatar
+              ? updatedUserData.avatar
+              : prev.avatar,
         }));
       }
 
@@ -1415,7 +1422,6 @@ const AdminPanel = ({ users: initialUsers }) => {
                 <PostModerationPanel />
               </div>
             )}
-            
           </div>
 
           {activeView !== "chat" && (

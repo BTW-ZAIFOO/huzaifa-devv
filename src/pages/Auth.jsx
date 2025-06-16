@@ -45,6 +45,9 @@ const Auth = () => {
 
       setUser(response.data.user);
       setIsAuthenticated(true);
+      try {
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+      } catch (err) {}
       toast.success(response.data.message);
     } catch (error) {
       console.error("Login error:", error);

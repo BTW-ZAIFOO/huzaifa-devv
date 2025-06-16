@@ -176,8 +176,12 @@ const ChatInterface = ({ adminMode }) => {
         setAllUsers((prevUsers) =>
           prevUsers.map((u) => {
             if (u._id === updatedUserData.userId) {
-              let updatedAvatar = updatedUserData.avatar || u.avatar;
-              if (updatedAvatar) {
+              let updatedAvatar =
+                typeof updatedUserData.avatar === "string" &&
+                updatedUserData.avatar
+                  ? updatedUserData.avatar
+                  : u.avatar;
+              if (updatedAvatar && !updatedAvatar.startsWith("data:")) {
                 const timestamp = new Date().getTime();
                 updatedAvatar = updatedAvatar.includes("?")
                   ? `${updatedAvatar}&t=${timestamp}`
@@ -204,8 +208,11 @@ const ChatInterface = ({ adminMode }) => {
         );
 
         if (selectedUser && selectedUser._id === updatedUserData.userId) {
-          let updatedAvatar = updatedUserData.avatar || selectedUser.avatar;
-          if (updatedAvatar) {
+          let updatedAvatar =
+            typeof updatedUserData.avatar === "string" && updatedUserData.avatar
+              ? updatedUserData.avatar
+              : selectedUser.avatar;
+          if (updatedAvatar && !updatedAvatar.startsWith("data:")) {
             const timestamp = new Date().getTime();
             updatedAvatar = updatedAvatar.includes("?")
               ? `${updatedAvatar}&t=${timestamp}`
@@ -226,6 +233,71 @@ const ChatInterface = ({ adminMode }) => {
             interests: updatedUserData.interests || prev.interests,
             avatar: updatedAvatar,
           }));
+        }
+        
+        if (user && updatedUserData.userId === user._id) {
+          const updatedUser = {
+            ...user,
+            name: updatedUserData.name || user.name,
+            bio:
+              updatedUserData.bio !== undefined
+                ? updatedUserData.bio
+                : user.bio,
+            location:
+              updatedUserData.location !== undefined
+                ? updatedUserData.location
+                : user.location,
+            interests: updatedUserData.interests || user.interests,
+            avatar:
+              typeof updatedUserData.avatar === "string" &&
+              updatedUserData.avatar
+                ? updatedUserData.avatar
+                : user.avatar,
+          };
+          setUser(updatedUser);
+          try {
+            localStorage.setItem("user", JSON.stringify(updatedUser));
+          } catch (err) {}
+        }
+      });
+
+      socketRef.current.on("message-deleted", ({ messageId, permanent }) => {
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg._id === messageId
+              ? {
+                  ...msg,
+                  isDeleted: !permanent,
+                  permanentlyDeleted: permanent,
+                  content: permanent
+                    ? "This message has been permanently deleted"
+                    : "This message has been deleted",
+                }
+              : msg
+          )
+        );
+      });
+
+      socketRef.current.on("new-message", (message) => {
+        if (selectedChat && message.chat === selectedChat.chat._id) {
+          setMessages((prev) => [...prev, message]);
+
+          if (message.sender._id !== user._id) {
+            socketRef.current.emit("message-received", {
+              chatId: selectedChat.chat._id,
+              messageId: message._id,
+            });
+          }
+        } else if (message.sender._id !== user._id) {
+          setNotifications((prev) => [
+            {
+              chatId: message.chat,
+              sender: message.sender,
+              content: message.content,
+              createdAt: message.createdAt,
+            },
+            ...prev,
+          ]);
         }
       });
     };
@@ -703,6 +775,10 @@ const ChatInterface = ({ adminMode }) => {
     if (!isAdmin) return;
 
     try {
+      await axios.delete(`http://localhost:4000/api/v1/message/${messageId}`, {
+        withCredentials: true,
+      });
+
       setMessages((prev) =>
         prev.map((msg) =>
           msg._id === messageId
@@ -740,7 +816,7 @@ const ChatInterface = ({ adminMode }) => {
       }
     } catch (error) {
       console.error("Failed to delete message");
-      toast.error("Failed to delete message");
+      toast.error(error.response?.data?.message || "Failed to delete message");
     }
   };
 
@@ -802,12 +878,10 @@ const ChatInterface = ({ adminMode }) => {
 
   const handleDeleteOwnMessage = async (messageId, permanent = false) => {
     try {
-      await axios({
-        method: "DELETE",
-        url: `http://localhost:4000/api/v1/message/${messageId}`,
-        data: { permanent },
-        withCredentials: true,
-      });
+      await axios.delete(
+        `http://localhost:4000/api/v1/message/${messageId}?permanent=${permanent}`,
+        { withCredentials: true }
+      );
       setMessages((prev) =>
         prev.map((msg) =>
           msg._id === messageId

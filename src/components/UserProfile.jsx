@@ -354,6 +354,12 @@ const UserProfile = ({
       }
 
       setUser(response.data.user);
+
+      try {
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+      } catch (err) {  
+      }
+
       toast.success(response.data.message || "Profile updated successfully!");
 
       if (formData.avatar && response.data.user.avatar) {
@@ -380,8 +386,16 @@ const UserProfile = ({
     }
   };
 
+  useEffect(() => {
+    if (!isModal && !currentUser && typeof window !== "undefined") {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        setProfileData(JSON.parse(storedUser));
+      }
+    }
+  }, []);
+
   if (isModal) {
-    // Sidebar/Modal view version
     return (
       <div className="w-[300px] bg-white border-l border-gray-200 shadow-lg absolute right-0 top-0 bottom-0 z-20 transform transition-transform duration-300 overflow-y-auto">
         <div className="p-5">
@@ -581,7 +595,7 @@ const UserProfile = ({
     );
   }
 
-  // Full page version
+  
   if (isAuthLoading) return <LoadingScreen />;
   if (!isAuthenticated) return <Navigate to="/auth" />;
 

@@ -33,6 +33,9 @@ const Login = () => {
       }
       setUser(response.data.user);
       setIsAuthenticated(true);
+      try {
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+      } catch (err) {}
       console.log("Login successful");
       toast.success("Login successful!");
       navigateTo(response.data.user?.role === "admin" ? "/admin" : "/chat");

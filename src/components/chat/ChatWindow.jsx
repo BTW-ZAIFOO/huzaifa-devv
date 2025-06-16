@@ -166,12 +166,10 @@ const ChatWindow = ({
       if (onDeleteOwnMessage) {
         await onDeleteOwnMessage(messageId, permanent);
       } else {
-        await axios({
-          method: "DELETE",
-          url: `http://localhost:4000/api/v1/message/${messageId}`,
-          data: { permanent },
-          withCredentials: true,
-        });
+        await axios.delete(
+          `http://localhost:4000/api/v1/message/${messageId}?permanent=${permanent}`,
+          { withCredentials: true }
+        );
         console.log(
           `Message ${
             permanent ? "permanently deleted" : "deleted"
@@ -561,15 +559,27 @@ const ChatWindow = ({
               </div>
             ) : (
               <div className="relative">
-                <div
-                  className="w-10 h-10 md:w-12 md:h-12 rounded-full mr-3 border-2 border-white shadow-sm flex items-center justify-center text-white font-medium cursor-pointer"
-                  style={{ backgroundColor: avatar.color }}
-                  onClick={onViewProfile}
-                  title="View profile"
-                  role="button"
-                >
-                  {avatar.initials}
-                </div>
+                {avatar.imageUrl ? (
+                  <img
+                    src={avatar.imageUrl}
+                    alt={selectedUser.name || "User"}
+                    className="w-10 h-10 md:w-12 md:h-12 rounded-full mr-3 border-2 border-white shadow-sm object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = avatar.fallbackUrl;
+                    }}
+                  />
+                ) : (
+                  <div
+                    className="w-10 h-10 md:w-12 md:h-12 rounded-full mr-3 border-2 border-white shadow-sm flex items-center justify-center text-white font-medium cursor-pointer"
+                    style={{ backgroundColor: avatar.color }}
+                    onClick={onViewProfile}
+                    title="View profile"
+                    role="button"
+                  >
+                    {avatar.initials}
+                  </div>
+                )}
                 <span
                   className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
                     selectedUser.status === "online"

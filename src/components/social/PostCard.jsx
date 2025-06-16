@@ -259,6 +259,10 @@ const PostCard = ({ post, onDelete, onUpdate, isAdmin = false }) => {
                 src={avatar.imageUrl}
                 alt={post.author.name}
                 className="h-10 w-10 rounded-full object-cover"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = avatar.fallbackUrl;
+                }}
               />
             ) : (
               <div

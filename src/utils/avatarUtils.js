@@ -1,11 +1,25 @@
 export const getAvatarByRole = (user) => {
   if (!user) return generateDefaultAvatar();
 
-  if (user.role === "admin") {
-    return generateAdminAvatar(user);
+  let imageUrl = user.avatar || null;
+  if (imageUrl && !imageUrl.startsWith("data:")) {
+    const t = Date.now();
+    imageUrl = imageUrl.includes("?")
+      ? `${imageUrl}&t=${t}`
+      : `${imageUrl}?t=${t}`;
   }
 
-  return generateAvatar(user);
+  if (user.role === "admin") {
+    return {
+      ...generateAdminAvatar(user),
+      imageUrl,
+    };
+  }
+
+  return {
+    ...generateAvatar(user),
+    imageUrl,
+  };
 };
 
 export const generateAdminAvatar = (user) => {
