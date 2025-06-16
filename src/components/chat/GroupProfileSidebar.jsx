@@ -8,8 +8,12 @@ const GroupProfileSidebar = ({ group, onClose, onViewMemberProfile }) => {
     console.error("No group data provided to GroupProfileSidebar");
     return null;
   }
-
   const participants = group.participants || [];
+  console.log("Participants:", participants);
+  if (!Array.isArray(participants)) {
+    console.error("Participants is not an array:", participants);
+    return null;
+  }
 
   return (
     <div className="w-[300px] bg-white border-l border-gray-200 shadow-lg absolute right-0 top-0 bottom-0 z-20 transform transition-transform duration-300 overflow-y-auto">
