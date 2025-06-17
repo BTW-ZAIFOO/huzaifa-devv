@@ -32,7 +32,8 @@ const ChatInterface = ({ adminMode }) => {
   const [reconnectAttempt, setReconnectAttempt] = useState(0);
   const [showProfileSidebar, setShowProfileSidebar] = useState(false);
   const [showGroupProfileSidebar, setShowGroupProfileSidebar] = useState(false);
-  const [setSelectedMember] = useState(null);
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const [selectedMember, setSelectedMember] = useState(null);
   const socketRef = useRef(null);
   const heartbeatRef = useRef(null);
   const SOCKET_URL = "http://localhost:4000";
@@ -236,6 +237,16 @@ const ChatInterface = ({ adminMode }) => {
         }
 
         if (user && updatedUserData.userId === user._id) {
+          let updatedAvatar =
+            typeof updatedUserData.avatar === "string" && updatedUserData.avatar
+              ? updatedUserData.avatar
+              : user.avatar;
+          if (updatedAvatar && !updatedAvatar.startsWith("data:")) {
+            const timestamp = new Date().getTime();
+            updatedAvatar = updatedAvatar.includes("?")
+              ? `${updatedAvatar}&t=${timestamp}`
+              : `${updatedAvatar}?t=${timestamp}`;
+          }
           const updatedUser = {
             ...user,
             name: updatedUserData.name || user.name,
@@ -248,11 +259,7 @@ const ChatInterface = ({ adminMode }) => {
                 ? updatedUserData.location
                 : user.location,
             interests: updatedUserData.interests || user.interests,
-            avatar:
-              typeof updatedUserData.avatar === "string" &&
-              updatedUserData.avatar
-                ? updatedUserData.avatar
-                : user.avatar,
+            avatar: updatedAvatar,
           };
           setUser(updatedUser);
           try {
@@ -605,10 +612,28 @@ const ChatInterface = ({ adminMode }) => {
     }
   };
 
-  const handleViewProfile = () => {
-    if (selectedChat && selectedChat.chat && selectedChat.chat.isGroupChat) {
-      console.log("Opening group profile sidebar", selectedChat.chat);
-      setShowGroupProfileSidebar(true);
+  const handleViewProfile = async () => {
+    if (
+      selectedChat &&
+      selectedChat.chat &&
+      (selectedChat.chat.isGroupChat || selectedChat.isGroupChat)
+    ) {
+      if (selectedChat.chat._id) {
+        try {
+          const res = await axios.get(
+            `http://localhost:4000/api/v1/chat/group/${selectedChat.chat._id}`,
+            { withCredentials: true }
+          );
+          setSelectedGroup(res.data.group);
+          setShowGroupProfileSidebar(true);
+        } catch (err) {
+          setSelectedGroup(selectedChat.chat);
+          setShowGroupProfileSidebar(true);
+        }
+      } else {
+        setSelectedGroup(selectedChat.chat);
+        setShowGroupProfileSidebar(true);
+      }
     } else {
       setShowProfileSidebar(true);
     }
@@ -1030,25 +1055,35 @@ const ChatInterface = ({ adminMode }) => {
                     onBanUser={isAdmin ? handleBanUser : null}
                     onCloseChat={clearSelectedChat}
                   />
-                  {showProfileSidebar && selectedUser && (
+                  {showProfileSidebar && (selectedUser || selectedMember) && (
                     <UserProfile
-                      user={selectedUser}
-                      onClose={() => setShowProfileSidebar(false)}
+                      user={selectedMember || selectedUser}
+                      onClose={() => {
+                        setShowProfileSidebar(false);
+                        setSelectedMember(null);
+                        setSelectedUser(true);
+                      }}
                       isAdmin={isAdmin}
-                      onBlockUser={isAdmin ? handleBlockUser : null}
+                      onBlockUser={isAdmin ? handleBanUser : null}
                       onReportUser={isAdmin ? handleReportUser : null}
                       isModal={true}
                     />
                   )}
                   {showGroupProfileSidebar &&
-                    selectedChat &&
-                    selectedChat.chat && (
+                    (selectedGroup &&
+                    selectedGroup._id === selectedChat.chat._id ? (
+                      <GroupProfileSidebar
+                        group={selectedGroup}
+                        onClose={() => setShowGroupProfileSidebar(false)}
+                        onViewUserProfile={handleViewGroupMemberProfile}
+                      />
+                    ) : (
                       <GroupProfileSidebar
                         group={selectedChat.chat}
                         onClose={() => setShowGroupProfileSidebar(false)}
-                        onViewMemberProfile={handleViewGroupMemberProfile}
+                        onViewUserProfile={handleViewGroupMemberProfile}
                       />
-                    )}
+                    ))}
                 </>
               ) : (
                 <EmptyState setSidebarOpen={setSidebarOpen} />

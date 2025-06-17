@@ -339,6 +339,12 @@ const AdminDashboard = ({
                                     className="h-10 w-10 rounded-full object-cover border border-gray-200"
                                     src={avatarUrl}
                                     alt={user.name}
+                                    onError={(e) => {
+                                      e.target.onerror = null;
+                                      e.target.src =
+                                        "https://ui-avatars.com/api/?name=" +
+                                        (user.name || "User");
+                                    }}
                                   />
                                 ) : (
                                   <div className="h-10 w-10 rounded-full border border-gray-200 flex items-center justify-center text-white text-sm bg-gray-400">

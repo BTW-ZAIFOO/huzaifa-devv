@@ -13,6 +13,11 @@ const UserProfileSidebar = ({ user }) => {
               src={getAvatarUrl(user)}
               alt={user?.name}
               className="w-20 h-20 rounded-full border-4 border-white object-cover"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src =
+                  "https://ui-avatars.com/api/?name=" + (user?.name || "User");
+              }}
             />
           ) : (
             <div className="w-20 h-20 rounded-full border-4 border-white flex items-center justify-center text-white text-2xl bg-gray-400">

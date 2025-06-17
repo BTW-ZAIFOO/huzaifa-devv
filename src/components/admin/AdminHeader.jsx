@@ -17,6 +17,11 @@ const AdminHeader = ({ user, onLogout }) => {
               src={avatarUrl}
               alt={user?.name || "Admin"}
               className="w-8 h-8 rounded-full object-cover"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src =
+                  "https://ui-avatars.com/api/?name=" + (user?.name || "Admin");
+              }}
             />
           ) : (
             <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm bg-gray-400">

@@ -66,6 +66,8 @@ const UserProfile = ({
   useEffect(() => {
     if (displayedUser?.avatar) {
       setAvatarPreview(displayedUser.avatar);
+    } else {
+      setAvatarPreview(null);
     }
   }, [displayedUser]);
 
@@ -359,6 +361,8 @@ const UserProfile = ({
         localStorage.setItem("user", JSON.stringify(response.data.user));
       } catch (err) {}
 
+      setAvatarPreview(null);
+
       toast.success(response.data.message || "Profile updated successfully!");
 
       if (activeTab === "security") {
@@ -648,6 +652,12 @@ const UserProfile = ({
                     src={avatarPreview || avatarUrl}
                     alt={displayedUser?.name}
                     className="w-36 h-36 rounded-full object-cover border-4 border-white shadow-lg relative"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src =
+                        "https://ui-avatars.com/api/?name=" +
+                        (displayedUser?.name || "User");
+                    }}
                   />
                 ) : (
                   <div className="w-36 h-36 rounded-full border-4 border-white shadow-lg flex items-center justify-center text-white text-4xl font-bold relative bg-gray-400">

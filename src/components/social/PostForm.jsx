@@ -102,6 +102,11 @@ const PostForm = ({ onPostCreated }) => {
               src={avatarUrl}
               alt={user?.name}
               className="h-10 w-10 rounded-full object-cover"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src =
+                  "https://ui-avatars.com/api/?name=" + (user?.name || "User");
+              }}
             />
           ) : (
             <div className="h-10 w-10 rounded-full flex items-center justify-center text-white text-lg font-semibold bg-gray-400">

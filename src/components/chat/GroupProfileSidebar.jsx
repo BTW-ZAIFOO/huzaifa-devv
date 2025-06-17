@@ -1,17 +1,12 @@
 import React from "react";
 import { getAvatarUrl } from "../../utils/avatarUtils";
 
-const GroupProfileSidebar = ({ group, onClose, onViewMemberProfile }) => {
-  console.log("GroupProfileSidebar rendered with group:", group);
-
+const GroupProfileSidebar = ({ group, onClose, onViewUserProfile }) => {
   if (!group) {
-    console.error("No group data provided to GroupProfileSidebar");
     return null;
   }
   const participants = group.participants || [];
-  console.log("Participants:", participants);
   if (!Array.isArray(participants)) {
-    console.error("Participants is not an array:", participants);
     return null;
   }
 
@@ -57,7 +52,9 @@ const GroupProfileSidebar = ({ group, onClose, onViewMemberProfile }) => {
                   <div
                     key={member._id}
                     className="flex items-center p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
-                    onClick={() => onViewMemberProfile(member)}
+                    onClick={() =>
+                      onViewUserProfile && onViewUserProfile(member)
+                    }
                   >
                     <div className="relative mr-3">
                       {avatarUrl ? (

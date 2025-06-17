@@ -1,17 +1,44 @@
 export const getAvatarUrl = (user) => {
   if (!user || !user.avatar) return null;
   let imageUrl = user.avatar;
-  if (
-    imageUrl &&
-    !imageUrl.startsWith("http") &&
-    !imageUrl.startsWith("data:") &&
-    !imageUrl.startsWith("/")
-  ) {
-    imageUrl = `http://localhost:4000/${imageUrl}`;
-  } else if (imageUrl.startsWith("/uploads/")) {
-    imageUrl = `http://localhost:4000${imageUrl}`;
+
+  if (imageUrl.startsWith("data:")) {
+    return imageUrl;
   }
-  return imageUrl;
+
+  if (imageUrl.startsWith("http")) {
+    return imageUrl;
+  }
+
+  if (
+    imageUrl.startsWith("uploads/avatars/") ||
+    imageUrl.startsWith("/uploads/avatars/")
+  ) {
+    imageUrl = imageUrl.replace(/^\/?uploads/, "uploads");
+    return `http://localhost:4000/${imageUrl}`;
+  }
+
+  if (imageUrl.startsWith("/uploads/")) {
+    return `http://localhost:4000${imageUrl}`;
+  }
+  if (imageUrl.startsWith("/public/uploads/")) {
+    return `http://localhost:4000${imageUrl}`;
+  }
+  if (imageUrl.startsWith("/avatars/")) {
+    return `http://localhost:4000/uploads${imageUrl}`;
+  }
+  if (imageUrl.startsWith("/public/")) {
+    return `http://localhost:4000${imageUrl}`;
+  }
+
+  if (!imageUrl.includes("/")) {
+    return `http://localhost:4000/uploads/avatars/${imageUrl}`;
+  }
+
+  return (
+    imageUrl ||
+    "https://ui-avatars.com/api/?name=User&background=9ca3af&color=fff"
+  );
 };
 
 export const generateAdminAvatar = (user) => {

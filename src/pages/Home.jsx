@@ -95,6 +95,12 @@ const Home = () => {
                           src={getAvatarUrl(user)}
                           alt={user?.name}
                           className="w-8 h-8 rounded-full mr-2"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src =
+                              "https://ui-avatars.com/api/?name=" +
+                              (user?.name || "User");
+                          }}
                         />
                       ) : (
                         <div className="w-8 h-8 rounded-full mr-2 flex items-center justify-center text-white text-sm bg-gray-400">
