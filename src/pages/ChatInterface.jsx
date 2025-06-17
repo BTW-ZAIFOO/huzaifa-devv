@@ -234,7 +234,7 @@ const ChatInterface = ({ adminMode }) => {
             avatar: updatedAvatar,
           }));
         }
-        
+
         if (user && updatedUserData.userId === user._id) {
           const updatedUser = {
             ...user,
@@ -1037,6 +1037,7 @@ const ChatInterface = ({ adminMode }) => {
                       isAdmin={isAdmin}
                       onBlockUser={isAdmin ? handleBlockUser : null}
                       onReportUser={isAdmin ? handleReportUser : null}
+                      isModal={true}
                     />
                   )}
                   {showGroupProfileSidebar &&

@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import { Context } from "../main";
-import { Navigate, useParams } from "react-router-dom";
+import { Navigate, useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import LoadingScreen from "./LoadingScreen";
 import axios from "axios";
@@ -42,16 +42,17 @@ const UserProfile = ({
   const [userPosts, setUserPosts] = useState([]);
   const [postsLoading, setPostsLoading] = useState(false);
   const params = useParams();
+  const navigate = useNavigate();
 
   const userId = isModal ? propUser?._id : params?.userId || currentUser?._id;
   const isOwnProfile =
     !isModal && (!params?.userId || params?.userId === currentUser?._id);
 
-  const [profileData, setProfileData] = useState(propUser || currentUser);
+  const [profileData, setProfileData] = useState(
+    isModal ? propUser : currentUser
+  );
   const displayedUser = isModal
-    ? propUser?._id === currentUser?._id
-      ? currentUser
-      : profileData
+    ? propUser
     : isOwnProfile
     ? currentUser
     : profileData;
@@ -76,7 +77,9 @@ const UserProfile = ({
         bio: displayedUser.bio || "",
         location: displayedUser.location || "",
         interests: displayedUser.interests
-          ? displayedUser.interests.join(", ")
+          ? Array.isArray(displayedUser.interests)
+            ? displayedUser.interests.join(", ")
+            : displayedUser.interests
           : "",
         oldPassword: "",
         newPassword: "",
@@ -586,12 +589,35 @@ const UserProfile = ({
   if (isAuthLoading) return <LoadingScreen />;
   if (!isAuthenticated) return <Navigate to="/auth" />;
 
-  const avatar = getAvatarByRole(displayedUser);
   const avatarUrl = getAvatarUrl(displayedUser);
 
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-5xl mx-auto pb-12">
+        {isOwnProfile && (
+          <div className="pt-6 px-4 flex items-center justify-center">
+            <button
+              onClick={() => {
+                if (window.history.length > 2) {
+                  navigate(-1);
+                } else {
+                  navigate("/chat");
+                }
+              }}
+              className="flex items-center gap-2 text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg font-medium mb-4 shadow-sm transition-all"
+            >
+              <i className="fas fa-arrow-left"></i>
+              Back to Chat
+            </button>
+            <button
+              onClick={() => navigate("/feed")}
+              className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg font-medium mb-4 shadow-sm transition-all ml-3"
+            >
+              <i className="fas fa-home"></i>
+              Back to Feed
+            </button>
+          </div>
+        )}
         <div className="h-56 sm:h-72 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-lg relative overflow-hidden shadow-xl">
           <div className="absolute inset-0 bg-pattern opacity-10"></div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
