@@ -568,7 +568,7 @@ const ChatWindow = ({
         renderGroupHeader()
       ) : (
         <div
-          className={`py-3 md:py-5 px-4 md:px-8 border-b flex justify-between items-center shadow-sm ${
+          className={`py-3 md:py-5 px-4 md:px-8 flex justify-between items-center shadow-sm ${
             isAdminChat
               ? "bg-purple-50"
               : isBannedUser
