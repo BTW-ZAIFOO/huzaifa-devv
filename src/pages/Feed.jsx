@@ -145,7 +145,6 @@ const Feed = () => {
     if (isAuthenticated) {
       fetchPosts(1, true);
       fetchSuggestedUsers();
-      fetchTrendingTopics();
     }
   }, [isAuthenticated, filter]);
 
@@ -455,16 +454,6 @@ const Feed = () => {
                   }`}
                 >
                   <i className="fas fa-user-friends mr-2"></i> Following
-                </button>
-                <button
-                  onClick={() => handleFilterChange("trending")}
-                  className={`px-4 py-2 rounded-lg flex-1 ${
-                    filter === "trending"
-                      ? "bg-blue-50 text-blue-600"
-                      : "text-gray-600 hover:bg-gray-50"
-                  }`}
-                >
-                  <i className="fas fa-fire mr-2"></i> Trending
                 </button>
               </div>
             </div>
