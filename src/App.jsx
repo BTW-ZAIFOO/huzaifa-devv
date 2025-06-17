@@ -14,7 +14,6 @@ import AdminAuth from "./pages/AdminAuth";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import ChatInterface from "./pages/ChatInterface";
-
 import OtpVerification from "./pages/OtpVerification";
 import Feed from "./pages/Feed";
 import NotFound from "./pages/NotFound";

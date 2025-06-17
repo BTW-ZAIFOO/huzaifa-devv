@@ -1,11 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { Context } from "../../main";
-import {
-  generateAvatar,
-  generateAdminAvatar,
-  getAvatarUrl,
-} from "../../utils/avatarUtils";
+import { getAvatarUrl } from "../../utils/avatarUtils";
 import GroupChatModal from "./GroupChatModal";
 import { Link } from "react-router-dom";
 

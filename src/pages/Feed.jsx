@@ -16,7 +16,7 @@ const Feed = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [suggestedUsers, setSuggestedUsers] = useState([]);
-  const [trendingTopics, setTrendingTopics] = useState([]);
+  const [setTrendingTopics] = useState([]);
   const [filter, setFilter] = useState("all");
   const [searchResults, setSearchResults] = useState(null);
   const [page, setPage] = useState(1);
@@ -29,7 +29,6 @@ const Feed = () => {
   useEffect(() => {
     if (!user) return;
 
-    let socket = null;
     let connectionAttempts = 0;
     const MAX_ATTEMPTS = 3;
     const RETRY_DELAY = 2000;
