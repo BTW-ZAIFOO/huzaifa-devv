@@ -139,7 +139,13 @@ const UserProfile = ({
   }, [userId, currentUser?._id, setUser]);
 
   useEffect(() => {
-    if (userId && !isModal && isAuthenticated) {
+    if (
+      userId &&
+      typeof userId === "string" &&
+      userId !== "undefined" &&
+      !isModal &&
+      isAuthenticated
+    ) {
       fetchUserProfile();
       fetchUserPosts();
     }
@@ -159,6 +165,7 @@ const UserProfile = ({
   };
 
   const fetchUserProfile = async () => {
+    if (!userId || userId === "undefined") return; // Prevent API call if userId is invalid
     try {
       if (isOwnProfile) {
         const [followersRes, followingRes] = await Promise.all([
@@ -191,7 +198,7 @@ const UserProfile = ({
   };
 
   const fetchUserPosts = async () => {
-    if (isModal) return;
+    if (isModal || !userId || userId === "undefined") return; // Prevent API call if userId is invalid
 
     setPostsLoading(true);
     try {
@@ -1249,13 +1256,15 @@ const UserProfile = ({
                   </svg>
                 </div>
               ) : userPosts.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 gap-6">
                   {userPosts.map((post) => (
                     <PostCard
                       key={post._id}
                       post={post}
                       onDelete={handlePostDelete}
                       onUpdate={handlePostUpdate}
+                      isAdmin={isAdmin}
+                      showActions={true}
                     />
                   ))}
                 </div>

@@ -52,7 +52,7 @@ const UserList = ({
           return (
             <li
               key={user._id}
-              className="p-4 hover:bg-gray-50 transition-colors"
+              className="p-4 hover:bg-gray-50 transition-colors rounded-xl"
             >
               <div className="flex justify-between items-center">
                 <Link to={`/profile/${user._id}`} className="flex items-center">

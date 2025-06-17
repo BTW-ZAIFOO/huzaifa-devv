@@ -32,7 +32,6 @@ const CommentSection = ({
 
       if (res.data.success) {
         setNewComment("");
-
         if (onCommentAdded) {
           onCommentAdded(res.data.comment);
         }

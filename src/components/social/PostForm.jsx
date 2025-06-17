@@ -17,9 +17,15 @@ const PostForm = ({ onPostCreated }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/gif"];
+      const validTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/jpg",
+        "image/gif",
+        "image/webp",
+      ];
       if (!validTypes.includes(file.type)) {
-        toast.error("Only JPG, PNG and GIF images are allowed");
+        toast.error("Only JPG, PNG, GIF, and WEBP images are allowed");
         return;
       }
 

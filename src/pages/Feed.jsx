@@ -200,6 +200,8 @@ const Feed = () => {
         endpoint = "http://localhost:4000/api/v1/post";
       } else if (filter === "trending") {
         endpoint = "http://localhost:4000/api/v1/post/trending";
+      } else if (filter === "my-posts") {
+        endpoint = `http://localhost:4000/api/v1/post/user/${user._id}`;
       }
 
       console.log(`Fetching posts from: ${endpoint}`);
@@ -269,13 +271,15 @@ const Feed = () => {
 
   const fetchSuggestedUsers = async () => {
     try {
-      const res = await axios.get(
-        "http://localhost:4000/api/v1/user/suggested",
-        {
-          withCredentials: true,
-        }
+      const res = await axios.get("http://localhost:4000/api/v1/user/all", {
+        withCredentials: true,
+      });
+      const currentUserId = user?._id;
+      const followingIds = user?.following || [];
+      const suggestions = (res.data.users || []).filter(
+        (u) => u._id !== currentUserId && !followingIds.includes(u._id)
       );
-      setSuggestedUsers(res.data.users || []);
+      setSuggestedUsers(suggestions);
     } catch (error) {
       console.error("Failed to fetch suggested users:", error);
     }
@@ -391,7 +395,7 @@ const Feed = () => {
   if (!isAuthenticated) return <Navigate to="/auth" />;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-10">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 pb-10">
       <div className="fixed top-0 left-0 right-0 bg-white shadow z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
           <Link to="/" className="flex items-center">
@@ -408,7 +412,7 @@ const Feed = () => {
               <i className="fas fa-comments text-xl"></i>
               Chats
             </Link>
-            <Link to="/profile" className="flex items-center">
+            <Link to={`/profile/${user?._id}`} className="flex items-center">
               <img
                 src={user?.avatar || "https://via.placeholder.com/40"}
                 alt={user?.name}
@@ -432,7 +436,7 @@ const Feed = () => {
               <PostForm onPostCreated={handleCreatePost} />
             </div>
             <div className="bg-white rounded-xl shadow-sm p-3">
-              <div className="flex justify-between">
+              <div className="flex justify-between gap-2">
                 <button
                   onClick={() => handleFilterChange("all")}
                   className={`px-4 py-2 rounded-lg flex-1 ${
@@ -452,6 +456,16 @@ const Feed = () => {
                   }`}
                 >
                   <i className="fas fa-user-friends mr-2"></i> Following
+                </button>
+                <button
+                  onClick={() => handleFilterChange("my-posts")}
+                  className={`px-4 py-2 rounded-lg flex-1 ${
+                    filter === "my-posts"
+                      ? "bg-blue-50 text-blue-600"
+                      : "text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  <i className="fas fa-user mr-2"></i> My Posts
                 </button>
               </div>
             </div>
@@ -542,6 +556,7 @@ const Feed = () => {
                         onDelete={handlePostDelete}
                         onUpdate={handlePostUpdate}
                         isAdmin={isAdmin}
+                        showActions={true}
                       />
                     </div>
                   ))}
