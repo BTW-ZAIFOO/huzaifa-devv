@@ -1,7 +1,11 @@
 import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { Context } from "../../main";
-import { generateAvatar, generateAdminAvatar } from "../../utils/avatarUtils";
+import {
+  generateAvatar,
+  generateAdminAvatar,
+  getAvatarUrl,
+} from "../../utils/avatarUtils";
 import GroupChatModal from "./GroupChatModal";
 import { Link } from "react-router-dom";
 
@@ -224,10 +228,7 @@ const ChatSidebar = ({
                         const userNotifications = notifications.filter(
                           (n) => n.sender?._id === userId
                         );
-                        const avatar =
-                          user.role === "admin"
-                            ? generateAdminAvatar(user)
-                            : generateAvatar(user);
+                        const avatarUrl = getAvatarUrl(user);
                         const isSelected = selectedId === userId;
                         let borderClass = "";
                         if (user.isReported)
@@ -248,9 +249,9 @@ const ChatSidebar = ({
                               onClick={() => onSelectUser(user)}
                             >
                               <div className="relative">
-                                {avatar.imageUrl ? (
+                                {avatarUrl ? (
                                   <img
-                                    src={avatar.imageUrl}
+                                    src={avatarUrl}
                                     alt={user.name || "User"}
                                     className={`w-12 h-12 rounded-full object-cover border border-gray-200 shadow-sm ${
                                       user.status === "blocked"
@@ -261,7 +262,9 @@ const ChatSidebar = ({
                                     }`}
                                     onError={(e) => {
                                       e.target.onerror = null;
-                                      e.target.src = avatar.fallbackUrl;
+                                      e.target.src =
+                                        "https://ui-avatars.com/api/?name=" +
+                                        (user.name || "User");
                                     }}
                                   />
                                 ) : (
@@ -272,10 +275,9 @@ const ChatSidebar = ({
                                         : user.status === "banned"
                                         ? "opacity-60 grayscale"
                                         : ""
-                                    }`}
-                                    style={{ backgroundColor: avatar.color }}
+                                    } bg-gray-400`}
                                   >
-                                    {avatar.initials}
+                                    {user.name?.charAt(0) || "?"}
                                   </div>
                                 )}
                                 {userNotifications.length > 0 && (

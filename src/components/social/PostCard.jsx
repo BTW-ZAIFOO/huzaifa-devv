@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Context } from "../../main";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { getAvatarByRole } from "../../utils/avatarUtils";
+import { getAvatarUrl } from "../../utils/avatarUtils";
 import CommentSection from "./CommentSection";
 import ConfirmDialog from "../ConfirmDialog";
 
@@ -23,7 +23,7 @@ const PostCard = ({ post, onDelete, onUpdate, isAdmin = false }) => {
   const isAuthor = post.author?._id === user?._id;
   const postedTime = new Date(post.createdAt);
   const timeAgo = formatTimeAgo(postedTime);
-  const avatar = post.author ? getAvatarByRole(post.author) : null;
+  const avatarUrl = post.author ? getAvatarUrl(post.author) : null;
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -254,22 +254,21 @@ const PostCard = ({ post, onDelete, onUpdate, isAdmin = false }) => {
       <div className="p-5 pb-3 flex justify-between">
         <div className="flex items-center gap-3">
           <Link to={`/profile/${post.author?._id}`}>
-            {avatar?.imageUrl ? (
+            {avatarUrl ? (
               <img
-                src={avatar.imageUrl}
+                src={avatarUrl}
                 alt={post.author.name}
                 className="h-10 w-10 rounded-full object-cover"
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = avatar.fallbackUrl;
+                  e.target.src =
+                    "https://ui-avatars.com/api/?name=" +
+                    (post.author.name || "User");
                 }}
               />
             ) : (
-              <div
-                className="h-10 w-10 rounded-full flex items-center justify-center text-white text-lg font-semibold"
-                style={{ backgroundColor: avatar?.color || "#4f46e5" }}
-              >
-                {avatar?.initials || post.author?.name?.charAt(0) || "?"}
+              <div className="h-10 w-10 rounded-full flex items-center justify-center text-white text-lg font-semibold bg-gray-400">
+                {post.author?.name?.charAt(0) || "?"}
               </div>
             )}
           </Link>

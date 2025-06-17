@@ -1,5 +1,5 @@
 import React from "react";
-import { getAvatarByRole } from "../../utils/avatarUtils";
+import { getAvatarUrl } from "../../utils/avatarUtils";
 
 const GroupProfileSidebar = ({ group, onClose, onViewMemberProfile }) => {
   console.log("GroupProfileSidebar rendered with group:", group);
@@ -47,7 +47,7 @@ const GroupProfileSidebar = ({ group, onClose, onViewMemberProfile }) => {
           <div className="space-y-3">
             {participants.length > 0 ? (
               participants.map((member) => {
-                const avatar = getAvatarByRole(member);
+                const avatarUrl = getAvatarUrl(member);
                 const isAdmin =
                   group.groupAdmin &&
                   (group.groupAdmin._id === member._id ||
@@ -60,9 +60,9 @@ const GroupProfileSidebar = ({ group, onClose, onViewMemberProfile }) => {
                     onClick={() => onViewMemberProfile(member)}
                   >
                     <div className="relative mr-3">
-                      {avatar.imageUrl ? (
+                      {avatarUrl ? (
                         <img
-                          src={avatar.imageUrl}
+                          src={avatarUrl}
                           alt={member.name || "Member"}
                           className="h-10 w-10 rounded-full object-cover"
                           onError={(e) => {
@@ -73,12 +73,8 @@ const GroupProfileSidebar = ({ group, onClose, onViewMemberProfile }) => {
                           }}
                         />
                       ) : (
-                        <div
-                          className="h-10 w-10 rounded-full flex items-center justify-center text-white font-medium"
-                          style={{ backgroundColor: avatar.color || "#4f46e5" }}
-                        >
-                          {avatar.initials ||
-                            (member.name ? member.name.charAt(0) : "?")}
+                        <div className="h-10 w-10 rounded-full flex items-center justify-center text-white font-medium bg-gray-400">
+                          {member.name ? member.name.charAt(0) : "?"}
                         </div>
                       )}
 

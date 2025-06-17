@@ -1,9 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { getAvatarByRole } from "../../utils/avatarUtils";
+import { getAvatarUrl } from "../../utils/avatarUtils";
 
 const AdminHeader = ({ user, onLogout }) => {
-  const avatar = getAvatarByRole(user);
+  const avatarUrl = getAvatarUrl(user);
 
   return (
     <div className="bg-purple-900 text-white shadow-md py-4 px-6 flex justify-between items-center">
@@ -12,12 +12,17 @@ const AdminHeader = ({ user, onLogout }) => {
       </Link>
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
-          <div
-            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm"
-            style={{ backgroundColor: avatar.color }}
-          >
-            {avatar.initials}
-          </div>
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt={user?.name || "Admin"}
+              className="w-8 h-8 rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm bg-gray-400">
+              {user?.name?.charAt(0) || "A"}
+            </div>
+          )}
           <span>{user?.name || "Admin"}</span>
         </div>
 
@@ -29,7 +34,6 @@ const AdminHeader = ({ user, onLogout }) => {
             <i className="fas fa-sign-out-alt mr-1"></i> Logout
           </button>
         )}
-        
       </div>
     </div>
   );

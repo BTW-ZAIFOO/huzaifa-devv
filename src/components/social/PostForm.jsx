@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { Context } from "../../main";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { getAvatarByRole } from "../../utils/avatarUtils";
+import { getAvatarUrl } from "../../utils/avatarUtils";
 import EmojiPicker from "emoji-picker-react";
 
 const PostForm = ({ onPostCreated }) => {
@@ -12,7 +12,7 @@ const PostForm = ({ onPostCreated }) => {
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
-  const avatar = user ? getAvatarByRole(user) : null;
+  const avatarUrl = user ? getAvatarUrl(user) : null;
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -97,18 +97,15 @@ const PostForm = ({ onPostCreated }) => {
     <div className="w-full">
       <div className="flex items-start gap-3">
         <div className="flex-shrink-0">
-          {avatar?.imageUrl ? (
+          {avatarUrl ? (
             <img
-              src={avatar.imageUrl}
+              src={avatarUrl}
               alt={user?.name}
               className="h-10 w-10 rounded-full object-cover"
             />
           ) : (
-            <div
-              className="h-10 w-10 rounded-full flex items-center justify-center text-white text-lg font-semibold"
-              style={{ backgroundColor: avatar?.color || "#4f46e5" }}
-            >
-              {avatar?.initials || user?.name?.charAt(0) || "?"}
+            <div className="h-10 w-10 rounded-full flex items-center justify-center text-white text-lg font-semibold bg-gray-400">
+              {user?.name?.charAt(0) || "?"}
             </div>
           )}
         </div>

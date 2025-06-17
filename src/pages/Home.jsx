@@ -4,7 +4,7 @@ import axios from "axios";
 import { Context } from "../main";
 import { Link, Navigate } from "react-router-dom";
 import LoadingScreen from "../components/LoadingScreen";
-import { getAvatarByRole } from "../utils/avatarUtils";
+import { getAvatarUrl } from "../utils/avatarUtils";
 
 const Home = () => {
   const {
@@ -90,25 +90,17 @@ const Home = () => {
                 <div className="flex items-center">
                   {user && (
                     <>
-                      {() => {
-                        const avatar = getAvatarByRole(user);
-                        return avatar?.imageUrl ? (
-                          <img
-                            src={avatar.imageUrl}
-                            alt={user?.name}
-                            className="w-8 h-8 rounded-full mr-2"
-                          />
-                        ) : (
-                          <div
-                            className="w-8 h-8 rounded-full mr-2 flex items-center justify-center text-white text-sm"
-                            style={{
-                              backgroundColor: avatar?.color || "#4f46e5",
-                            }}
-                          >
-                            {avatar?.initials || user?.name?.charAt(0) || "?"}
-                          </div>
-                        );
-                      }}
+                      {getAvatarUrl(user) ? (
+                        <img
+                          src={getAvatarUrl(user)}
+                          alt={user?.name}
+                          className="w-8 h-8 rounded-full mr-2"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full mr-2 flex items-center justify-center text-white text-sm bg-gray-400">
+                          {user?.name?.charAt(0) || "?"}
+                        </div>
+                      )}
                     </>
                   )}
                   <span className="text-slate-700 font-medium">

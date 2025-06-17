@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import { getAvatarByRole } from "../../utils/avatarUtils";
+import { getAvatarUrl } from "../../utils/avatarUtils";
 
 const AdminDashboard = ({
   users: usersProp,
@@ -303,7 +303,6 @@ const AdminDashboard = ({
                       ...(user.flaggedWords || []),
                       ...(flaggedUsers[userId] || []),
                     ];
-                    const avatar = getAvatarByRole(user);
                     const getBorderStyle = () => {
                       if (user.isReported)
                         return "border-l-4 border-yellow-500 ";
@@ -333,20 +332,20 @@ const AdminDashboard = ({
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="flex-shrink-0 h-10 w-10 relative">
-                              {avatar.imageUrl ? (
-                                <img
-                                  className="h-10 w-10 rounded-full object-cover border border-gray-200"
-                                  src={avatar.imageUrl}
-                                  alt={user.name}
-                                />
-                              ) : (
-                                <div
-                                  className="h-10 w-10 rounded-full border border-gray-200 flex items-center justify-center text-white text-sm"
-                                  style={{ backgroundColor: avatar.color }}
-                                >
-                                  {avatar.initials}
-                                </div>
-                              )}
+                              {(() => {
+                                const avatarUrl = getAvatarUrl(user);
+                                return avatarUrl ? (
+                                  <img
+                                    className="h-10 w-10 rounded-full object-cover border border-gray-200"
+                                    src={avatarUrl}
+                                    alt={user.name}
+                                  />
+                                ) : (
+                                  <div className="h-10 w-10 rounded-full border border-gray-200 flex items-center justify-center text-white text-sm bg-gray-400">
+                                    {user.name?.charAt(0) || "?"}
+                                  </div>
+                                );
+                              })()}
                               <span
                                 className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white ${
                                   user.status === "online"

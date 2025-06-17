@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { Context } from "../../main";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { getAvatarByRole } from "../../utils/avatarUtils";
+import { getAvatarUrl } from "../../utils/avatarUtils";
 
 const CommentSection = ({
   postId,
@@ -26,7 +26,7 @@ const CommentSection = ({
     try {
       const res = await axios.post(
         `http://localhost:4000/api/v1/post/${postId}/comment`,
-        { text: newComment }, 
+        { text: newComment },
         { withCredentials: true }
       );
 
@@ -83,20 +83,15 @@ const CommentSection = ({
     <div className="p-4">
       <form onSubmit={handleAddComment} className="flex gap-2 mb-4">
         <div className="flex-shrink-0">
-          {user && getAvatarByRole(user)?.imageUrl ? (
+          {user && getAvatarUrl(user) ? (
             <img
-              src={getAvatarByRole(user).imageUrl}
+              src={getAvatarUrl(user)}
               alt={user.name}
               className="h-8 w-8 rounded-full object-cover"
             />
           ) : (
-            <div
-              className="h-8 w-8 rounded-full flex items-center justify-center text-white text-sm font-semibold"
-              style={{
-                backgroundColor: getAvatarByRole(user)?.color || "#4f46e5",
-              }}
-            >
-              {getAvatarByRole(user)?.initials || user?.name?.charAt(0) || "?"}
+            <div className="h-8 w-8 rounded-full flex items-center justify-center text-white text-sm font-semibold bg-gray-400">
+              {user?.name?.charAt(0) || "?"}
             </div>
           )}
         </div>
@@ -130,27 +125,20 @@ const CommentSection = ({
         {comments.length > 0 ? (
           comments.map((comment) => {
             const isAuthor = comment.author?._id === user?._id;
-            const avatar = comment.author
-              ? getAvatarByRole(comment.author)
-              : null;
+            const avatarUrl = getAvatarUrl(comment.author);
 
             return (
               <div key={comment._id} className="flex gap-2 group">
                 <div className="flex-shrink-0">
-                  {avatar?.imageUrl ? (
+                  {avatarUrl ? (
                     <img
-                      src={avatar.imageUrl}
+                      src={avatarUrl}
                       alt={comment.author?.name}
                       className="h-8 w-8 rounded-full object-cover"
                     />
                   ) : (
-                    <div
-                      className="h-8 w-8 rounded-full flex items-center justify-center text-white text-sm font-semibold"
-                      style={{ backgroundColor: avatar?.color || "#4f46e5" }}
-                    >
-                      {avatar?.initials ||
-                        comment.author?.name?.charAt(0) ||
-                        "?"}
+                    <div className="h-8 w-8 rounded-full flex items-center justify-center text-white text-sm font-semibold bg-gray-400">
+                      {comment.author?.name?.charAt(0) || "?"}
                     </div>
                   )}
                 </div>

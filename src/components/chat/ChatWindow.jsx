@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
 import { toast } from "react-toastify";
 import { Context } from "../../main";
-import { generateAvatar } from "../../utils/avatarUtils";
+import { generateAvatar, getAvatarUrl } from "../../utils/avatarUtils";
 import {
   highlightInappropriateContent,
   containsInappropriateContent,
@@ -22,17 +22,19 @@ const ChatWindow = ({
 }) => {
   const [messageText, setMessageText] = useState("");
   const [isRecording, setIsRecording] = useState(false);
-  const messagesEndRef = useRef(null);
   const [recognition, setRecognition] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(null);
+  const { user: loggedInUser } = useContext(Context);
+  const messagesEndRef = useRef(null);
   const isAdminChat = selectedUser?.role === "admin";
   const isBannedUser = selectedUser?.status === "banned";
   const isBlockedUser = selectedUser?.status === "blocked";
   const isMessageDisabled = (isBannedUser || isBlockedUser) && !isAdmin;
-  const { user: loggedInUser } = useContext(Context);
   const isCurrentUserBlockedOrBanned =
     loggedInUser?.status === "blocked" || loggedInUser?.status === "banned";
   const isChatDisabled = isCurrentUserBlockedOrBanned;
   const avatar = generateAvatar(selectedUser);
+  const avatarUrl = getAvatarUrl(selectedUser);
 
   useEffect(() => {
     initializeSpeechRecognition();
@@ -430,25 +432,49 @@ const ChatWindow = ({
             </div>
 
             {!isDeleted && !isPermanentlyDeleted && (
-              <div className="absolute -top-2 -right-2 flex gap-1">
+              <div className="absolute top-2 right-2 z-10">
                 <button
-                  className="bg-gray-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-gray-600 transition-all shadow"
+                  className="text-gray-400 hover:text-gray-700 focus:outline-none"
                   onClick={() =>
-                    handleDeleteOwnMessage(message._id || message.id, false)
+                    setDropdownOpen(
+                      dropdownOpen === message._id ? null : message._id
+                    )
                   }
-                  title="Delete message"
                 >
-                  <i className="fas fa-times text-xs"></i>
+                  <i className="fas fa-ellipsis-v h-14"></i>
                 </button>
-                <button
-                  className="bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-all shadow"
-                  onClick={() =>
-                    handleDeleteOwnMessage(message._id || message.id, true)
-                  }
-                  title="Permanently delete message"
-                >
-                  <i className="fas fa-trash-alt text-xs"></i>
-                </button>
+                {dropdownOpen === message._id && (
+                  <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg border border-gray-200 z-50">
+                    {isMe ? (
+                      <button
+                        className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                        onClick={() => {
+                          setDropdownOpen(null);
+                          handleDeleteOwnMessage(
+                            message._id || message.id,
+                            true
+                          );
+                        }}
+                      >
+                        Delete for everyone
+                      </button>
+                    ) : (
+                      <button
+                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        onClick={() => {
+                          setDropdownOpen(null);
+                          handleDeleteOwnMessage(
+                            message._id || message.id,
+                            false
+                          );
+                        }}
+                      >
+                        <i className="fas fa-eye-slash mr-2"></i>
+                        Delete for me
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
@@ -559,25 +585,26 @@ const ChatWindow = ({
               </div>
             ) : (
               <div className="relative">
-                {avatar.imageUrl ? (
+                {avatarUrl ? (
                   <img
-                    src={avatar.imageUrl}
+                    src={avatarUrl}
                     alt={selectedUser.name || "User"}
                     className="w-10 h-10 md:w-12 md:h-12 rounded-full mr-3 border-2 border-white shadow-sm object-cover"
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = avatar.fallbackUrl;
+                      e.target.src =
+                        "https://ui-avatars.com/api/?name=" +
+                        (selectedUser.name || "User");
                     }}
                   />
                 ) : (
                   <div
-                    className="w-10 h-10 md:w-12 md:h-12 rounded-full mr-3 border-2 border-white shadow-sm flex items-center justify-center text-white font-medium cursor-pointer"
-                    style={{ backgroundColor: avatar.color }}
+                    className="w-10 h-10 md:w-12 md:h-12 rounded-full mr-3 border-2 border-white shadow-sm flex items-center justify-center text-white font-medium cursor-pointer bg-gray-400"
                     onClick={onViewProfile}
                     title="View profile"
                     role="button"
                   >
-                    {avatar.initials}
+                    {selectedUser.name?.charAt(0) || "?"}
                   </div>
                 )}
                 <span

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { getAvatarByRole } from "../../utils/avatarUtils";
+import { getAvatarUrl } from "../../utils/avatarUtils";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -45,7 +45,7 @@ const UserList = ({
       </h3>
       <ul className="divide-y divide-gray-200">
         {users.map((user) => {
-          const avatar = getAvatarByRole(user);
+          const avatarUrl = getAvatarUrl(user);
           const isCurrentUser = user._id === currentUser?._id;
           const isFollowing = currentUser?.following?.includes(user._id);
 
@@ -56,17 +56,14 @@ const UserList = ({
             >
               <div className="flex justify-between items-center">
                 <Link to={`/profile/${user._id}`} className="flex items-center">
-                  {avatar.imageUrl ? (
+                  {avatarUrl ? (
                     <img
-                      src={avatar.imageUrl}
+                      src={avatarUrl}
                       alt={user.name}
                       className="w-10 h-10 rounded-full object-cover border border-gray-200"
                     />
                   ) : (
-                    <div
-                      className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-white"
-                      style={{ backgroundColor: avatar.color }}
-                    >
+                    <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-white bg-gray-400">
                       {user.name?.charAt(0)}
                     </div>
                   )}

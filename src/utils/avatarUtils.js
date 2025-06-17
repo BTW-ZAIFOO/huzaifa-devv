@@ -1,25 +1,17 @@
-export const getAvatarByRole = (user) => {
-  if (!user) return generateDefaultAvatar();
-
-  let imageUrl = user.avatar || null;
-  if (imageUrl && !imageUrl.startsWith("data:")) {
-    const t = Date.now();
-    imageUrl = imageUrl.includes("?")
-      ? `${imageUrl}&t=${t}`
-      : `${imageUrl}?t=${t}`;
+export const getAvatarUrl = (user) => {
+  if (!user || !user.avatar) return null;
+  let imageUrl = user.avatar;
+  if (
+    imageUrl &&
+    !imageUrl.startsWith("http") &&
+    !imageUrl.startsWith("data:") &&
+    !imageUrl.startsWith("/")
+  ) {
+    imageUrl = `http://localhost:4000/${imageUrl}`;
+  } else if (imageUrl.startsWith("/uploads/")) {
+    imageUrl = `http://localhost:4000${imageUrl}`;
   }
-
-  if (user.role === "admin") {
-    return {
-      ...generateAdminAvatar(user),
-      imageUrl,
-    };
-  }
-
-  return {
-    ...generateAvatar(user),
-    imageUrl,
-  };
+  return imageUrl;
 };
 
 export const generateAdminAvatar = (user) => {
@@ -92,4 +84,10 @@ export const simpleHashFromString = (str) => {
   }
 
   return Math.abs(hash);
+};
+
+export const getAvatarByRole = (user) => {
+  if (!user) return generateDefaultAvatar();
+  if (user.role === "admin") return generateAdminAvatar(user);
+  return generateAvatar(user);
 };

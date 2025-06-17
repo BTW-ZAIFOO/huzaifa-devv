@@ -1,11 +1,11 @@
-import React, { useContext, useState, useEffect, useRef } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Context } from "../main";
 import { Navigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import LoadingScreen from "./LoadingScreen";
 import axios from "axios";
 import { formatInterests, logProfileUpdate } from "../utils/moderationUtils";
-import { getAvatarByRole } from "../utils/avatarUtils";
+import { getAvatarByRole, getAvatarUrl } from "../utils/avatarUtils";
 import PostCard from "./social/PostCard";
 
 const UserProfile = ({
@@ -25,7 +25,6 @@ const UserProfile = ({
   const [loading, setLoading] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [activeTab, setActiveTab] = useState("profile");
-  const socketRef = useRef(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -44,12 +43,10 @@ const UserProfile = ({
   const [postsLoading, setPostsLoading] = useState(false);
   const params = useParams();
 
-  // Determine which user to show
   const userId = isModal ? propUser?._id : params?.userId || currentUser?._id;
   const isOwnProfile =
     !isModal && (!params?.userId || params?.userId === currentUser?._id);
 
-  // Set the profile data
   const [profileData, setProfileData] = useState(propUser || currentUser);
   const displayedUser = isModal
     ? propUser?._id === currentUser?._id
@@ -357,18 +354,9 @@ const UserProfile = ({
 
       try {
         localStorage.setItem("user", JSON.stringify(response.data.user));
-      } catch (err) {  
-      }
+      } catch (err) {}
 
       toast.success(response.data.message || "Profile updated successfully!");
-
-      if (formData.avatar && response.data.user.avatar) {
-        const timestamp = new Date().getTime();
-        const avatarUrl = response.data.user.avatar.includes("?")
-          ? `${response.data.user.avatar}&t=${timestamp}`
-          : `${response.data.user.avatar}?t=${timestamp}`;
-        setAvatarPreview(avatarUrl);
-      }
 
       if (activeTab === "security") {
         setFormData({
@@ -595,11 +583,11 @@ const UserProfile = ({
     );
   }
 
-  
   if (isAuthLoading) return <LoadingScreen />;
   if (!isAuthenticated) return <Navigate to="/auth" />;
 
   const avatar = getAvatarByRole(displayedUser);
+  const avatarUrl = getAvatarUrl(displayedUser);
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -629,18 +617,15 @@ const UserProfile = ({
             <div className="absolute -top-20 left-1/2 transform -translate-x-1/2">
               <div className="relative group">
                 <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-400 to-purple-600 blur-md opacity-75 group-hover:opacity-100 transition-opacity duration-300 scale-110"></div>
-                {avatarPreview || displayedUser?.avatar ? (
+                {avatarPreview || avatarUrl ? (
                   <img
-                    src={avatarPreview || displayedUser?.avatar}
+                    src={avatarPreview || avatarUrl}
                     alt={displayedUser?.name}
                     className="w-36 h-36 rounded-full object-cover border-4 border-white shadow-lg relative"
                   />
                 ) : (
-                  <div
-                    className="w-36 h-36 rounded-full border-4 border-white shadow-lg flex items-center justify-center text-white text-4xl font-bold relative"
-                    style={{ backgroundColor: avatar?.color || "#4f46e5" }}
-                  >
-                    {avatar?.initials || displayedUser?.name?.charAt(0) || "?"}
+                  <div className="w-36 h-36 rounded-full border-4 border-white shadow-lg flex items-center justify-center text-white text-4xl font-bold relative bg-gray-400">
+                    {displayedUser?.name?.charAt(0) || "?"}
                   </div>
                 )}
                 {isOwnProfile && (
@@ -657,13 +642,13 @@ const UserProfile = ({
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2}
-                          d="M3 9a2 2 0 002-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                          d="M3 9a2 2 0 002-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 002 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
                         />
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2}
-                          d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                          d="M15 13a3 3 0 11-6 0 3 3 0 006 0z"
                         />
                       </svg>
                     </label>
