@@ -345,7 +345,7 @@ const ChatInterface = ({ adminMode }) => {
         heartbeatRef.current = null;
       }
     };
-  }, [user, reconnectAttempt, selectedChat]);
+  }, [user, reconnectAttempt]);
 
   useEffect(() => {
     if (!user || !socketConnected || !socketRef.current) return;
