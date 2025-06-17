@@ -403,12 +403,10 @@ const Feed = () => {
           <div className="flex items-center gap-4">
             <Link
               to="/chat"
-              className="text-gray-700 hover:text-blue-600 relative"
+              className="text-gray-700 hover:text-blue-600 relative flex items-center gap-2"
             >
               <i className="fas fa-comments text-xl"></i>
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
-                3
-              </span>
+              Chats
             </Link>
             <Link to="/profile" className="flex items-center">
               <img
