@@ -331,31 +331,27 @@ const PostCard = ({
             </button>
             {showOptions && (
               <div className="absolute mb-5 right-0 mt-2 w-48 bg-white rounded-xl shadow-lg z-20 border border-gray-100">
-                {isAuthor && (
-                  <>
-                    <button
-                      onClick={() => {
-                        setEditing(true);
-                        setShowOptions(false);
-                      }}
-                      className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      <i className="fas fa-edit mr-2"></i> Edit Post
-                    </button>
-                    <button
-                      onClick={() => {
-                        setShowConfirmDelete(true);
-                        setShowOptions(false);
-                      }}
-                      className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                    >
-                      <i className="fas fa-trash-alt mr-2"></i> Delete Post
-                    </button>
-                  </>
-                )}
+                <button
+                  onClick={() => {
+                    setEditing(true);
+                    setShowOptions(false);
+                  }}
+                  className="flex w-full items-center px-4 py-2 rounded-xl text-sm text-gray-700 hover:bg-gray-50"
+                >
+                  <i className="fas fa-edit mr-2"></i> Edit Post
+                </button>
+                <button
+                  onClick={() => {
+                    setShowConfirmDelete(true);
+                    setShowOptions(false);
+                  }}
+                  className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                >
+                  <i className="fas fa-trash-alt mr-2"></i> Delete Post
+                </button>
                 <button
                   onClick={handleSave}
-                  className="flex w-full items-center px-4 py-2 text-sm text-blue-600 hover:bg-blue-50"
+                  className="flex w-full items-center rounded-xl px-4 py-2 text-sm text-blue-600 hover:bg-blue-50"
                 >
                   <i
                     className={`fas ${
@@ -366,7 +362,7 @@ const PostCard = ({
                 </button>
                 <button
                   onClick={handleShare}
-                  className="flex w-full items-center px-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50"
+                  className="flex w-full items-center px-4 rounded-xl py-2 text-sm text-indigo-600 hover:bg-indigo-50"
                 >
                   <i className="fas fa-share-alt mr-2"></i> Share Post
                 </button>
@@ -376,7 +372,7 @@ const PostCard = ({
                       toast.info("Post reported");
                       setShowOptions(false);
                     }}
-                    className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    className="flex w-full items-center px-4 py-2 rounded-xl text-sm text-gray-700 hover:bg-gray-50"
                   >
                     <i className="fas fa-flag mr-2"></i> Report Post
                   </button>
