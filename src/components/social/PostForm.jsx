@@ -4,6 +4,20 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import EmojiPicker from "emoji-picker-react";
 
+const getAvatarByRole = (user) => {
+  if (!user || !user.role) return { color: "#4f46e5" };
+  switch (user.role) {
+    case "admin":
+      return { color: "#ef4444" };
+    case "moderator":
+      return { color: "#f59e42" };
+    case "user":
+      return { color: "#3b82f6" };
+    default:
+      return { color: "#4f46e5" };
+  }
+};
+
 const PostForm = ({ onPostCreated }) => {
   const { user } = useContext(Context);
   const [content, setContent] = useState("");

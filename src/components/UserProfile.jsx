@@ -65,7 +65,7 @@ const UserProfile = ({
 
   useEffect(() => {
     if (displayedUser?.avatar) {
-      setAvatarPreview(displayedUser.avatar);
+      setAvatarPreview(null);
     } else {
       setAvatarPreview(null);
     }
@@ -92,7 +92,7 @@ const UserProfile = ({
         oldPassword: "",
         newPassword: "",
         confirmPassword: "",
-        avatar: null,
+        avatar: null, // keep for compatibility, but not used
       });
     }
   }, [displayedUser]);
@@ -171,7 +171,7 @@ const UserProfile = ({
   };
 
   const fetchUserProfile = async () => {
-    if (!userId || userId === "undefined") return; 
+    if (!userId || userId === "undefined") return;
     try {
       if (isOwnProfile) {
         const [followersRes, followingRes] = await Promise.all([
@@ -279,10 +279,6 @@ const UserProfile = ({
         data.append("interests", formData.interests);
       }
 
-      if (formData.avatar) {
-        data.append("avatar", formData.avatar);
-      }
-
       if (activeTab === "security") {
         if (
           !formData.oldPassword ||
@@ -334,10 +330,6 @@ const UserProfile = ({
           (displayedUser.interests ? displayedUser.interests.join(", ") : "")
         ) {
           changes.interests = formatInterests(formData.interests);
-        }
-        if (formData.avatar) {
-          changes.avatar = "Updated profile picture";
-          toast.success("Profile picture updated successfully!");
         }
 
         logProfileUpdate(displayedUser._id, displayedUser.name, changes);

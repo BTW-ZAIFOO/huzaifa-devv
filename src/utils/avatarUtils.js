@@ -75,11 +75,7 @@ export const getAvatarByRole = (user) => {
 
 export const getAvatarUrl = (user) => {
   if (!user) return null;
-  if (
-    user.avatar &&
-    typeof user.avatar === "string" &&
-    user.avatar.startsWith("http")
-  ) {
+  if (typeof user.avatar === "string" && user.avatar.startsWith("http")) {
     return user.avatar;
   }
   if (user.profilePicture && typeof user.profilePicture === "string") {
