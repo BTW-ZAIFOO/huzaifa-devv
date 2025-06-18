@@ -198,7 +198,6 @@ const PostModerationPanel = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              
               {posts.map((post) => {
                 const avatar = getAvatarByRole(post.user);
                 return (

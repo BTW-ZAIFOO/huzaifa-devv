@@ -56,8 +56,10 @@ const PostForm = ({ onPostCreated }) => {
 
       if (res.data.success) {
         setContent("");
-        toast.success("Post created successfully!");
-
+        toast.success(
+          `Post created successfully by ${user?.name || "Unknown"}!`,
+          { className: "animate-toast-pop" }
+        );
         if (onPostCreated) {
           onPostCreated(res.data.post);
         }
@@ -70,8 +72,30 @@ const PostForm = ({ onPostCreated }) => {
     }
   };
 
+  if (
+    typeof window !== "undefined" &&
+    !document.getElementById("toastPopKeyframes")
+  ) {
+    const style = document.createElement("style");
+    style.id = "toastPopKeyframes";
+    style.innerHTML = `
+    @keyframes toastPop {
+      0% { transform: scale(0.8); opacity: 0;}
+      60% { transform: scale(1.05); opacity: 1;}
+      100% { transform: scale(1); }
+    }
+    .animate-toast-pop { animation: toastPop 0.5s cubic-bezier(.4,0,.2,1);}
+  `;
+    document.head.appendChild(style);
+  }
+
   return (
-    <div className="w-full">
+    <div
+      className="w-full animate-fade-in"
+      style={{
+        animation: "fadeInUp 0.7s cubic-bezier(.4,0,.2,1)",
+      }}
+    >
       <div className="flex items-start gap-3">
         <div className="flex-shrink-0">
           <div

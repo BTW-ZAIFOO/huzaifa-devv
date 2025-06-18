@@ -39,7 +39,12 @@ const UserList = ({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div
+      className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden animate-fade-in"
+      style={{
+        animation: "fadeInUp 0.7s cubic-bezier(.4,0,.2,1)",
+      }}
+    >
       <h3 className="text-lg font-medium text-gray-800 p-4 border-b">
         {title}
       </h3>
@@ -56,20 +61,12 @@ const UserList = ({
             >
               <div className="flex justify-between items-center">
                 <Link to={`/profile/${user._id}`} className="flex items-center">
-                  {avatar?.imageUrl ? (
-                    <img
-                      src={avatar.imageUrl}
-                      alt={user.name}
-                      className="w-10 h-10 rounded-full object-cover border border-gray-200"
-                    />
-                  ) : (
-                    <div
-                      className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-white"
-                      style={{ backgroundColor: avatar?.color || "#4f46e5" }}
-                    >
-                      {avatar?.initials || user.name?.charAt(0)}
-                    </div>
-                  )}
+                  <div
+                    className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-white"
+                    style={{ backgroundColor: avatar?.color || "#4f46e5" }}
+                  >
+                    {avatar?.initials || user.name?.charAt(0)}
+                  </div>
                   <div className="ml-3">
                     <h4 className="font-medium text-gray-800">{user.name}</h4>
                     {user.bio && (

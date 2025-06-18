@@ -12,25 +12,12 @@ const AdminHeader = ({ user, onLogout }) => {
       </Link>
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
-          {avatar?.imageUrl ? (
-            <img
-              src={avatar.imageUrl}
-              alt={user?.name || "Admin"}
-              className="w-8 h-8 rounded-full object-cover"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src =
-                  "https://ui-avatars.com/api/?name=" + (user?.name || "Admin");
-              }}
-            />
-          ) : (
-            <div
-              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm"
-              style={{ backgroundColor: avatar?.color || "#4f46e5" }}
-            >
-              {avatar?.initials || user?.name?.charAt(0) || "A"}
-            </div>
-          )}
+          <div
+            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm"
+            style={{ backgroundColor: avatar?.color || "#4f46e5" }}
+          >
+            {avatar?.initials || user?.name?.charAt(0) || "A"}
+          </div>
           <span>{user?.name || "Admin"}</span>
         </div>
 

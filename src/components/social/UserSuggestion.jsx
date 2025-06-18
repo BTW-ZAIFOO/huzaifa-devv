@@ -47,7 +47,10 @@ const UserSuggestion = ({ users = [] }) => {
   }
 
   return (
-    <div className="space-y-4">
+    <div
+      className="space-y-4 animate-fade-in"
+      style={{ animation: "fadeInUp 0.7s cubic-bezier(.4,0,.2,1)" }}
+    >
       {users.map((user) => {
         const avatar = getAvatarByRole(user);
         const isFollowing = currentUser?.following?.includes(user._id);

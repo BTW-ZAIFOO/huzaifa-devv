@@ -1117,7 +1117,6 @@ const AdminPanel = ({ users: initialUsers }) => {
                 const flaggedWords = hasFlaggedContent
                   ? extractInappropriateWords(message.content)
                   : [];
-                const avatarUrl = getAvatarUrl(message.sender);
 
                 return (
                   <tr
@@ -1127,23 +1126,18 @@ const AdminPanel = ({ users: initialUsers }) => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10 relative">
-                          {avatarUrl ? (
-                            <img
-                              src={avatarUrl}
-                              alt={message.sender.name}
-                              className="h-10 w-10 rounded-full"
-                              onError={(e) => {
-                                e.target.onerror = null;
-                                e.target.src =
-                                  "https://ui-avatars.com/api/?name=" +
-                                  (message.sender.name || "User");
-                              }}
-                            />
-                          ) : (
-                            <div className="h-10 w-10 rounded-full flex items-center justify-center text-white font-medium bg-gray-400">
-                              {message.sender.name?.charAt(0) || "?"}
-                            </div>
-                          )}
+                          <div
+                            className="h-10 w-10 rounded-full flex items-center justify-center text-white font-medium"
+                            style={{
+                              backgroundColor:
+                                getAvatarByRole(message.sender)?.color ||
+                                "#4f46e5",
+                            }}
+                          >
+                            {getAvatarByRole(message.sender)?.initials ||
+                              message.sender.name?.charAt(0) ||
+                              "?"}
+                          </div>
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">

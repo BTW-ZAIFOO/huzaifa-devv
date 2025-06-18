@@ -5,7 +5,10 @@ import { getAvatarByRole } from "../../utils/avatarUtils";
 const UserProfileSidebar = ({ user }) => {
   const avatar = getAvatarByRole(user);
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden sticky top-20">
+    <div
+      className="bg-white rounded-xl shadow-sm overflow-hidden sticky top-20 animate-fade-in"
+      style={{ animation: "fadeInUp 0.7s cubic-bezier(.4,0,.2,1)" }}
+    >
       <div className="h-24 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
       <div className="px-5 pb-5 relative">
         <div className="absolute -top-10">

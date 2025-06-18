@@ -332,22 +332,17 @@ const AdminDashboard = ({
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="flex-shrink-0 h-10 w-10 relative">
-                              {(() => {
-                                const avatar = getAvatarByRole(user);
-                                return (
-                                  <div
-                                    className="h-10 w-10 rounded-full border border-gray-200 flex items-center justify-center text-white text-sm"
-                                    style={{
-                                      backgroundColor:
-                                        avatar?.color || "#4f46e5",
-                                    }}
-                                  >
-                                    {avatar?.initials ||
-                                      user.name?.charAt(0) ||
-                                      "?"}
-                                  </div>
-                                );
-                              })()}
+                              <div
+                                className="h-10 w-10 rounded-full border border-gray-200 flex items-center justify-center text-white text-sm"
+                                style={{
+                                  backgroundColor:
+                                    getAvatarByRole(user)?.color || "#4f46e5",
+                                }}
+                              >
+                                {getAvatarByRole(user)?.initials ||
+                                  user.name?.charAt(0) ||
+                                  "?"}
+                              </div>
                               <span
                                 className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white ${
                                   user.status === "online"

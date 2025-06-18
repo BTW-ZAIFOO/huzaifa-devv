@@ -10,13 +10,13 @@ import UserSuggestion from "../components/social/UserSuggestion";
 import UserProfileSidebar from "../components/social/UserProfileSidebar";
 import SearchBar from "../components/social/SearchBar";
 import io from "socket.io-client";
+import { getAvatarByRole } from "../utils/avatarUtils";
 
 const Feed = () => {
   const { isAuthenticated, isAuthLoading, user, isAdmin } = useContext(Context);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [suggestedUsers, setSuggestedUsers] = useState([]);
-  const [setTrendingTopics] = useState([]);
   const [filter, setFilter] = useState("all");
   const [searchResults, setSearchResults] = useState(null);
   const [page, setPage] = useState(1);
@@ -75,7 +75,9 @@ const Feed = () => {
         socket.on("new-post", (newPost) => {
           if (filter !== "trending") {
             setPosts((prevPosts) => [newPost, ...prevPosts]);
-            toast.info("New post added to your feed!");
+            toast.info(`New post by ${newPost.author?.name || "Unknown"}!`, {
+              className: "animate-toast-pop",
+            });
           }
         });
 
@@ -198,8 +200,6 @@ const Feed = () => {
       let endpoint = "http://localhost:4000/api/v1/post/all";
       if (filter === "following") {
         endpoint = "http://localhost:4000/api/v1/post";
-      } else if (filter === "trending") {
-        endpoint = "http://localhost:4000/api/v1/post/trending";
       } else if (filter === "my-posts") {
         endpoint = `http://localhost:4000/api/v1/post/user/${user._id}`;
       }
@@ -229,7 +229,7 @@ const Feed = () => {
     } catch (error) {
       console.error("Failed to fetch posts:", error);
 
-      if (filter === "following" || filter === "trending") {
+      if (filter === "following") {
         try {
           console.log("Trying fallback to all posts");
           const fallbackRes = await axios.get(
@@ -282,27 +282,6 @@ const Feed = () => {
       setSuggestedUsers(suggestions);
     } catch (error) {
       console.error("Failed to fetch suggested users:", error);
-    }
-  };
-
-  const fetchTrendingTopics = async () => {
-    try {
-      const res = await axios.get(
-        "http://localhost:4000/api/v1/post/trending/topics",
-        {
-          withCredentials: true,
-        }
-      );
-      setTrendingTopics(res.data.topics || []);
-    } catch (error) {
-      console.error("Failed to fetch trending topics:", error);
-      setTrendingTopics([
-        { name: "AI", postCount: 125 },
-        { name: "Technology", postCount: 98 },
-        { name: "Programming", postCount: 87 },
-        { name: "Web", postCount: 65 },
-        { name: "Learning", postCount: 42 },
-      ]);
     }
   };
 
@@ -413,11 +392,16 @@ const Feed = () => {
               Chats
             </Link>
             <Link to={`/profile/${user?._id}`} className="flex items-center">
-              <img
-                src={user?.avatar || "https://via.placeholder.com/40"}
-                alt={user?.name}
-                className="w-8 h-8 rounded-full object-cover"
-              />
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold"
+                style={{
+                  backgroundColor: getAvatarByRole(user)?.color || "#4f46e5",
+                  color: "#fff",
+                  border: "1px solid #e5e7eb",
+                }}
+              >
+                {getAvatarByRole(user)?.initials}
+              </div>
             </Link>
           </div>
         </div>

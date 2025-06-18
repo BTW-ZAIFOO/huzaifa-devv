@@ -265,7 +265,8 @@ const PostCard = ({
 
   function getAvatarUrl(author) {
     const avatar = getAvatarByRole(author);
-    return avatar?.color || "#4f46e5";
+    // Use imageUrl if available, else fallback to null (for solid color)
+    return avatar?.imageUrl || null;
   }
 
   if (post.isHidden && !isAdmin && !isAuthor) {
@@ -279,18 +280,36 @@ const PostCard = ({
     );
   }
 
+  if (
+    typeof window !== "undefined" &&
+    !document.getElementById("fadeInUpKeyframes")
+  ) {
+    const style = document.createElement("style");
+    style.id = "fadeInUpKeyframes";
+    style.innerHTML = `
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(40px);}
+      100% { opacity: 1; transform: translateY(0);}
+    }
+    .animate-fade-in { animation: fadeInUp 0.7s cubic-bezier(.4,0,.2,1);}
+  `;
+    document.head.appendChild(style);
+  }
+
   return (
     <div
-      className={`bg-white rounded-2xl shadow-md border border-gray-100 mb-6 transition-all duration-200 hover:shadow-lg ${
+      className={`bg-white rounded-2xl shadow-md border border-gray-100 mb-6 transition-all duration-300 hover:shadow-lg ${
         post.isHidden ? "border-l-4 border-orange-500" : ""
-      }`}
+      } animate-fade-in`}
+      style={{ animation: "fadeInUp 0.7s cubic-bezier(.4,0,.2,1)" }}
     >
       <div className="flex items-center gap-3 px-5 pt-5 pb-2 relative">
         <Link to={`/profile/${post.author?._id}`}>
           <div
-            className="h-11 w-11 rounded-full flex items-center justify-center text-white text-lg font-semibold bg-gray-400 border-2 border-blue-100 shadow"
+            className="h-11 w-11 rounded-full flex items-center justify-center text-white text-lg font-semibold border-2 border-blue-100 shadow"
             style={{
-              backgroundColor: getAvatarUrl(post.author) || "#4f46e5",
+              backgroundColor: getAvatarByRole(post.author)?.color || "#4f46e5",
+              transition: "transform 0.2s",
             }}
           >
             {getAvatarByRole(post.author)?.initials ||
@@ -317,7 +336,7 @@ const PostCard = ({
             )}
           </div>
         </div>
-        {showActions && (
+        {showActions && isAuthor && (
           <div ref={optionsRef}>
             <button
               onClick={() => setShowOptions(!showOptions)}

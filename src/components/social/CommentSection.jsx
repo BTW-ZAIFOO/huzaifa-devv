@@ -79,20 +79,20 @@ const CommentSection = ({
   };
 
   return (
-    <div className="p-4">
+    <div
+      className="p-4 animate-fade-in"
+      style={{ animation: "fadeInUp 0.7s cubic-bezier(.4,0,.2,1)" }}
+    >
       <form onSubmit={handleAddComment} className="flex gap-2 mb-4">
         <div className="flex-shrink-0">
-          {user && getAvatarUrl(user) ? (
-            <img
-              src={getAvatarUrl(user)}
-              alt={user.name}
-              className="h-8 w-8 rounded-full object-cover"
-            />
-          ) : (
-            <div className="h-8 w-8 rounded-full flex items-center justify-center text-white text-sm font-semibold bg-gray-400">
-              {user?.name?.charAt(0) || "?"}
-            </div>
-          )}
+          <div
+            className="h-8 w-8 rounded-full flex items-center justify-center text-white text-sm font-semibold"
+            style={{
+              backgroundColor: getAvatarByRole(user)?.color || "#4f46e5",
+            }}
+          >
+            {getAvatarByRole(user)?.initials || user?.name?.charAt(0) || "?"}
+          </div>
         </div>
         <div className="flex-grow relative">
           <input
@@ -129,22 +129,12 @@ const CommentSection = ({
             return (
               <div key={comment._id} className="flex gap-2 group">
                 <div className="flex-shrink-0">
-                  {avatar?.imageUrl ? (
-                    <img
-                      src={avatar.imageUrl}
-                      alt={comment.author?.name}
-                      className="h-8 w-8 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div
-                      className="h-8 w-8 rounded-full flex items-center justify-center text-white text-sm font-semibold"
-                      style={{ backgroundColor: avatar?.color || "#4f46e5" }}
-                    >
-                      {avatar?.initials ||
-                        comment.author?.name?.charAt(0) ||
-                        "?"}
-                    </div>
-                  )}
+                  <div
+                    className="h-8 w-8 rounded-full flex items-center justify-center text-white text-sm font-semibold"
+                    style={{ backgroundColor: avatar?.color || "#4f46e5" }}
+                  >
+                    {avatar?.initials || comment.author?.name?.charAt(0) || "?"}
+                  </div>
                 </div>
                 <div className="flex-grow">
                   <div className="bg-gray-100 rounded-lg px-3 py-2 inline-block">
