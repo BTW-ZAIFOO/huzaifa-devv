@@ -123,8 +123,9 @@ const CommentSection = ({
       <div className="space-y-3">
         {comments.length > 0 ? (
           comments.map((comment) => {
-            const isAuthor = comment.author?._id === user?._id;
-            const avatar = getAvatarByRole(comment.author);
+            const authorObj = comment.author || comment.user || {};
+            const isAuthor = authorObj?._id === user?._id;
+            const avatar = getAvatarByRole(authorObj);
 
             return (
               <div key={comment._id} className="flex gap-2 group">
@@ -133,13 +134,13 @@ const CommentSection = ({
                     className="h-8 w-8 rounded-full flex items-center justify-center text-white text-sm font-semibold"
                     style={{ backgroundColor: avatar?.color || "#4f46e5" }}
                   >
-                    {avatar?.initials || comment.author?.name?.charAt(0) || "?"}
+                    {avatar?.initials || authorObj?.name?.charAt(0) || "?"}
                   </div>
                 </div>
                 <div className="flex-grow">
                   <div className="bg-gray-100 rounded-lg px-3 py-2 inline-block">
                     <div className="font-medium text-gray-800">
-                      {comment.author?.name}
+                      {authorObj?.name}
                     </div>
                     <div className="text-gray-700">
                       {comment.text || comment.content}

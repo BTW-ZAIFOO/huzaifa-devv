@@ -34,7 +34,7 @@ const PostCard = ({
     }
   });
   const optionsRef = useRef(null);
-  const isAuthor = post.author?._id === user?._id;
+  const isAuthor = (post.author?._id || post.user?._id) === user?._id;
   const postedTime = new Date(post.createdAt);
   const timeAgo = formatTimeAgo(postedTime);
 
@@ -298,26 +298,43 @@ const PostCard = ({
       style={{ animation: "fadeInUp 0.7s cubic-bezier(.4,0,.2,1)" }}
     >
       <div className="flex items-center gap-3 px-5 pt-5 pb-2 relative">
-        <Link to={`/profile/${post.author?._id}`}>
-          <div
-            className="h-11 w-11 rounded-full flex items-center justify-center text-white text-lg font-semibold border-2 border-blue-100 shadow"
-            style={{
-              backgroundColor: getAvatarByRole(post.author)?.color || "#4f46e5",
-              transition: "transform 0.2s",
-            }}
-          >
-            {getAvatarByRole(post.author)?.initials ||
-              post.author?.name?.charAt(0) ||
-              "?"}
-          </div>
-        </Link>
+        <div className="flex-shrink-0">
+          {(() => {
+            const authorObj = post.author || post.user || {};
+            const avatar = getAvatarByRole(authorObj);
+            if (avatar.imageUrl) {
+              return (
+                <img
+                  src={avatar.imageUrl}
+                  alt={authorObj?.name}
+                  className="w-10 h-10 rounded-full object-cover bg-gray-200"
+                  style={{ display: "block" }}
+                />
+              );
+            }
+            return (
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg"
+                style={{ background: avatar.color, userSelect: "none" }}
+                title={authorObj?.name}
+              >
+                {avatar.initials}
+              </div>
+            );
+          })()}
+        </div>
         <div className="flex-1">
           <Link
-            to={`/profile/${post.author?._id}`}
+            to={`/profile/${post.author?._id || post.user?._id}`}
             className="font-semibold text-gray-900 hover:text-blue-600"
           >
-            {post.author?.name}
+            {post.author?.name || post.user?.name}
           </Link>
+          {(post.author?.username || post.user?.username) && (
+            <div className="text-xs text-gray-400">
+              @{post.author?.username || post.user?.username}
+            </div>
+          )}
           <div className="text-xs text-gray-500 flex items-center gap-1">
             <span>{timeAgo}</span>
             {post.updatedAt && post.updatedAt !== post.createdAt && (
