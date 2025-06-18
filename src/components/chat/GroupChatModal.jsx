@@ -8,6 +8,21 @@ const GroupChatModal = ({ isOpen, onClose, onGroupCreated }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [allUsers, setAllUsers] = useState([]);
+
+  useEffect(() => {
+    if (isOpen) {
+      axios
+        .get("http://localhost:4000/api/v1/user/all", { withCredentials: true })
+        .then((res) => {
+          const currentUserId = JSON.parse(localStorage.getItem("user"))?._id;
+          setAllUsers(
+            (res.data.users || []).filter((u) => u._id !== currentUserId)
+          );
+        })
+        .catch(() => setAllUsers([]));
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (searchTerm.trim() && isOpen) {
@@ -120,6 +135,40 @@ const GroupChatModal = ({ isOpen, onClose, onGroupCreated }) => {
               />
               <i className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
             </div>
+
+            {!searchTerm.trim() && allUsers.length > 0 && (
+              <div className="mt-2 border border-gray-200 rounded-lg max-h-32 overflow-y-auto">
+                {allUsers
+                  .filter(
+                    (user) => !selectedUsers.some((u) => u._id === user._id)
+                  )
+                  .map((user) => (
+                    <div
+                      key={user._id}
+                      className="px-3 py-2 hover:bg-gray-100 flex items-center justify-between cursor-pointer"
+                      onClick={() => handleAddUser(user)}
+                    >
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-2">
+                          {user.name.charAt(0).toUpperCase()}
+                        </div>
+                        <span>{user.name}</span>
+                      </div>
+                      <button
+                        type="button"
+                        className="text-blue-600 hover:text-blue-800"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddUser(user);
+                        }}
+                      >
+                        <i className="fas fa-plus-circle"></i>
+                      </button>
+                    </div>
+                  ))}
+              </div>
+            )}
+
             {searchTerm.trim() && searchResults.length > 0 && (
               <div className="mt-2 border border-gray-200 rounded-lg max-h-32 overflow-y-auto">
                 {searchResults.map((user) => (
