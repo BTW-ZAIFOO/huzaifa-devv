@@ -263,12 +263,6 @@ const PostCard = ({
     return date.toLocaleDateString();
   }
 
-  function getAvatarUrl(author) {
-    const avatar = getAvatarByRole(author);
-    // Use imageUrl if available, else fallback to null (for solid color)
-    return avatar?.imageUrl || null;
-  }
-
   if (post.isHidden && !isAdmin && !isAuthor) {
     return (
       <div className="bg-gray-50 rounded-xl shadow-sm p-6 text-center">
