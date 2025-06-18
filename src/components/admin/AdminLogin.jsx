@@ -133,7 +133,6 @@ const AdminLogin = () => {
                 {errors.password.message}
               </p>
             )}
-
           </div>
           <div className="text-right text-sm">
             <Link
@@ -148,7 +147,6 @@ const AdminLogin = () => {
             disabled={isLoading}
             className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white border-none rounded-xl text-base font-medium cursor-pointer transition-all duration-300 shadow-lg hover:shadow-pink-500/30 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0 flex items-center justify-center"
           >
-
             {isLoading ? (
               <LoadingSpinner />
             ) : (
@@ -157,7 +155,6 @@ const AdminLogin = () => {
                 Admin Sign In
               </>
             )}
-            
           </button>
         </div>
         <div className="mt-6 text-black text-center">

@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 import { Context } from "../../main";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { getAvatarUrl } from "../../utils/avatarUtils";
 import CommentSection from "./CommentSection";
 import ConfirmDialog from "../ConfirmDialog";
+import { getAvatarByRole } from "../../utils/avatarUtils";
 
 const PostCard = ({
   post,
@@ -37,7 +37,6 @@ const PostCard = ({
   const isAuthor = post.author?._id === user?._id;
   const postedTime = new Date(post.createdAt);
   const timeAgo = formatTimeAgo(postedTime);
-  const avatarUrl = post.author ? getAvatarUrl(post.author) : null;
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -264,6 +263,11 @@ const PostCard = ({
     return date.toLocaleDateString();
   }
 
+  function getAvatarUrl(author) {
+    const avatar = getAvatarByRole(author);
+    return avatar?.color || "#4f46e5";
+  }
+
   if (post.isHidden && !isAdmin && !isAuthor) {
     return (
       <div className="bg-gray-50 rounded-xl shadow-sm p-6 text-center">
@@ -283,23 +287,16 @@ const PostCard = ({
     >
       <div className="flex items-center gap-3 px-5 pt-5 pb-2 relative">
         <Link to={`/profile/${post.author?._id}`}>
-          {avatarUrl ? (
-            <img
-              src={avatarUrl}
-              alt={post.author.name}
-              className="h-11 w-11 rounded-full object-cover border-2 border-blue-100 shadow"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src =
-                  "https://ui-avatars.com/api/?name=" +
-                  (post.author.name || "User");
-              }}
-            />
-          ) : (
-            <div className="h-11 w-11 rounded-full flex items-center justify-center text-white text-lg font-semibold bg-gray-400 border-2 border-blue-100 shadow">
-              {post.author?.name?.charAt(0) || "?"}
-            </div>
-          )}
+          <div
+            className="h-11 w-11 rounded-full flex items-center justify-center text-white text-lg font-semibold bg-gray-400 border-2 border-blue-100 shadow"
+            style={{
+              backgroundColor: getAvatarUrl(post.author) || "#4f46e5",
+            }}
+          >
+            {getAvatarByRole(post.author)?.initials ||
+              post.author?.name?.charAt(0) ||
+              "?"}
+          </div>
         </Link>
         <div className="flex-1">
           <Link

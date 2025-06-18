@@ -56,20 +56,12 @@ const UserSuggestion = ({ users = [] }) => {
           <div key={user._id} className="flex items-center justify-between">
             <Link to={`/profile/${user._id}`} className="flex items-center">
               <div className="mr-3">
-                {avatar?.imageUrl ? (
-                  <img
-                    src={avatar.imageUrl}
-                    alt={user.name}
-                    className="h-10 w-10 rounded-full object-cover border border-gray-200"
-                  />
-                ) : (
-                  <div
-                    className="h-10 w-10 rounded-full border border-gray-200 flex items-center justify-center text-white text-sm font-semibold"
-                    style={{ backgroundColor: avatar?.color || "#4f46e5" }}
-                  >
-                    {avatar?.initials || user.name?.charAt(0) || "?"}
-                  </div>
-                )}
+                <div
+                  className="h-10 w-10 rounded-full border border-gray-200 flex items-center justify-center text-white text-sm font-semibold"
+                  style={{ backgroundColor: avatar?.color || "#4f46e5" }}
+                >
+                  {avatar?.initials || user.name?.charAt(0) || "?"}
+                </div>
               </div>
               <div>
                 <div className="font-medium text-gray-800 hover:text-blue-600 transition-colors">

@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import LoadingScreen from "./LoadingScreen";
 import axios from "axios";
 import { formatInterests, logProfileUpdate } from "../utils/moderationUtils";
-import { getAvatarByRole, getAvatarUrl } from "../utils/avatarUtils";
+import { getAvatarByRole } from "../utils/avatarUtils";
 import PostCard from "./social/PostCard";
 
 const UserProfile = ({
@@ -23,7 +23,7 @@ const UserProfile = ({
     setUser,
   } = useContext(Context);
   const [loading, setLoading] = useState(false);
-  const [avatarPreview, setAvatarPreview] = useState(null);
+  const [setAvatarPreview] = useState(null);
   const [activeTab, setActiveTab] = useState("profile");
   const [formData, setFormData] = useState({
     name: "",
@@ -67,6 +67,12 @@ const UserProfile = ({
     if (displayedUser?.avatar) {
       setAvatarPreview(displayedUser.avatar);
     } else {
+      setAvatarPreview(null);
+    }
+  }, [displayedUser]);
+
+  useEffect(() => {
+    if (displayedUser?.name) {
       setAvatarPreview(null);
     }
   }, [displayedUser]);
@@ -165,7 +171,7 @@ const UserProfile = ({
   };
 
   const fetchUserProfile = async () => {
-    if (!userId || userId === "undefined") return; // Prevent API call if userId is invalid
+    if (!userId || userId === "undefined") return; 
     try {
       if (isOwnProfile) {
         const [followersRes, followingRes] = await Promise.all([
@@ -198,7 +204,7 @@ const UserProfile = ({
   };
 
   const fetchUserPosts = async () => {
-    if (isModal || !userId || userId === "undefined") return; // Prevent API call if userId is invalid
+    if (isModal || !userId || userId === "undefined") return;
 
     setPostsLoading(true);
     try {
@@ -245,31 +251,6 @@ const UserProfile = ({
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-  };
-
-  const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
-      if (!validTypes.includes(file.type)) {
-        toast.error("Please select a valid image file (JPEG, PNG, GIF, WEBP)");
-        e.target.value = null;
-        return;
-      }
-
-      if (file.size > 1 * 1024 * 1024) {
-        toast.error("Image size should be less than 1MB");
-        e.target.value = null;
-        return;
-      }
-
-      setFormData({ ...formData, avatar: file });
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatarPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -412,31 +393,17 @@ const UserProfile = ({
           </div>
           <div className="flex flex-col items-center">
             <div className="relative mb-4">
-              {avatarPreview || displayedUser?.avatar ? (
-                <img
-                  src={avatarPreview || displayedUser?.avatar}
-                  alt={displayedUser?.name || "User"}
-                  className="w-24 h-24 rounded-full object-cover border-4 border-blue-100"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src =
-                      "https://ui-avatars.com/api/?name=" +
-                      (displayedUser?.name || "User");
-                  }}
-                />
-              ) : (
-                <div
-                  className="w-24 h-24 rounded-full border-4 border-blue-100 flex items-center justify-center text-white text-3xl font-bold"
-                  style={{
-                    backgroundColor:
-                      getAvatarByRole(displayedUser)?.color || "#4f46e5",
-                  }}
-                >
-                  {getAvatarByRole(displayedUser)?.initials ||
-                    displayedUser?.name?.charAt(0) ||
-                    "?"}
-                </div>
-              )}
+              <div
+                className="w-24 h-24 rounded-full border-4 border-blue-100 flex items-center justify-center text-white text-3xl font-bold"
+                style={{
+                  backgroundColor:
+                    getAvatarByRole(displayedUser)?.color || "#4f46e5",
+                }}
+              >
+                {getAvatarByRole(displayedUser)?.initials ||
+                  displayedUser?.name?.charAt(0) ||
+                  "?"}
+              </div>
               <span
                 className={`absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full ${getStatusColor()} border-2 border-white`}
               ></span>
@@ -600,8 +567,6 @@ const UserProfile = ({
   if (isAuthLoading) return <LoadingScreen />;
   if (!isAuthenticated) return <Navigate to="/auth" />;
 
-  const avatarUrl = getAvatarUrl(displayedUser);
-
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-5xl mx-auto pb-12">
@@ -654,57 +619,17 @@ const UserProfile = ({
             <div className="absolute -top-20 left-1/2 transform -translate-x-1/2">
               <div className="relative group">
                 <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-400 to-purple-600 blur-md opacity-75 group-hover:opacity-100 transition-opacity duration-300 scale-110"></div>
-                {avatarPreview || avatarUrl ? (
-                  <img
-                    src={avatarPreview || avatarUrl}
-                    alt={displayedUser?.name}
-                    className="w-36 h-36 rounded-full object-cover border-4 border-white shadow-lg relative"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src =
-                        "https://ui-avatars.com/api/?name=" +
-                        (displayedUser?.name || "User");
-                    }}
-                  />
-                ) : (
-                  <div className="w-36 h-36 rounded-full border-4 border-white shadow-lg flex items-center justify-center text-white text-4xl font-bold relative bg-gray-400">
-                    {displayedUser?.name?.charAt(0) || "?"}
-                  </div>
-                )}
-                {isOwnProfile && (
-                  <div className="absolute bottom-1 right-1 bg-white p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-0 group-hover:translate-y-0 scale-90 group-hover:scale-100">
-                    <label htmlFor="avatar-upload" className="cursor-pointer">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 text-blue-600"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M3 9a2 2 0 002-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 002 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 13a3 3 0 11-6 0 3 3 0 006 0z"
-                        />
-                      </svg>
-                    </label>
-                    <input
-                      id="avatar-upload"
-                      type="file"
-                      accept="image/*"
-                      name="avatar"
-                      onChange={handleAvatarChange}
-                      className="hidden"
-                    />
-                  </div>
-                )}
+                <div
+                  className="w-36 h-36 rounded-full border-4 border-white shadow-lg flex items-center justify-center text-white text-4xl font-bold relative"
+                  style={{
+                    backgroundColor:
+                      getAvatarByRole(displayedUser)?.color || "#4f46e5",
+                  }}
+                >
+                  {getAvatarByRole(displayedUser)?.initials ||
+                    displayedUser?.name?.charAt(0) ||
+                    "?"}
+                </div>
               </div>
             </div>
             <h1 className="text-3xl font-bold mt-2 text-gray-800 tracking-tight">

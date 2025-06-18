@@ -1,12 +1,16 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
 import { toast } from "react-toastify";
 import { Context } from "../../main";
-import { generateAvatar, getAvatarUrl } from "../../utils/avatarUtils";
+import { getAvatarByRole } from "../../utils/avatarUtils";
 import {
   highlightInappropriateContent,
   containsInappropriateContent,
 } from "../../utils/moderationUtils";
 import axios from "axios";
+
+function getAvatarUrl(user) {
+  return user && user.avatarUrl ? user.avatarUrl : null;
+}
 
 const ChatWindow = ({
   selectedUser,
@@ -33,8 +37,7 @@ const ChatWindow = ({
   const isCurrentUserBlockedOrBanned =
     loggedInUser?.status === "blocked" || loggedInUser?.status === "banned";
   const isChatDisabled = isCurrentUserBlockedOrBanned;
-  const avatar = generateAvatar(selectedUser);
-  const avatarUrl = getAvatarUrl(selectedUser);
+  const avatar = getAvatarByRole(selectedUser);
 
   useEffect(() => {
     initializeSpeechRecognition();
@@ -585,28 +588,15 @@ const ChatWindow = ({
               </div>
             ) : (
               <div className="relative">
-                {avatarUrl ? (
-                  <img
-                    src={avatarUrl}
-                    alt={selectedUser.name || "User"}
-                    className="w-10 h-10 md:w-12 md:h-12 rounded-full mr-3 border-2 border-white shadow-sm object-cover"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src =
-                        "https://ui-avatars.com/api/?name=" +
-                        (selectedUser.name || "User");
-                    }}
-                  />
-                ) : (
-                  <div
-                    className="w-10 h-10 md:w-12 md:h-12 rounded-full mr-3 border-2 border-white shadow-sm flex items-center justify-center text-white font-medium cursor-pointer bg-gray-400"
-                    onClick={onViewProfile}
-                    title="View profile"
-                    role="button"
-                  >
-                    {selectedUser.name?.charAt(0) || "?"}
-                  </div>
-                )}
+                <div
+                  className="w-10 h-10 md:w-12 md:h-12 rounded-full mr-3 border-2 border-white shadow-sm flex items-center justify-center text-white font-medium cursor-pointer"
+                  style={{ backgroundColor: avatar.color }}
+                  onClick={onViewProfile}
+                  title="View profile"
+                  role="button"
+                >
+                  {avatar.initials}
+                </div>
                 <span
                   className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
                     selectedUser.status === "online"

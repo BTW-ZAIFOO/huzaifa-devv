@@ -269,17 +269,9 @@ const ChatHeader = ({
                 className="w-8 h-8 rounded-full flex items-center justify-center text-white overflow-hidden shadow-sm"
                 style={{ backgroundColor: avatar?.color || "#4f46e5" }}
               >
-                {avatar?.imageUrl ? (
-                  <img
-                    src={avatar.imageUrl}
-                    alt={user?.name || "User"}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="font-medium text-sm">
-                    {avatar?.initials || user?.name?.charAt(0) || "?"}
-                  </span>
-                )}
+                <span className="font-medium text-sm">
+                  {avatar?.initials || user?.name?.charAt(0) || "?"}
+                </span>
               </div>
             )}
             <span className="hidden md:inline">{user?.name || "User"}</span>

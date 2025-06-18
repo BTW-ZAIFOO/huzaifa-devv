@@ -1,5 +1,5 @@
 import React from "react";
-import { getAvatarUrl } from "../../utils/avatarUtils";
+import { getAvatarByRole } from "../../utils/avatarUtils";
 
 const GroupProfileSidebar = ({ group, onClose, onViewUserProfile }) => {
   if (!group) {
@@ -42,7 +42,7 @@ const GroupProfileSidebar = ({ group, onClose, onViewUserProfile }) => {
           <div className="space-y-3">
             {participants.length > 0 ? (
               participants.map((member) => {
-                const avatarUrl = getAvatarUrl(member);
+                const avatar = getAvatarByRole(member);
                 const isAdmin =
                   group.groupAdmin &&
                   (group.groupAdmin._id === member._id ||
@@ -57,24 +57,12 @@ const GroupProfileSidebar = ({ group, onClose, onViewUserProfile }) => {
                     }
                   >
                     <div className="relative mr-3">
-                      {avatarUrl ? (
-                        <img
-                          src={avatarUrl}
-                          alt={member.name || "Member"}
-                          className="h-10 w-10 rounded-full object-cover"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src =
-                              "https://ui-avatars.com/api/?name=" +
-                              (member.name || "User");
-                          }}
-                        />
-                      ) : (
-                        <div className="h-10 w-10 rounded-full flex items-center justify-center text-white font-medium bg-gray-400">
-                          {member.name ? member.name.charAt(0) : "?"}
-                        </div>
-                      )}
-
+                      <div
+                        className="h-10 w-10 rounded-full flex items-center justify-center text-white font-medium"
+                        style={{ backgroundColor: avatar?.color || "#4f46e5" }}
+                      >
+                        {avatar?.initials || member.name?.charAt(0) || "?"}
+                      </div>
                       <span
                         className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
                           member.status === "online"
@@ -124,22 +112,17 @@ const GroupProfileSidebar = ({ group, onClose, onViewUserProfile }) => {
               {typeof group.groupAdmin === "object" ? (
                 <>
                   <div className="mr-3">
-                    {group.groupAdmin.avatar?.imageUrl ? (
-                      <img
-                        src={group.groupAdmin.avatar.imageUrl}
-                        alt={group.groupAdmin.name || "Admin"}
-                        className="h-8 w-8 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div
-                        className="h-8 w-8 rounded-full flex items-center justify-center text-white font-medium"
-                        style={{ backgroundColor: "#4f46e5" }}
-                      >
-                        {group.groupAdmin.name
-                          ? group.groupAdmin.name.charAt(0)
-                          : "A"}
-                      </div>
-                    )}
+                    <div
+                      className="h-8 w-8 rounded-full flex items-center justify-center text-white font-medium"
+                      style={{
+                        backgroundColor:
+                          getAvatarByRole(group.groupAdmin)?.color || "#4f46e5",
+                      }}
+                    >
+                      {getAvatarByRole(group.groupAdmin)?.initials ||
+                        group.groupAdmin.name?.charAt(0) ||
+                        "A"}
+                    </div>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-800 truncate">

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import { getAvatarUrl } from "../../utils/avatarUtils";
+import { getAvatarByRole } from "../../utils/avatarUtils";
 
 const AdminDashboard = ({
   users: usersProp,
@@ -333,22 +333,18 @@ const AdminDashboard = ({
                           <div className="flex items-center">
                             <div className="flex-shrink-0 h-10 w-10 relative">
                               {(() => {
-                                const avatarUrl = getAvatarUrl(user);
-                                return avatarUrl ? (
-                                  <img
-                                    className="h-10 w-10 rounded-full object-cover border border-gray-200"
-                                    src={avatarUrl}
-                                    alt={user.name}
-                                    onError={(e) => {
-                                      e.target.onerror = null;
-                                      e.target.src =
-                                        "https://ui-avatars.com/api/?name=" +
-                                        (user.name || "User");
+                                const avatar = getAvatarByRole(user);
+                                return (
+                                  <div
+                                    className="h-10 w-10 rounded-full border border-gray-200 flex items-center justify-center text-white text-sm"
+                                    style={{
+                                      backgroundColor:
+                                        avatar?.color || "#4f46e5",
                                     }}
-                                  />
-                                ) : (
-                                  <div className="h-10 w-10 rounded-full border border-gray-200 flex items-center justify-center text-white text-sm bg-gray-400">
-                                    {user.name?.charAt(0) || "?"}
+                                  >
+                                    {avatar?.initials ||
+                                      user.name?.charAt(0) ||
+                                      "?"}
                                   </div>
                                 );
                               })()}

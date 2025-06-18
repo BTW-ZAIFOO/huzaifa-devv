@@ -12,7 +12,6 @@ import {
   containsInappropriateContent,
 } from "../../utils/moderationUtils";
 import io from "socket.io-client";
-import { getAvatarUrl } from "../../utils/avatarUtils";
 
 const AdminPanel = ({ users: initialUsers }) => {
   const [selectedUser, setSelectedUser] = useState(null);

@@ -1,29 +1,20 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { getAvatarUrl } from "../../utils/avatarUtils";
+import { getAvatarByRole } from "../../utils/avatarUtils";
 
 const UserProfileSidebar = ({ user }) => {
+  const avatar = getAvatarByRole(user);
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden sticky top-20">
       <div className="h-24 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
       <div className="px-5 pb-5 relative">
         <div className="absolute -top-10">
-          {getAvatarUrl(user) ? (
-            <img
-              src={getAvatarUrl(user)}
-              alt={user?.name}
-              className="w-20 h-20 rounded-full border-4 border-white object-cover"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src =
-                  "https://ui-avatars.com/api/?name=" + (user?.name || "User");
-              }}
-            />
-          ) : (
-            <div className="w-20 h-20 rounded-full border-4 border-white flex items-center justify-center text-white text-2xl bg-gray-400">
-              {user?.name?.charAt(0) || "?"}
-            </div>
-          )}
+          <div
+            className="w-20 h-20 rounded-full border-4 border-white flex items-center justify-center text-white text-2xl"
+            style={{ backgroundColor: avatar?.color || "#4f46e5" }}
+          >
+            {avatar?.initials || user?.name?.charAt(0) || "?"}
+          </div>
         </div>
         <div className="pt-12">
           <h2 className="font-bold text-xl text-gray-800">{user?.name}</h2>

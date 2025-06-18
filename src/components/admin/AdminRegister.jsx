@@ -76,7 +76,6 @@ const AdminRegister = () => {
             {errors.name && (
               <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
             )}
-
           </div>
           <div className="space-y-2">
             <label
@@ -109,7 +108,6 @@ const AdminRegister = () => {
                 {errors.email.message}
               </p>
             )}
-
           </div>
           <div className="space-y-2">
             <label
@@ -142,7 +140,6 @@ const AdminRegister = () => {
                 {errors.password.message}
               </p>
             )}
-            
           </div>
           <button
             type="submit"

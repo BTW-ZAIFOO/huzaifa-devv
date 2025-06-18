@@ -8,28 +8,7 @@ import {
 
 const CreatePost = ({ onPostCreated }) => {
   const [content, setContent] = useState("");
-  const [media, setMedia] = useState(null);
-  const [mediaPreview, setMediaPreview] = useState(null);
   const [loading, setLoading] = useState(false);
-
-  const handleMediaChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("File too large. Maximum size is 5MB.");
-      e.target.value = null;
-      return;
-    }
-
-    setMedia(file);
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setMediaPreview(reader.result);
-    };
-    reader.readAsDataURL(file);
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,9 +30,6 @@ const CreatePost = ({ onPostCreated }) => {
     try {
       const formData = new FormData();
       formData.append("content", content);
-      if (media) {
-        formData.append("media", media);
-      }
 
       const res = await axios.post(
         "http://localhost:4000/api/v1/post/create",
@@ -68,8 +44,6 @@ const CreatePost = ({ onPostCreated }) => {
 
       toast.success("Post created successfully");
       setContent("");
-      setMedia(null);
-      setMediaPreview(null);
       onPostCreated(res.data.post);
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to create post");
@@ -87,40 +61,8 @@ const CreatePost = ({ onPostCreated }) => {
           placeholder="What's on your mind?"
           className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none h-24"
         />
-
-        {mediaPreview && (
-          <div className="relative mt-3 mb-2">
-            <img
-              src={mediaPreview}
-              alt="Preview"
-              className="max-h-60 rounded-lg mx-auto"
-            />
-            <button
-              type="button"
-              onClick={() => {
-                setMedia(null);
-                setMediaPreview(null);
-              }}
-              className="absolute top-2 right-2 bg-gray-800 bg-opacity-50 text-white rounded-full p-1"
-            >
-              <i className="fas fa-times"></i>
-            </button>
-          </div>
-        )}
-
         <div className="flex justify-between items-center mt-3">
-          <div>
-            <label className="cursor-pointer flex items-center text-gray-600 hover:text-blue-600">
-              <i className="far fa-image mr-2 text-lg"></i>
-              <span className="text-sm">Add Image</span>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleMediaChange}
-                className="hidden"
-              />
-            </label>
-          </div>
+          <div />
           <button
             type="submit"
             disabled={loading || !content.trim()}

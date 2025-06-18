@@ -1,9 +1,9 @@
 import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { Context } from "../../main";
-import { getAvatarUrl } from "../../utils/avatarUtils";
 import GroupChatModal from "./GroupChatModal";
 import { Link } from "react-router-dom";
+import { getAvatarByRole } from "../../utils/avatarUtils";
 
 const ChatSidebar = ({
   users,
@@ -21,7 +21,7 @@ const ChatSidebar = ({
   const [searchResults, setSearchResults] = useState([]);
   const [groupChats, setGroupChats] = useState([]);
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
-  const [activeTab, setActiveTab] = useState("direct"); // 'direct' or 'group'
+  const [activeTab, setActiveTab] = useState("direct");
   const { user: currentUser } = useContext(Context);
 
   useEffect(() => {
@@ -224,7 +224,7 @@ const ChatSidebar = ({
                         const userNotifications = notifications.filter(
                           (n) => n.sender?._id === userId
                         );
-                        const avatarUrl = getAvatarUrl(user);
+                        const avatar = getAvatarByRole(user);
                         const isSelected = selectedId === userId;
                         let borderClass = "";
                         if (user.isReported)
@@ -245,9 +245,9 @@ const ChatSidebar = ({
                               onClick={() => onSelectUser(user)}
                             >
                               <div className="relative">
-                                {avatarUrl ? (
+                                {avatar?.imageUrl ? (
                                   <img
-                                    src={avatarUrl}
+                                    src={avatar.imageUrl}
                                     alt={user.name || "User"}
                                     className={`w-12 h-12 rounded-full object-cover border border-gray-200 shadow-sm ${
                                       user.status === "blocked"
@@ -271,9 +271,15 @@ const ChatSidebar = ({
                                         : user.status === "banned"
                                         ? "opacity-60 grayscale"
                                         : ""
-                                    } bg-gray-400`}
+                                    }`}
+                                    style={{
+                                      backgroundColor:
+                                        avatar?.color || "#4f46e5",
+                                    }}
                                   >
-                                    {user.name?.charAt(0) || "?"}
+                                    {avatar?.initials ||
+                                      user.name?.charAt(0) ||
+                                      "?"}
                                   </div>
                                 )}
                                 {userNotifications.length > 0 && (

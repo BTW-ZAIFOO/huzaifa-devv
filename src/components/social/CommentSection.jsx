@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { Context } from "../../main";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { getAvatarUrl } from "../../utils/avatarUtils";
+import { getAvatarByRole } from "../../utils/avatarUtils";
 
 const CommentSection = ({
   postId,
@@ -124,20 +124,25 @@ const CommentSection = ({
         {comments.length > 0 ? (
           comments.map((comment) => {
             const isAuthor = comment.author?._id === user?._id;
-            const avatarUrl = getAvatarUrl(comment.author);
+            const avatar = getAvatarByRole(comment.author);
 
             return (
               <div key={comment._id} className="flex gap-2 group">
                 <div className="flex-shrink-0">
-                  {avatarUrl ? (
+                  {avatar?.imageUrl ? (
                     <img
-                      src={avatarUrl}
+                      src={avatar.imageUrl}
                       alt={comment.author?.name}
                       className="h-8 w-8 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="h-8 w-8 rounded-full flex items-center justify-center text-white text-sm font-semibold bg-gray-400">
-                      {comment.author?.name?.charAt(0) || "?"}
+                    <div
+                      className="h-8 w-8 rounded-full flex items-center justify-center text-white text-sm font-semibold"
+                      style={{ backgroundColor: avatar?.color || "#4f46e5" }}
+                    >
+                      {avatar?.initials ||
+                        comment.author?.name?.charAt(0) ||
+                        "?"}
                     </div>
                   )}
                 </div>

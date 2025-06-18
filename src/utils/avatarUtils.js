@@ -1,52 +1,9 @@
-export const getAvatarUrl = (user) => {
-  if (!user || !user.avatar) return null;
-  let imageUrl = user.avatar;
-
-  if (imageUrl.startsWith("data:")) {
-    return imageUrl;
-  }
-
-  if (imageUrl.startsWith("http")) {
-    return imageUrl;
-  }
-
-  if (
-    imageUrl.startsWith("uploads/avatars/") ||
-    imageUrl.startsWith("/uploads/avatars/")
-  ) {
-    imageUrl = imageUrl.replace(/^\/?uploads/, "uploads");
-    return `http://localhost:4000/${imageUrl}`;
-  }
-
-  if (imageUrl.startsWith("/uploads/")) {
-    return `http://localhost:4000${imageUrl}`;
-  }
-  if (imageUrl.startsWith("/public/uploads/")) {
-    return `http://localhost:4000${imageUrl}`;
-  }
-  if (imageUrl.startsWith("/avatars/")) {
-    return `http://localhost:4000/uploads${imageUrl}`;
-  }
-  if (imageUrl.startsWith("/public/")) {
-    return `http://localhost:4000${imageUrl}`;
-  }
-
-  if (!imageUrl.includes("/")) {
-    return `http://localhost:4000/uploads/avatars/${imageUrl}`;
-  }
-
-  return (
-    imageUrl ||
-    "https://ui-avatars.com/api/?name=User&background=9ca3af&color=fff"
-  );
-};
-
 export const generateAdminAvatar = (user) => {
   return {
     color: "#8b5cf6",
     initials: user?.name ? user.name.charAt(0).toUpperCase() : "A",
-    imageUrl: user?.avatar || null,
-    fallbackUrl: `https://ui-avatars.com/api/?name=Admin&background=8b5cf6&color=fff`,
+    imageUrl: null,
+    fallbackUrl: null,
   };
 };
 
@@ -83,10 +40,8 @@ export const generateAvatar = (user) => {
   return {
     color,
     initials,
-    imageUrl: user.avatar || null,
-    fallbackUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(
-      user.name || "User"
-    )}&background=${color.substring(1)}&color=fff`,
+    imageUrl: null,
+    fallbackUrl: null,
   };
 };
 
@@ -95,8 +50,7 @@ export const generateDefaultAvatar = () => {
     color: "#9ca3af",
     initials: "?",
     imageUrl: null,
-    fallbackUrl:
-      "https://ui-avatars.com/api/?name=User&background=9ca3af&color=fff",
+    fallbackUrl: null,
   };
 };
 
@@ -117,4 +71,24 @@ export const getAvatarByRole = (user) => {
   if (!user) return generateDefaultAvatar();
   if (user.role === "admin") return generateAdminAvatar(user);
   return generateAvatar(user);
+};
+
+export const getAvatarUrl = (user) => {
+  if (!user) return null;
+  if (
+    user.avatar &&
+    typeof user.avatar === "string" &&
+    user.avatar.startsWith("http")
+  ) {
+    return user.avatar;
+  }
+  if (user.profilePicture && typeof user.profilePicture === "string") {
+    return user.profilePicture;
+  }
+  if (user.name) {
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      user.name
+    )}&background=random&color=fff`;
+  }
+  return null;
 };

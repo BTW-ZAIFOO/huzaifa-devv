@@ -1,9 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { getAvatarUrl } from "../../utils/avatarUtils";
+import { getAvatarByRole } from "../../utils/avatarUtils";
 
 const AdminHeader = ({ user, onLogout }) => {
-  const avatarUrl = getAvatarUrl(user);
+  const avatar = getAvatarByRole(user);
 
   return (
     <div className="bg-purple-900 text-white shadow-md py-4 px-6 flex justify-between items-center">
@@ -12,9 +12,9 @@ const AdminHeader = ({ user, onLogout }) => {
       </Link>
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
-          {avatarUrl ? (
+          {avatar?.imageUrl ? (
             <img
-              src={avatarUrl}
+              src={avatar.imageUrl}
               alt={user?.name || "Admin"}
               className="w-8 h-8 rounded-full object-cover"
               onError={(e) => {
@@ -24,8 +24,11 @@ const AdminHeader = ({ user, onLogout }) => {
               }}
             />
           ) : (
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm bg-gray-400">
-              {user?.name?.charAt(0) || "A"}
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm"
+              style={{ backgroundColor: avatar?.color || "#4f46e5" }}
+            >
+              {avatar?.initials || user?.name?.charAt(0) || "A"}
             </div>
           )}
           <span>{user?.name || "Admin"}</span>

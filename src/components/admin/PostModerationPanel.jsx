@@ -11,7 +11,7 @@ const PostModerationPanel = () => {
   const [showHideConfirm, setShowHideConfirm] = useState(false);
   const [showWarnConfirm, setShowWarnConfirm] = useState(false);
   const [moderationReason, setModerationReason] = useState("");
-  const [activeView, setActiveView] = useState("reported"); // reported, all, hidden
+  const [activeView, setActiveView] = useState("reported");
 
   useEffect(() => {
     fetchPosts();
@@ -198,9 +198,9 @@ const PostModerationPanel = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
+              
               {posts.map((post) => {
                 const avatar = getAvatarByRole(post.user);
-
                 return (
                   <tr
                     key={post._id}

@@ -2,51 +2,13 @@ import React, { useState, useContext } from "react";
 import { Context } from "../../main";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { getAvatarUrl } from "../../utils/avatarUtils";
 import EmojiPicker from "emoji-picker-react";
 
 const PostForm = ({ onPostCreated }) => {
   const { user } = useContext(Context);
   const [content, setContent] = useState("");
-  const [image, setImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
-  const avatarUrl = user ? getAvatarUrl(user) : null;
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const validTypes = [
-        "image/jpeg",
-        "image/png",
-        "image/jpg",
-        "image/gif",
-        "image/webp",
-      ];
-      if (!validTypes.includes(file.type)) {
-        toast.error("Only JPG, PNG, GIF, and WEBP images are allowed");
-        return;
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("Image size should be less than 5MB");
-        return;
-      }
-
-      setImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const removeImage = () => {
-    setImage(null);
-    setImagePreview(null);
-  };
 
   const handleEmojiSelect = (emojiData) => {
     setContent((prev) => prev + emojiData.emoji);
@@ -56,7 +18,7 @@ const PostForm = ({ onPostCreated }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!content.trim() && !image) {
+    if (!content.trim()) {
       toast.error("Post cannot be empty");
       return;
     }
@@ -66,9 +28,6 @@ const PostForm = ({ onPostCreated }) => {
     try {
       const formData = new FormData();
       formData.append("content", content);
-      if (image) {
-        formData.append("media", image);
-      }
 
       const res = await axios.post(
         "http://localhost:4000/api/v1/post/create",
@@ -83,8 +42,6 @@ const PostForm = ({ onPostCreated }) => {
 
       if (res.data.success) {
         setContent("");
-        setImage(null);
-        setImagePreview(null);
         toast.success("Post created successfully!");
 
         if (onPostCreated) {
@@ -103,22 +60,14 @@ const PostForm = ({ onPostCreated }) => {
     <div className="w-full">
       <div className="flex items-start gap-3">
         <div className="flex-shrink-0">
-          {avatarUrl ? (
-            <img
-              src={avatarUrl}
-              alt={user?.name}
-              className="h-10 w-10 rounded-full object-cover"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src =
-                  "https://ui-avatars.com/api/?name=" + (user?.name || "User");
-              }}
-            />
-          ) : (
-            <div className="h-10 w-10 rounded-full flex items-center justify-center text-white text-lg font-semibold bg-gray-400">
-              {user?.name?.charAt(0) || "?"}
-            </div>
-          )}
+          <div
+            className="h-10 w-10 rounded-full flex items-center justify-center text-white text-lg font-semibold"
+            style={{
+              backgroundColor: user ? getAvatarByRole(user)?.color : "#4f46e5",
+            }}
+          >
+            {user?.name?.charAt(0) || "?"}
+          </div>
         </div>
         <div className="flex-grow">
           <form onSubmit={handleSubmit}>
@@ -130,34 +79,8 @@ const PostForm = ({ onPostCreated }) => {
               maxLength={500}
             />
 
-            {imagePreview && (
-              <div className="relative mt-2 rounded-lg overflow-hidden bg-gray-100">
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="max-h-60 w-auto mx-auto object-contain"
-                />
-                <button
-                  type="button"
-                  onClick={removeImage}
-                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                >
-                  <i className="fas fa-times"></i>
-                </button>
-              </div>
-            )}
-
             <div className="flex justify-between items-center mt-3">
               <div className="flex space-x-2 relative">
-                <label className="cursor-pointer text-gray-500 hover:text-blue-500 transition-colors p-2 rounded-full hover:bg-blue-50">
-                  <i className="far fa-image"></i>
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/jpg,image/gif"
-                    className="hidden"
-                    onChange={handleImageChange}
-                  />
-                </label>
                 <button
                   type="button"
                   className="text-gray-500 hover:text-blue-500 transition-colors p-2 rounded-full hover:bg-blue-50"
@@ -180,9 +103,9 @@ const PostForm = ({ onPostCreated }) => {
               </div>
               <button
                 type="submit"
-                disabled={loading || (!content.trim() && !image)}
+                disabled={loading || !content.trim()}
                 className={`${
-                  loading || (!content.trim() && !image)
+                  loading || !content.trim()
                     ? "bg-blue-300 cursor-not-allowed"
                     : "bg-blue-500 hover:bg-blue-600"
                 } text-white px-4 py-2 rounded-lg transition-colors`}
