@@ -348,6 +348,23 @@ const ChatInterface = ({ adminMode }) => {
   }, [user, reconnectAttempt]);
 
   useEffect(() => {
+    if (!socketRef.current) return;
+    if (selectedChat && selectedChat.chat && selectedChat.chat._id) {
+      socketRef.current.emit("join-room", selectedChat.chat._id);
+    }
+    return () => {
+      if (
+        socketRef.current &&
+        selectedChat &&
+        selectedChat.chat &&
+        selectedChat.chat._id
+      ) {
+        socketRef.current.emit("leave-room", selectedChat.chat._id);
+      }
+    };
+  }, [selectedChat]);
+
+  useEffect(() => {
     if (!user || !socketConnected || !socketRef.current) return;
     axios
       .get("http://localhost:4000/api/v1/user/all", { withCredentials: true })
@@ -374,10 +391,6 @@ const ChatInterface = ({ adminMode }) => {
         console.error("Error fetching users for chat rooms:", err)
       );
   }, [user, socketConnected]);
-
-  useEffect(() => {
-    fetchUsers();
-  }, [adminMode, user?.id]);
 
   useEffect(() => {
     if (selectedUser) {
@@ -445,16 +458,6 @@ const ChatInterface = ({ adminMode }) => {
       })
       .catch(() => setLoading(false));
   }, [user]);
-
-  useEffect(() => {
-    fetchUsersWithStatus();
-
-    const intervalId = setInterval(() => {
-      fetchUsersWithStatus(false);
-    }, 15000);
-
-    return () => clearInterval(intervalId);
-  }, []);
 
   const fetchUsersWithStatus = async (showLoading = true) => {
     if (showLoading) setLoading(true);
@@ -765,19 +768,6 @@ const ChatInterface = ({ adminMode }) => {
       console.error("Failed to send message:", err);
       toast.error(err.response?.data?.message || "Failed to send message");
       setMessages((prev) => prev.filter((msg) => !msg.isOptimistic));
-    }
-  };
-
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get("http://localhost:4000/api/v1/user/all", {
-        withCredentials: true,
-      });
-      setAllUsers(res.data.users);
-      setLoading(false);
-    } catch {
-      setLoading(false);
     }
   };
 
@@ -1135,22 +1125,6 @@ const AdminHeader = ({ user }) => (
         </div>
         <span className="hidden md:inline">{user?.name}</span>
       </Link>
-    </div>
-  </div>
-);
-
-const EmptyState = ({ setSidebarOpen }) => (
-  <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50/30">
-    <div className="text-center p-10 bg-white rounded-2xl shadow-sm max-w-md">
-      <div className="text-blue-600 mb-6 text-6xl">
-        <i className="far fa-comments"></i>
-      </div>
-      <h3 className="text-2xl font-medium text-gray-700 mb-3">
-        Select a conversation
-      </h3>
-      <p className="text-gray-500 mb-6">
-        Choose a user from the list to start chatting
-      </p>
     </div>
   </div>
 );

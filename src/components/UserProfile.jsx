@@ -23,7 +23,6 @@ const UserProfile = ({
     setUser,
   } = useContext(Context);
   const [loading, setLoading] = useState(false);
-  const [setAvatarPreview] = useState(null);
   const [activeTab, setActiveTab] = useState("profile");
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
@@ -62,20 +61,6 @@ const UserProfile = ({
       setProfileData(propUser);
     }
   }, [propUser, isModal]);
-
-  useEffect(() => {
-    if (displayedUser?.avatar) {
-      setAvatarPreview(null);
-    } else {
-      setAvatarPreview(null);
-    }
-  }, [displayedUser]);
-
-  useEffect(() => {
-    if (displayedUser?.name) {
-      setAvatarPreview(null);
-    }
-  }, [displayedUser]);
 
   useEffect(() => {
     if (displayedUser) {
@@ -340,8 +325,6 @@ const UserProfile = ({
       try {
         localStorage.setItem("user", JSON.stringify(response.data.user));
       } catch (err) {}
-
-      setAvatarPreview(null);
 
       toast.success(response.data.message || "Profile updated successfully!");
 
