@@ -25,6 +25,13 @@ const UserProfile = ({
   const [loading, setLoading] = useState(false);
   const [setAvatarPreview] = useState(null);
   const [activeTab, setActiveTab] = useState("profile");
+  const [followers, setFollowers] = useState([]);
+  const [following, setFollowing] = useState([]);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [userPosts, setUserPosts] = useState([]);
+  const [postsLoading, setPostsLoading] = useState(false);
+  const params = useParams();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -36,13 +43,6 @@ const UserProfile = ({
     confirmPassword: "",
     avatar: null,
   });
-  const [followers, setFollowers] = useState([]);
-  const [following, setFollowing] = useState([]);
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [userPosts, setUserPosts] = useState([]);
-  const [postsLoading, setPostsLoading] = useState(false);
-  const params = useParams();
-  const navigate = useNavigate();
 
   const userId = isModal ? propUser?._id : params?.userId || currentUser?._id;
   const isOwnProfile =
@@ -92,7 +92,7 @@ const UserProfile = ({
         oldPassword: "",
         newPassword: "",
         confirmPassword: "",
-        avatar: null, // keep for compatibility, but not used
+        avatar: null,
       });
     }
   }, [displayedUser]);
