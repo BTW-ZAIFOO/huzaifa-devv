@@ -24,6 +24,7 @@ const ChatWindow = ({
   const [isRecording, setIsRecording] = useState(false);
   const [recognition, setRecognition] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(null);
+  const [isSending, setIsSending] = useState(false);
   const { user: loggedInUser } = useContext(Context);
   const messagesEndRef = useRef(null);
   const isAdminChat = selectedUser?.role === "admin";
@@ -69,13 +70,20 @@ const ChatWindow = ({
     }
   }, [messages]);
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!canSendMessage()) return;
+    if (!canSendMessage() || isSending) return;
 
     if (messageText.trim()) {
-      onSendMessage(messageText);
-      setMessageText("");
+      setIsSending(true);
+      try {
+        await onSendMessage(messageText);
+        setMessageText("");
+      } catch (error) {
+        console.error("Error sending message:", error);
+      } finally {
+        setIsSending(false);
+      }
     }
   };
 
@@ -129,11 +137,18 @@ const ChatWindow = ({
       recognition.stop();
       setIsRecording(false);
 
-      setTimeout(() => {
+      setTimeout(async () => {
         if (messageText.trim()) {
-          onSendMessage(messageText, true);
-          toast.success("Voice message processed");
-          setMessageText("");
+          setIsSending(true);
+          try {
+            await onSendMessage(messageText, true);
+            toast.success("Voice message processed");
+            setMessageText("");
+          } catch (error) {
+            console.error("Error sending voice message:", error);
+          } finally {
+            setIsSending(false);
+          }
         } else {
           toast.warn("No speech detected. Please try again.");
         }
@@ -726,6 +741,7 @@ const ChatWindow = ({
           className={`p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl flex-shrink-0 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 transition-all mb-2 ${
             isMessageDisabled ||
             isChatDisabled ||
+            isSending ||
             (!messageText.trim() && !isRecording)
               ? "opacity-50 cursor-not-allowed"
               : ""
@@ -733,10 +749,15 @@ const ChatWindow = ({
           disabled={
             isMessageDisabled ||
             isChatDisabled ||
+            isSending ||
             (!messageText.trim() && !isRecording)
           }
         >
-          <i className="fas fa-paper-plane"></i>
+          {isSending ? (
+            <i className="fas fa-spinner fa-spin"></i>
+          ) : (
+            <i className="fas fa-paper-plane"></i>
+          )}
         </button>
       </form>
     </div>

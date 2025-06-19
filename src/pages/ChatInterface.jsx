@@ -288,7 +288,12 @@ const ChatInterface = ({ adminMode }) => {
 
       socketRef.current.on("new-message", (message) => {
         if (selectedChat && message.chat === selectedChat.chat._id) {
-          setMessages((prev) => [...prev, message]);
+          setMessages((prev) => {
+            if (prev.find((m) => m._id === message._id)) {
+              return prev;
+            }
+            return [...prev, message];
+          });
 
           if (message.sender._id !== user._id) {
             socketRef.current.emit("message-received", {
@@ -311,29 +316,6 @@ const ChatInterface = ({ adminMode }) => {
     };
 
     setupSocket();
-
-    socketRef.current.on("new-message", (message) => {
-      if (selectedChat && message.chat === selectedChat.chat._id) {
-        setMessages((prev) => [...prev, message]);
-
-        if (message.sender._id !== user._id) {
-          socketRef.current.emit("message-received", {
-            chatId: selectedChat.chat._id,
-            messageId: message._id,
-          });
-        }
-      } else if (message.sender._id !== user._id) {
-        setNotifications((prev) => [
-          {
-            chatId: message.chat,
-            sender: message.sender,
-            content: message.content,
-            createdAt: message.createdAt,
-          },
-          ...prev,
-        ]);
-      }
-    });
 
     return () => {
       if (socketRef.current) {
@@ -632,7 +614,7 @@ const ChatInterface = ({ adminMode }) => {
   const handleViewGroupMemberProfile = (member) => {
     const fullMemberData = allUsers.find((u) => u._id === member._id) || member;
     setSelectedMember(fullMemberData);
-    setProfileUser(fullMemberData); 
+    setProfileUser(fullMemberData);
     setShowGroupProfileSidebar(false);
     setShowProfileSidebar(true);
   };
@@ -642,7 +624,7 @@ const ChatInterface = ({ adminMode }) => {
     setSelectedUser(null);
     setMessages([]);
     setShowProfileSidebar(false);
-    setProfileUser(null); 
+    setProfileUser(null);
     setSelectedMember(null);
     if (user) {
       localStorage.removeItem(`chat_state_${user._id}`);
@@ -706,43 +688,25 @@ const ChatInterface = ({ adminMode }) => {
           formData.append("content", messageText);
         }
 
-        try {
-          res = await axios.post(
-            "http://localhost:4000/api/v1/message/send",
-            formData,
-            {
-              withCredentials: true,
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          );
-        } catch (err) {
-          console.error("Failed to send voice message:", err);
-          toast.error("Failed to send voice message. Please try again.");
-          setMessages((prev) =>
-            prev.filter((msg) => msg._id !== optimisticMessage._id)
-          );
-          return;
-        }
-      } else {
-        try {
-          res = await axios.post(
-            "http://localhost:4000/api/v1/message/send",
-            {
-              chatId: selectedChat.chat._id,
-              content: messageText,
+        res = await axios.post(
+          "http://localhost:4000/api/v1/message/send",
+          formData,
+          {
+            withCredentials: true,
+            headers: {
+              "Content-Type": "multipart/form-data",
             },
-            { withCredentials: true }
-          );
-        } catch (err) {
-          console.error("Failed to send message:", err);
-          toast.error("Failed to send message. Please try again.");
-          setMessages((prev) =>
-            prev.filter((msg) => msg._id !== optimisticMessage._id)
-          );
-          return;
-        }
+          }
+        );
+      } else {
+        res = await axios.post(
+          "http://localhost:4000/api/v1/message/send",
+          {
+            chatId: selectedChat.chat._id,
+            content: messageText,
+          },
+          { withCredentials: true }
+        );
       }
 
       setMessages((prev) =>

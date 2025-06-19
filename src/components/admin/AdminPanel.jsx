@@ -205,7 +205,13 @@ const AdminPanel = ({ users: initialUsers }) => {
       isVoice,
     };
 
-    setMessages((prev) => [...prev, newMessage]);
+    setMessages((prev) => {
+      if (prev.find((m) => m._id === newMessage._id)) {
+        return prev;
+      }
+      return [...prev, newMessage];
+    });
+
     logAdminActivity(`Sent message to ${selectedUser.name}`);
   };
 
