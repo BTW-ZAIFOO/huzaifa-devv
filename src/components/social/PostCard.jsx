@@ -299,7 +299,7 @@ const PostCard = ({
     >
       <div className="flex items-center gap-3 px-5 pt-5 pb-2 relative">
         <div className="flex-shrink-0">
-          {(() => {
+          {() => {
             const authorObj = post.author || post.user || {};
             const avatar = getAvatarByRole(authorObj);
             if (avatar.imageUrl) {
@@ -321,7 +321,7 @@ const PostCard = ({
                 {avatar.initials}
               </div>
             );
-          })()}
+          }}
         </div>
         <div className="flex-1">
           <Link

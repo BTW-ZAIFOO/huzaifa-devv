@@ -459,7 +459,7 @@ const ChatInterface = ({ adminMode }) => {
       .catch(() => setLoading(false));
   }, [user]);
 
-  const fetchUsersWithStatus = async (showLoading = true) => {
+  const fetchUsers = async (showLoading = true) => {
     if (showLoading) setLoading(true);
 
     try {
@@ -486,20 +486,6 @@ const ChatInterface = ({ adminMode }) => {
       });
 
       setAllUsers(usersWithVerifiedStatus);
-
-      if (selectedUser) {
-        const updatedSelectedUser = usersWithVerifiedStatus.find(
-          (u) => u._id === selectedUser._id || u.id === selectedUser._id
-        );
-
-        if (updatedSelectedUser) {
-          setSelectedUser((prev) => ({
-            ...prev,
-            status: updatedSelectedUser.status,
-            lastSeen: updatedSelectedUser.lastSeen,
-          }));
-        }
-      }
     } catch (error) {
       console.error("Error fetching users:", error);
     } finally {

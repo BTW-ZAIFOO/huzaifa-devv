@@ -8,16 +8,17 @@ const checkServerStatus = () => {
   })
     .then((response) => {
       if (response.ok) {
-        console.log("✅ Server is running and accessible");
         return response.json();
       }
-      throw new Error(`Server returned status: ${response.status}`);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     })
     .then((data) => {
+      console.log("✅ Server is running and healthy");
       console.log("Server response:", data);
+      console.log("Connection successful!");
     })
     .catch((error) => {
-      console.error("❌ Server connection failed:", error);
+      console.error("❌ Server connection failed:", error.message);
       console.log("\nPossible reasons:");
       console.log(
         '1. Server is not running - start it with "npm start" in the server directory'

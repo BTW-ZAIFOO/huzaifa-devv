@@ -11,6 +11,7 @@ import {
   extractInappropriateWords,
   containsInappropriateContent,
 } from "../../utils/moderationUtils";
+import { getAvatarByRole } from "../../utils/avatarUtils";
 import io from "socket.io-client";
 
 const AdminPanel = ({ users: initialUsers }) => {

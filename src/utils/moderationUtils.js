@@ -128,6 +128,18 @@ export const INAPPROPRIATE_WORDS = [
   "teri behan ka loda",
 ];
 
+const inappropriateWords = [
+  "spam",
+  "abuse",
+  "hate",
+  "violence",
+  "inappropriate",
+  "offensive",
+  "harassment",
+  "bullying",
+  "threat",
+];
+
 const createWordRegex = (word) => new RegExp(`\\b${word}\\b`, "i");
 export const containsInappropriateContent = (text, additionalWords = []) => {
   if (!text || typeof text !== "string") return false;
@@ -136,6 +148,18 @@ export const containsInappropriateContent = (text, additionalWords = []) => {
   const textLower = text.toLowerCase();
 
   return wordsToCheck.some((word) => createWordRegex(word).test(textLower));
+};
+
+export const extractInappropriateWords = (text, additionalWords = []) => {
+  if (!text || typeof text !== "string") return [];
+
+  const wordsToCheck = [...INAPPROPRIATE_WORDS, ...additionalWords];
+  const textLower = text.toLowerCase();
+  const words = textLower.split(/\s+/);
+
+  return wordsToCheck.filter((word) =>
+    words.some((w) => w.includes(word.toLowerCase()))
+  );
 };
 
 export const highlightInappropriateContent = (text, additionalWords = []) => {
@@ -153,13 +177,6 @@ export const highlightInappropriateContent = (text, additionalWords = []) => {
   });
 
   return highlighted;
-};
-
-export const extractInappropriateWords = (text, additionalWords = []) => {
-  if (!text || typeof text !== "string") return [];
-  const wordsToCheck = [...INAPPROPRIATE_WORDS, ...additionalWords];
-  const textLower = text.toLowerCase();
-  return wordsToCheck.filter((word) => createWordRegex(word).test(textLower));
 };
 
 export const logDeletedMessage = (
@@ -255,4 +272,24 @@ export const formatInterests = (interests) => {
       .filter(Boolean);
   }
   return [];
+};
+
+export const sanitizeMessage = (message) => {
+  if (!message || typeof message !== "string") return "";
+
+  return message
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
+export const validateMessageLength = (message, maxLength = 500) => {
+  if (!message) return { isValid: false, error: "Message cannot be empty" };
+  if (message.length > maxLength) {
+    return {
+      isValid: false,
+      error: `Message too long. Maximum ${maxLength} characters allowed.`,
+    };
+  }
+  return { isValid: true, error: null };
 };

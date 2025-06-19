@@ -68,23 +68,55 @@ export const simpleHashFromString = (str) => {
 };
 
 export const getAvatarByRole = (user) => {
-  if (!user) return generateDefaultAvatar();
-  if (user.role === "admin") return generateAdminAvatar(user);
-  return generateAvatar(user);
+  if (!user) {
+    return {
+      color: "#6b7280",
+      initials: "?",
+      imageUrl: null,
+    };
+  }
+
+  const initials = user.name ? user.name.charAt(0).toUpperCase() : "?";
+
+  if (user.avatar && typeof user.avatar === "string") {
+    return {
+      color: getRoleColor(user.role),
+      initials,
+      imageUrl: user.avatar,
+    };
+  }
+
+  return {
+    color: getRoleColor(user.role),
+    initials,
+    imageUrl: null,
+  };
 };
 
-export const getAvatarUrl = (user) => {
-  if (!user) return null;
-  if (typeof user.avatar === "string" && user.avatar.startsWith("http")) {
-    return user.avatar;
+const getRoleColor = (role) => {
+  switch (role) {
+    case "admin":
+      return "#dc2626";
+    case "moderator":
+      return "#ea580c";
+    case "premium":
+      return "#7c3aed";
+    case "user":
+    default:
+      return "#2563eb";
   }
-  if (user.profilePicture && typeof user.profilePicture === "string") {
-    return user.profilePicture;
-  }
-  if (user.name) {
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(
-      user.name
-    )}&background=random&color=fff`;
-  }
-  return null;
+};
+
+export const generateAvatarUrl = (name, role) => {
+  const colors = {
+    admin: "dc2626",
+    moderator: "ea580c",
+    premium: "7c3aed",
+    user: "2563eb",
+  };
+
+  const color = colors[role] || colors.user;
+  const initials = name ? name.charAt(0).toUpperCase() : "?";
+
+  return `https://ui-avatars.com/api/?name=${initials}&background=${color}&color=fff&size=128`;
 };

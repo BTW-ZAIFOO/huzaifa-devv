@@ -368,17 +368,31 @@ const UserProfile = ({
           </div>
           <div className="flex flex-col items-center">
             <div className="relative mb-4">
-              <div
-                className="w-24 h-24 rounded-full border-4 border-blue-100 flex items-center justify-center text-white text-3xl font-bold"
-                style={{
-                  backgroundColor:
-                    getAvatarByRole(displayedUser)?.color || "#4f46e5",
-                }}
-              >
-                {getAvatarByRole(displayedUser)?.initials ||
-                  displayedUser?.name?.charAt(0) ||
-                  "?"}
-              </div>
+              {() => {
+                const avatar = getAvatarByRole(displayedUser);
+                return (
+                  <div
+                    className="w-24 h-24 rounded-full border-4 border-blue-100 flex items-center justify-center text-white text-3xl font-bold overflow-hidden shadow-sm"
+                    style={{
+                      backgroundColor: avatar?.color || "#4f46e5",
+                    }}
+                  >
+                    {avatar?.imageUrl ? (
+                      <img
+                        src={avatar.imageUrl}
+                        alt={displayedUser?.name || "User"}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="font-medium">
+                        {avatar?.initials ||
+                          displayedUser?.name?.charAt(0) ||
+                          "?"}
+                      </span>
+                    )}
+                  </div>
+                );
+              }}
               <span
                 className={`absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full ${getStatusColor()} border-2 border-white`}
               ></span>
@@ -594,17 +608,31 @@ const UserProfile = ({
             <div className="absolute -top-20 left-1/2 transform -translate-x-1/2">
               <div className="relative group">
                 <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-400 to-purple-600 blur-md opacity-75 group-hover:opacity-100 transition-opacity duration-300 scale-110"></div>
-                <div
-                  className="w-36 h-36 rounded-full border-4 border-white shadow-lg flex items-center justify-center text-white text-4xl font-bold relative"
-                  style={{
-                    backgroundColor:
-                      getAvatarByRole(displayedUser)?.color || "#4f46e5",
-                  }}
-                >
-                  {getAvatarByRole(displayedUser)?.initials ||
-                    displayedUser?.name?.charAt(0) ||
-                    "?"}
-                </div>
+                {() => {
+                  const avatar = getAvatarByRole(displayedUser);
+                  return (
+                    <div
+                      className="w-36 h-36 rounded-full border-4 border-white shadow-lg flex items-center justify-center text-white text-4xl font-bold relative overflow-hidden"
+                      style={{
+                        backgroundColor: avatar?.color || "#4f46e5",
+                      }}
+                    >
+                      {avatar?.imageUrl ? (
+                        <img
+                          src={avatar.imageUrl}
+                          alt={displayedUser?.name || "User"}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="font-medium">
+                          {avatar?.initials ||
+                            displayedUser?.name?.charAt(0) ||
+                            "?"}
+                        </span>
+                      )}
+                    </div>
+                  );
+                }}
               </div>
             </div>
             <h1 className="text-3xl font-bold mt-2 text-gray-800 tracking-tight">
