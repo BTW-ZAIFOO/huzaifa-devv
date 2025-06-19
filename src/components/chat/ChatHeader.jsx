@@ -265,13 +265,28 @@ const ChatHeader = ({
             className="flex items-center gap-2 text-gray-600 hover:text-blue-600"
           >
             {user && (
-              <div
-                className="w-8 h-8 rounded-full flex items-center justify-center text-white overflow-hidden shadow-sm"
-                style={{ backgroundColor: avatar?.color || "#4f46e5" }}
-              >
-                <span className="font-medium text-sm">
-                  {avatar?.initials || user?.name?.charAt(0) || "?"}
-                </span>
+              <div className="relative">
+                {avatar?.imageUrl ? (
+                  <img
+                    src={avatar.imageUrl}
+                    alt={user?.name || "User"}
+                    className="w-8 h-8 rounded-full object-cover shadow-sm"
+                    onError={(e) => {
+                      e.target.style.display = "none";
+                      e.target.nextSibling.style.display = "flex";
+                    }}
+                  />
+                ) : null}
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-white overflow-hidden shadow-sm ${
+                    avatar?.imageUrl ? "hidden" : "flex"
+                  }`}
+                  style={{ backgroundColor: avatar?.color || "#4f46e5" }}
+                >
+                  <span className="font-medium text-sm">
+                    {avatar?.initials || user?.name?.charAt(0) || "?"}
+                  </span>
+                </div>
               </div>
             )}
             <span className="hidden md:inline">{user?.name || "User"}</span>

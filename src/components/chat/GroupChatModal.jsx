@@ -150,9 +150,9 @@ const GroupChatModal = ({ isOpen, onClose, onGroupCreated }) => {
                     >
                       <div className="flex items-center">
                         <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-2">
-                          {user.name.charAt(0).toUpperCase()}
+                          {user?.name?.charAt(0)?.toUpperCase() || "?"}
                         </div>
-                        <span>{user.name}</span>
+                        <span>{user?.name || "Unknown User"}</span>
                       </div>
                       <button
                         type="button"
@@ -179,9 +179,9 @@ const GroupChatModal = ({ isOpen, onClose, onGroupCreated }) => {
                   >
                     <div className="flex items-center">
                       <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-2">
-                        {user.name.charAt(0).toUpperCase()}
+                        {user?.name?.charAt(0)?.toUpperCase() || "?"}
                       </div>
-                      <span>{user.name}</span>
+                      <span>{user?.name || "Unknown User"}</span>
                     </div>
                     <button
                       type="button"

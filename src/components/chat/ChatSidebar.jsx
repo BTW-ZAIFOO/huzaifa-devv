@@ -248,7 +248,7 @@ const ChatSidebar = ({
                                 {avatar?.imageUrl ? (
                                   <img
                                     src={avatar.imageUrl}
-                                    alt={user.name || "User"}
+                                    alt={user?.name || "User"}
                                     className={`w-12 h-12 rounded-full object-cover border border-gray-200 shadow-sm ${
                                       user.status === "blocked"
                                         ? "opacity-75"
@@ -257,31 +257,30 @@ const ChatSidebar = ({
                                         : ""
                                     }`}
                                     onError={(e) => {
-                                      e.target.onerror = null;
-                                      e.target.src =
-                                        "https://ui-avatars.com/api/?name=" +
-                                        (user.name || "User");
+                                      e.target.style.display = "none";
+                                      e.target.nextSibling.style.display =
+                                        "flex";
                                     }}
                                   />
-                                ) : (
-                                  <div
-                                    className={`w-12 h-12 rounded-full border border-gray-200 shadow-sm flex items-center justify-center text-white font-medium text-lg ${
-                                      user.status === "blocked"
-                                        ? "opacity-75"
-                                        : user.status === "banned"
-                                        ? "opacity-60 grayscale"
-                                        : ""
-                                    }`}
-                                    style={{
-                                      backgroundColor:
-                                        avatar?.color || "#4f46e5",
-                                    }}
-                                  >
-                                    {avatar?.initials ||
-                                      user.name?.charAt(0) ||
-                                      "?"}
-                                  </div>
-                                )}
+                                ) : null}
+                                <div
+                                  className={`w-12 h-12 rounded-full border border-gray-200 shadow-sm flex items-center justify-center text-white font-medium text-lg ${
+                                    avatar?.imageUrl ? "hidden" : "flex"
+                                  } ${
+                                    user.status === "blocked"
+                                      ? "opacity-75"
+                                      : user.status === "banned"
+                                      ? "opacity-60 grayscale"
+                                      : ""
+                                  }`}
+                                  style={{
+                                    backgroundColor: avatar?.color || "#4f46e5",
+                                  }}
+                                >
+                                  {avatar?.initials ||
+                                    user?.name?.charAt(0) ||
+                                    "?"}
+                                </div>
                                 {userNotifications.length > 0 && (
                                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 min-w-5 px-1 flex items-center justify-center">
                                     {userNotifications.length > 9

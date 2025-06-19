@@ -368,31 +368,36 @@ const UserProfile = ({
           </div>
           <div className="flex flex-col items-center">
             <div className="relative mb-4">
-              {() => {
+              {(() => {
                 const avatar = getAvatarByRole(displayedUser);
                 return (
-                  <div
-                    className="w-24 h-24 rounded-full border-4 border-blue-100 flex items-center justify-center text-white text-3xl font-bold overflow-hidden shadow-sm"
-                    style={{
-                      backgroundColor: avatar?.color || "#4f46e5",
-                    }}
-                  >
-                    {avatar?.imageUrl ? (
+                  <div className="relative">
+                    {avatar?.imageUrl && (
                       <img
                         src={avatar.imageUrl}
                         alt={displayedUser?.name || "User"}
-                        className="w-full h-full object-cover"
+                        className="w-24 h-24 rounded-full border-4 border-blue-100 object-cover shadow-sm"
+                        onError={(e) => {
+                          e.target.style.display = "none";
+                          e.target.nextSibling.style.display = "flex";
+                        }}
                       />
-                    ) : (
-                      <span className="font-medium">
-                        {avatar?.initials ||
-                          displayedUser?.name?.charAt(0) ||
-                          "?"}
-                      </span>
                     )}
+                    <div
+                      className={`w-24 h-24 rounded-full border-4 border-blue-100 flex items-center justify-center text-white text-3xl font-bold overflow-hidden shadow-sm ${
+                        avatar?.imageUrl ? "hidden" : "flex"
+                      }`}
+                      style={{
+                        backgroundColor: avatar?.color || "#4f46e5",
+                      }}
+                    >
+                      <span className="font-medium">
+                        {avatar?.initials || "?"}
+                      </span>
+                    </div>
                   </div>
                 );
-              }}
+              })()}
               <span
                 className={`absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full ${getStatusColor()} border-2 border-white`}
               ></span>
@@ -611,25 +616,30 @@ const UserProfile = ({
                 {() => {
                   const avatar = getAvatarByRole(displayedUser);
                   return (
-                    <div
-                      className="w-36 h-36 rounded-full border-4 border-white shadow-lg flex items-center justify-center text-white text-4xl font-bold relative overflow-hidden"
-                      style={{
-                        backgroundColor: avatar?.color || "#4f46e5",
-                      }}
-                    >
-                      {avatar?.imageUrl ? (
+                    <div className="relative">
+                      {avatar?.imageUrl && (
                         <img
                           src={avatar.imageUrl}
                           alt={displayedUser?.name || "User"}
-                          className="w-full h-full object-cover"
+                          className="w-36 h-36 rounded-full border-4 border-white shadow-lg relative object-cover"
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                            e.target.nextSibling.style.display = "flex";
+                          }}
                         />
-                      ) : (
-                        <span className="font-medium">
-                          {avatar?.initials ||
-                            displayedUser?.name?.charAt(0) ||
-                            "?"}
-                        </span>
                       )}
+                      <div
+                        className={`w-36 h-36 rounded-full border-4 border-white shadow-lg flex items-center justify-center text-white text-4xl font-bold relative overflow-hidden ${
+                          avatar?.imageUrl ? "hidden" : "flex"
+                        }`}
+                        style={{
+                          backgroundColor: avatar?.color || "#4f46e5",
+                        }}
+                      >
+                        <span className="font-medium">
+                          {avatar?.initials || "?"}
+                        </span>
+                      </div>
                     </div>
                   );
                 }}

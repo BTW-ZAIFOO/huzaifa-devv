@@ -34,6 +34,7 @@ const ChatInterface = ({ adminMode }) => {
   const [showGroupProfileSidebar, setShowGroupProfileSidebar] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedMember, setSelectedMember] = useState(null);
+  const [profileUser, setProfileUser] = useState(null);
   const socketRef = useRef(null);
   const heartbeatRef = useRef(null);
   const SOCKET_URL = "http://localhost:4000";
@@ -631,6 +632,7 @@ const ChatInterface = ({ adminMode }) => {
   const handleViewGroupMemberProfile = (member) => {
     const fullMemberData = allUsers.find((u) => u._id === member._id) || member;
     setSelectedMember(fullMemberData);
+    setProfileUser(fullMemberData); 
     setShowGroupProfileSidebar(false);
     setShowProfileSidebar(true);
   };
@@ -640,6 +642,8 @@ const ChatInterface = ({ adminMode }) => {
     setSelectedUser(null);
     setMessages([]);
     setShowProfileSidebar(false);
+    setProfileUser(null); 
+    setSelectedMember(null);
     if (user) {
       localStorage.removeItem(`chat_state_${user._id}`);
     }
@@ -1031,20 +1035,21 @@ const ChatInterface = ({ adminMode }) => {
                     onBanUser={isAdmin ? handleBanUser : null}
                     onCloseChat={clearSelectedChat}
                   />
-                  {showProfileSidebar && (selectedUser || selectedMember) && (
-                    <UserProfile
-                      user={selectedMember || selectedUser}
-                      onClose={() => {
-                        setShowProfileSidebar(false);
-                        setSelectedMember(null);
-                        setSelectedUser(true);
-                      }}
-                      isAdmin={isAdmin}
-                      onBlockUser={isAdmin ? handleBanUser : null}
-                      onReportUser={isAdmin ? handleReportUser : null}
-                      isModal={true}
-                    />
-                  )}
+                  {showProfileSidebar &&
+                    (selectedUser || selectedMember || profileUser) && (
+                      <UserProfile
+                        user={profileUser || selectedMember || selectedUser}
+                        onClose={() => {
+                          setShowProfileSidebar(false);
+                          setSelectedMember(null);
+                          setProfileUser(null);
+                        }}
+                        isAdmin={isAdmin}
+                        onBlockUser={isAdmin ? handleBanUser : null}
+                        onReportUser={isAdmin ? handleReportUser : null}
+                        isModal={true}
+                      />
+                    )}
                   {showGroupProfileSidebar &&
                     (selectedGroup &&
                     selectedGroup._id === selectedChat.chat._id ? (

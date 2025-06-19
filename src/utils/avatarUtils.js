@@ -76,20 +76,31 @@ export const getAvatarByRole = (user) => {
     };
   }
 
-  const initials = user.name ? user.name.charAt(0).toUpperCase() : "?";
+  let initials = "?";
+  if (user.name && typeof user.name === "string") {
+    const nameParts = user.name.trim().split(" ");
+    if (nameParts.length >= 2) {
+      initials = (nameParts[0][0] + nameParts[1][0]).toUpperCase();
+    } else if (nameParts[0]) {
+      initials = nameParts[0][0].toUpperCase();
+    }
+  } else if (user.email && typeof user.email === "string") {
+    initials = user.email[0].toUpperCase();
+  }
 
-  if (user.avatar && typeof user.avatar === "string") {
-    return {
-      color: getRoleColor(user.role),
-      initials,
-      imageUrl: user.avatar,
-    };
+  let imageUrl = null;
+  if (user.avatar) {
+    if (typeof user.avatar === "string") {
+      imageUrl = user.avatar;
+    } else if (user.avatar.imageUrl) {
+      imageUrl = user.avatar.imageUrl;
+    }
   }
 
   return {
     color: getRoleColor(user.role),
     initials,
-    imageUrl: null,
+    imageUrl,
   };
 };
 

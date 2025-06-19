@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { getAvatarByRole } from "../../utils/avatarUtils";
 
 const UserProfileSidebar = ({ user }) => {
-  const avatar = getAvatarByRole(user);
   return (
     <div
       className="bg-white rounded-xl shadow-sm overflow-hidden sticky top-20 animate-fade-in"
@@ -12,12 +11,34 @@ const UserProfileSidebar = ({ user }) => {
       <div className="h-24 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
       <div className="px-5 pb-5 relative">
         <div className="absolute -top-10">
-          <div
-            className="w-20 h-20 rounded-full border-4 border-white flex items-center justify-center text-white text-2xl"
-            style={{ backgroundColor: avatar?.color || "#4f46e5" }}
-          >
-            {avatar?.initials || user?.name?.charAt(0) || "?"}
-          </div>
+          {(() => {
+            const avatar = getAvatarByRole(user);
+            return (
+              <div className="relative">
+                {avatar?.imageUrl ? (
+                  <img
+                    src={avatar.imageUrl}
+                    alt={user?.name || "User"}
+                    className="w-20 h-20 rounded-full border-4 border-white object-cover"
+                    onError={(e) => {
+                      e.target.style.display = "none";
+                      e.target.nextSibling.style.display = "flex";
+                    }}
+                  />
+                ) : null}
+                <div
+                  className={`w-20 h-20 rounded-full border-4 border-white flex items-center justify-center text-white text-2xl ${
+                    avatar?.imageUrl ? "hidden" : "flex"
+                  }`}
+                  style={{
+                    backgroundColor: avatar?.color || "#4f46e5",
+                  }}
+                >
+                  {avatar?.initials || user?.name?.charAt(0) || "?"}
+                </div>
+              </div>
+            );
+          })()}
         </div>
         <div className="pt-12">
           <h2 className="font-bold text-xl text-gray-800">{user?.name}</h2>

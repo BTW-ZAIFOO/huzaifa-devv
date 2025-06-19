@@ -57,8 +57,21 @@ const GroupProfileSidebar = ({ group, onClose, onViewUserProfile }) => {
                     }
                   >
                     <div className="relative mr-3">
+                      {avatar?.imageUrl ? (
+                        <img
+                          src={avatar.imageUrl}
+                          alt={member?.name || "User"}
+                          className="h-10 w-10 rounded-full object-cover"
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                            e.target.nextSibling.style.display = "flex";
+                          }}
+                        />
+                      ) : null}
                       <div
-                        className="h-10 w-10 rounded-full flex items-center justify-center text-white font-medium"
+                        className={`h-10 w-10 rounded-full flex items-center justify-center text-white font-medium ${
+                          avatar?.imageUrl ? "hidden" : "flex"
+                        }`}
                         style={{ backgroundColor: avatar?.color || "#4f46e5" }}
                       >
                         {avatar?.initials || member.name?.charAt(0) || "?"}
