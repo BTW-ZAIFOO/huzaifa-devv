@@ -1129,4 +1129,18 @@ const AdminHeader = ({ user }) => (
   </div>
 );
 
+const EmptyState = ({ setSidebarOpen }) => (
+  <div className="flex flex-col items-center justify-center h-full w-full">
+    <div className="text-6xl mb-4 text-gray-300">
+      <i className="fas fa-comments"></i>
+    </div>
+    <h2 className="text-xl font-semibold text-gray-700 mb-2">
+      Select a chat to start messaging
+    </h2>
+    <p className="text-gray-500 mb-4">
+      Choose a user from the sidebar to begin a conversation.
+    </p>
+  </div>
+);
+
 export default ChatInterface;

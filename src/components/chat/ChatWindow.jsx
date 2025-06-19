@@ -8,10 +8,6 @@ import {
 } from "../../utils/moderationUtils";
 import axios from "axios";
 
-function getAvatarUrl(user) {
-  return user && user.avatarUrl ? user.avatarUrl : null;
-}
-
 const ChatWindow = ({
   selectedUser,
   messages,
