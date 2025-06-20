@@ -42,11 +42,9 @@ const UserProfile = ({
     confirmPassword: "",
     avatar: null,
   });
-
   const userId = isModal ? propUser?._id : params?.userId || currentUser?._id;
   const isOwnProfile =
     !isModal && (!params?.userId || params?.userId === currentUser?._id);
-
   const [profileData, setProfileData] = useState(
     isModal ? propUser : currentUser
   );

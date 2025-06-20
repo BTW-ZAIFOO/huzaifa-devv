@@ -388,11 +388,9 @@ const ChatWindow = ({
       containsInappropriateContent(messageText, flaggedWords);
     const isDeleted = message.isDeleted;
     const isPermanentlyDeleted = message.permanentlyDeleted;
-
     const senderName =
       message.sender?.name ||
       selectedUser?.participants?.find((p) => p._id === senderId)?.name;
-
     const uniqueKey = `message-${message._id || message.id || index}-${
       message.createdAt || Date.now()
     }-${senderId}`;
@@ -499,6 +497,7 @@ const ChatWindow = ({
                 >
                   <i className="fas fa-ellipsis-v h-14"></i>
                 </button>
+
                 {dropdownOpen === (message._id || message.id) && (
                   <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg border border-gray-200 z-50">
                     {isMe ? (

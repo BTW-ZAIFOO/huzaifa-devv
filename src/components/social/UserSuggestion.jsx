@@ -7,7 +7,6 @@ import { toast } from "react-toastify";
 
 const UserSuggestion = ({ users = [] }) => {
   const { user: currentUser } = useContext(Context);
-
   const handleFollow = async (userId) => {
     try {
       await axios.post(

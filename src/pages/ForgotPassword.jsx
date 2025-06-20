@@ -6,7 +6,6 @@ import { Link } from "react-router-dom";
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
   const handleForgotPassword = async (e) => {
     e.preventDefault();
     setIsLoading(true);

@@ -21,7 +21,6 @@ const ChatHeader = ({
     incomingNotifications.length > 0 || unreadSystemNotifications.length > 0;
   const markNotificationsAsRead = () => {
     if (!currentUser || !currentUser.notifications) return;
-
     currentUser.notifications = currentUser.notifications.map((n) => ({
       ...n,
       read: true,

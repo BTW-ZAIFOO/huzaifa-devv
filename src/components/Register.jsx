@@ -7,7 +7,6 @@ import { toast } from "react-toastify";
 const Register = () => {
   const navigateTo = useNavigate();
   const { register, handleSubmit } = useForm();
-
   const handleRegister = async (data) => {
     try {
       const response = await axios.post(

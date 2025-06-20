@@ -25,6 +25,10 @@ const PostCard = ({
   const [loading, setLoading] = useState(false);
   const [showModActions, setShowModActions] = useState(false);
   const [showShareOptions, setShowShareOptions] = useState(false);
+  const optionsRef = useRef(null);
+  const isAuthor = (post.author?._id || post.user?._id) === user?._id;
+  const postedTime = new Date(post.createdAt);
+  const timeAgo = formatTimeAgo(postedTime);
   const [saved, setSaved] = useState(() => {
     try {
       const savedPosts = JSON.parse(localStorage.getItem("savedPosts") || "[]");
@@ -33,10 +37,6 @@ const PostCard = ({
       return false;
     }
   });
-  const optionsRef = useRef(null);
-  const isAuthor = (post.author?._id || post.user?._id) === user?._id;
-  const postedTime = new Date(post.createdAt);
-  const timeAgo = formatTimeAgo(postedTime);
 
   useEffect(() => {
     function handleClickOutside(event) {
