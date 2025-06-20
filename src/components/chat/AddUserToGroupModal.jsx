@@ -32,7 +32,6 @@ const AddUserToGroupModal = ({ group, isOpen, onClose, onAddUser }) => {
 
       if (response.ok) {
         const users = await response.json();
-        // Filter out users already in the group
         const existingUserIds = group.participants?.map((p) => p._id) || [];
         const filteredUsers = users.filter(
           (user) => !existingUserIds.includes(user._id)

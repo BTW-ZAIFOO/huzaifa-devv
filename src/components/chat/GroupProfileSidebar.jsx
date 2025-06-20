@@ -9,7 +9,7 @@ const GroupProfileSidebar = ({
   onGroupUpdate,
 }) => {
   const [showAddUserModal, setShowAddUserModal] = useState(false);
-  const [currentUser, setCurrentUser] = useState(() => {
+  const [currentUser] = useState(() => {
     try {
       const userData = localStorage.getItem("user");
       return userData ? JSON.parse(userData) : null;

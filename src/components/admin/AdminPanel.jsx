@@ -47,8 +47,12 @@ const AdminPanel = ({ users: initialUsers }) => {
 
     socketRef.current.on("connect", () => {
       socketRef.current.emit("join-admin-room");
+      socketRef.current.emit("authenticate", adminUser._id);
     });
+
     socketRef.current.on("admin-message-monitor", (message) => {
+      console.log("Admin monitoring new message:", message);
+
       setMessageQueue((prev) => [message, ...prev].slice(0, 50));
 
       if (containsInappropriateContent(message.content)) {
@@ -82,7 +86,18 @@ const AdminPanel = ({ users: initialUsers }) => {
           message.content.substring(0, 50) +
           (message.content.length > 50 ? "..." : ""),
         timestamp: message.createdAt,
+        realTime: true,
       });
+    });
+
+    socketRef.current.on("user-status-updated", (userData) => {
+      setUsers((prevUsers) =>
+        prevUsers.map((u) =>
+          u._id === userData.userId
+            ? { ...u, status: userData.status, lastSeen: userData.lastSeen }
+            : u
+        )
+      );
     });
 
     socketRef.current.on("user-profile-updated", (updatedUserData) => {

@@ -10,8 +10,6 @@ const ChatSidebar = ({
   selectedUser,
   onSelectUser,
   isAdmin,
-  onBlockUser,
-  onReportUser,
   loading,
   showAdminChat,
   notifications = [],
@@ -128,6 +126,169 @@ const ChatSidebar = ({
     return date.toLocaleDateString();
   };
 
+  const renderUserItem = (user) => {
+    const userId = user._id?.toString() || user.id?.toString();
+    const selectedId =
+      selectedUser?._id?.toString() || selectedUser?.id?.toString();
+    const userNotifications = notifications.filter(
+      (n) => n.sender?._id === userId || n.chatId === user.chatId
+    );
+    const avatar = getAvatarByRole(user);
+    const isSelected = selectedId === userId;
+    const hasUnreadMessages = userNotifications.length > 0;
+
+    let borderClass = "";
+    if (user.isReported) borderClass = "border-l-4 border-yellow-500";
+    else if (user.status === "blocked")
+      borderClass = "border-l-4 border-red-400";
+    else if (user.status === "banned") borderClass = "border-l-4 border-black";
+    else if (hasUnreadMessages) borderClass = "border-l-4 border-blue-500";
+
+    return (
+      <li key={userId} className="mb-1">
+        <button
+          className={`w-full flex items-center px-3 py-2.5 rounded-xl ${
+            isSelected
+              ? "bg-gradient-to-r from-blue-50 to-blue-100 shadow-sm"
+              : hasUnreadMessages
+              ? "bg-blue-50/50 hover:bg-blue-100/50"
+              : "hover:bg-gray-50"
+          } transition-all ${borderClass} relative`}
+          onClick={() => onSelectUser(user)}
+        >
+          <div className="relative">
+            {avatar?.imageUrl ? (
+              <img
+                src={avatar.imageUrl}
+                alt={user?.name || "User"}
+                className={`w-12 h-12 rounded-full object-cover border border-gray-200 shadow-sm ${
+                  user.status === "blocked"
+                    ? "opacity-75"
+                    : user.status === "banned"
+                    ? "opacity-60 grayscale"
+                    : ""
+                }`}
+                onError={(e) => {
+                  e.target.style.display = "none";
+                  e.target.nextSibling.style.display = "flex";
+                }}
+              />
+            ) : null}
+            <div
+              className={`w-12 h-12 rounded-full border border-gray-200 shadow-sm flex items-center justify-center text-white font-medium text-lg ${
+                avatar?.imageUrl ? "hidden" : "flex"
+              } ${
+                user.status === "blocked"
+                  ? "opacity-75"
+                  : user.status === "banned"
+                  ? "opacity-60 grayscale"
+                  : ""
+              }`}
+              style={{
+                backgroundColor: avatar?.color || "#4f46e5",
+              }}
+            >
+              {avatar?.initials || user?.name?.charAt(0) || "?"}
+            </div>
+
+            {hasUnreadMessages && (
+              <div className="absolute -top-1 -right-1 flex">
+                <span className="bg-blue-500 text-white text-xs rounded-full h-5 min-w-5 px-1 flex items-center justify-center animate-pulse">
+                  {userNotifications.length > 9
+                    ? "9+"
+                    : userNotifications.length}
+                </span>
+              </div>
+            )}
+
+            <span
+              className={`absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full border-2 border-white ${
+                user.status === "online"
+                  ? "bg-green-500"
+                  : user.status === "blocked"
+                  ? "bg-red-500"
+                  : user.status === "banned"
+                  ? "bg-black"
+                  : "bg-gray-400"
+              }`}
+            />
+          </div>
+
+          <div className="ml-3 flex-1 text-left">
+            <div className="flex justify-between items-center">
+              <h3
+                className={`font-medium ${
+                  hasUnreadMessages ? "text-blue-800" : "text-gray-800"
+                }`}
+              >
+                {user.name}
+                {user.role === "admin" && (
+                  <span className="ml-1.5 bg-purple-100 text-purple-800 text-xs px-1.5 py-0.5 rounded-full">
+                    Admin
+                  </span>
+                )}
+                {user.status === "blocked" && !isAdmin && (
+                  <span className="ml-1.5 bg-red-100 text-red-800 text-xs px-1.5 py-0.5 rounded-full">
+                    Blocked
+                  </span>
+                )}
+                {user.status === "banned" && !isAdmin && (
+                  <span className="ml-1.5 bg-gray-800 text-white text-xs px-1.5 py-0.5 rounded-full">
+                    Banned
+                  </span>
+                )}
+              </h3>
+
+              {hasUnreadMessages && (
+                <span className="text-xs text-blue-600 font-medium">
+                  {new Date(userNotifications[0].createdAt).toLocaleTimeString(
+                    [],
+                    {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }
+                  )}
+                </span>
+              )}
+            </div>
+
+            {hasUnreadMessages && (
+              <p className="text-xs text-blue-700 mt-0.5 truncate font-medium">
+                {userNotifications[0].content?.substring(0, 30)}
+                {userNotifications[0].content?.length > 30 ? "..." : ""}
+              </p>
+            )}
+
+            <p className="text-xs text-gray-500 mt-0.5">
+              {user.status === "banned"
+                ? "Banned by admin"
+                : user.status === "blocked"
+                ? "Blocked by admin"
+                : user.status === "online"
+                ? "Online"
+                : "Offline" +
+                  (user.lastSeen ? ` - ${formatLastSeen(user.lastSeen)}` : "")}
+            </p>
+            {isAdmin && user.lastActivity && (
+              <p className="text-xs text-blue-600 mt-1">
+                <i className="fas fa-history mr-1"></i>
+                {user.lastActivity}
+              </p>
+            )}
+            {isAdmin && user.flaggedWords && user.flaggedWords.length > 0 && (
+              <div className="flex mt-1 gap-1">
+                <span className="text-xs bg-red-100 text-red-800 px-1.5 py-0.5 rounded">
+                  <i className="fas fa-exclamation-circle mr-1"></i>
+                  {user.flaggedWords.length} flagged
+                </span>
+              </div>
+            )}
+          </div>
+        </button>
+      </li>
+    );
+  };
+
   return (
     <>
       <div className="w-[280px] lg:w-[320px] bg-white/95 border-r border-gray-200 flex flex-col h-full">
@@ -214,201 +375,7 @@ const ChatSidebar = ({
                       <p>No users found</p>
                     </div>
                   ) : (
-                    <ul>
-                      {displayUsers.map((user) => {
-                        const userId =
-                          user._id?.toString() || user.id?.toString();
-                        const selectedId =
-                          selectedUser?._id?.toString() ||
-                          selectedUser?.id?.toString();
-                        const userNotifications = notifications.filter(
-                          (n) => n.sender?._id === userId
-                        );
-                        const avatar = getAvatarByRole(user);
-                        const isSelected = selectedId === userId;
-                        let borderClass = "";
-                        if (user.isReported)
-                          borderClass = "border-l-4 border-yellow-500";
-                        else if (user.status === "blocked")
-                          borderClass = "border-l-4 border-red-400";
-                        else if (user.status === "banned")
-                          borderClass = "border-l-4 border-black";
-
-                        return (
-                          <li key={userId} className="mb-1">
-                            <button
-                              className={`w-full flex items-center px-3 py-2.5 rounded-xl ${
-                                isSelected
-                                  ? "bg-gradient-to-r from-blue-50 to-blue-100 shadow-sm"
-                                  : "hover:bg-gray-50"
-                              } transition-all ${borderClass}`}
-                              onClick={() => onSelectUser(user)}
-                            >
-                              <div className="relative">
-                                {avatar?.imageUrl ? (
-                                  <img
-                                    src={avatar.imageUrl}
-                                    alt={user?.name || "User"}
-                                    className={`w-12 h-12 rounded-full object-cover border border-gray-200 shadow-sm ${
-                                      user.status === "blocked"
-                                        ? "opacity-75"
-                                        : user.status === "banned"
-                                        ? "opacity-60 grayscale"
-                                        : ""
-                                    }`}
-                                    onError={(e) => {
-                                      e.target.style.display = "none";
-                                      e.target.nextSibling.style.display =
-                                        "flex";
-                                    }}
-                                  />
-                                ) : null}
-                                <div
-                                  className={`w-12 h-12 rounded-full border border-gray-200 shadow-sm flex items-center justify-center text-white font-medium text-lg ${
-                                    avatar?.imageUrl ? "hidden" : "flex"
-                                  } ${
-                                    user.status === "blocked"
-                                      ? "opacity-75"
-                                      : user.status === "banned"
-                                      ? "opacity-60 grayscale"
-                                      : ""
-                                  }`}
-                                  style={{
-                                    backgroundColor: avatar?.color || "#4f46e5",
-                                  }}
-                                >
-                                  {avatar?.initials ||
-                                    user?.name?.charAt(0) ||
-                                    "?"}
-                                </div>
-                                {userNotifications.length > 0 && (
-                                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 min-w-5 px-1 flex items-center justify-center">
-                                    {userNotifications.length > 9
-                                      ? "9+"
-                                      : userNotifications.length}
-                                  </span>
-                                )}
-                                <span
-                                  className={`absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full ${
-                                    user.status === "online"
-                                      ? "bg-green-500"
-                                      : user.status === "blocked"
-                                      ? "bg-red-500"
-                                      : user.status === "banned"
-                                      ? "bg-black"
-                                      : "bg-gray-400"
-                                  } border-2 border-white`}
-                                ></span>
-                              </div>
-                              <div className="ml-3 flex-1 text-left">
-                                <div className="flex justify-between items-center">
-                                  <h3 className="font-medium text-gray-800">
-                                    {user.name}
-                                    {user.role === "admin" && (
-                                      <span className="ml-1.5 bg-purple-100 text-purple-800 text-xs px-1.5 py-0.5 rounded-full">
-                                        Admin
-                                      </span>
-                                    )}
-                                    {user.status === "blocked" && !isAdmin && (
-                                      <span className="ml-1.5 bg-red-100 text-red-800 text-xs px-1.5 py-0.5 rounded-full">
-                                        Blocked
-                                      </span>
-                                    )}
-                                    {user.status === "banned" && !isAdmin && (
-                                      <span className="ml-1.5 bg-gray-800 text-white text-xs px-1.5 py-0.5 rounded-full">
-                                        Banned
-                                      </span>
-                                    )}
-                                  </h3>
-                                  {isAdmin && (
-                                    <div className="flex gap-2">
-                                      <button
-                                        className="text-gray-400 hover:text-red-500"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          onBlockUser(user.id, "block");
-                                        }}
-                                        title={
-                                          user.status === "blocked"
-                                            ? "Unblock User"
-                                            : "Block User"
-                                        }
-                                      >
-                                        <i
-                                          className={`fas ${
-                                            user.status === "blocked"
-                                              ? "fa-unlock"
-                                              : "fa-ban"
-                                          } text-xs`}
-                                        ></i>
-                                      </button>
-                                      <button
-                                        className="text-gray-400 hover:text-black"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          onBlockUser(user.id, "ban");
-                                        }}
-                                        title={
-                                          user.status === "banned"
-                                            ? "Unban User"
-                                            : "Ban User"
-                                        }
-                                      >
-                                        <i
-                                          className={`fas ${
-                                            user.status === "banned"
-                                              ? "fa-user-check"
-                                              : "fa-user-slash"
-                                          } text-xs`}
-                                        ></i>
-                                      </button>
-                                      <button
-                                        className="text-gray-400 hover:text-yellow-500"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          onReportUser(user.id);
-                                        }}
-                                        title="Report User"
-                                      >
-                                        <i className="fas fa-flag text-xs"></i>
-                                      </button>
-                                    </div>
-                                  )}
-                                </div>
-                                <p className="text-xs text-gray-500 mt-0.5">
-                                  {user.status === "banned"
-                                    ? "Banned by admin"
-                                    : user.status === "blocked"
-                                    ? "Blocked by admin"
-                                    : user.status === "online"
-                                    ? "Online"
-                                    : "Offline" +
-                                      (user.lastSeen
-                                        ? ` - ${formatLastSeen(user.lastSeen)}`
-                                        : "")}
-                                </p>
-                                {isAdmin && user.lastActivity && (
-                                  <p className="text-xs text-blue-600 mt-1">
-                                    <i className="fas fa-history mr-1"></i>
-                                    {user.lastActivity}
-                                  </p>
-                                )}
-                                {isAdmin &&
-                                  user.flaggedWords &&
-                                  user.flaggedWords.length > 0 && (
-                                    <div className="flex mt-1 gap-1">
-                                      <span className="text-xs bg-red-100 text-red-800 px-1.5 py-0.5 rounded">
-                                        <i className="fas fa-exclamation-circle mr-1"></i>
-                                        {user.flaggedWords.length} flagged
-                                      </span>
-                                    </div>
-                                  )}
-                              </div>
-                            </button>
-                          </li>
-                        );
-                      })}
-                    </ul>
+                    <ul>{displayUsers.map((user) => renderUserItem(user))}</ul>
                   )}
                 </>
               ) : (

@@ -19,12 +19,17 @@ const ChatWindow = ({
   onBanUser,
   onCloseChat,
   flaggedWords = [],
+  typingUsers = [],
+  onTypingStart,
+  onTypingStop,
 }) => {
   const [messageText, setMessageText] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const [recognition, setRecognition] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [isSending, setIsSending] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const typingTimeoutRef = useRef(null);
   const { user: loggedInUser } = useContext(Context);
   const messagesEndRef = useRef(null);
   const isAdminChat = selectedUser?.role === "admin";
@@ -70,17 +75,46 @@ const ChatWindow = ({
     }
   }, [messages]);
 
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setMessageText(value);
+
+    if (value.trim() && !isTyping) {
+      setIsTyping(true);
+      if (onTypingStart) onTypingStart();
+    }
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    typingTimeoutRef.current = setTimeout(() => {
+      setIsTyping(false);
+      if (onTypingStop) onTypingStop();
+    }, 2000);
+  };
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!canSendMessage() || isSending) return;
 
     if (messageText.trim()) {
+      setIsTyping(false);
+      if (onTypingStop) onTypingStop();
+
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+
+      const currentMessage = messageText.trim();
+      setMessageText("");
       setIsSending(true);
+
       try {
-        await onSendMessage(messageText);
-        setMessageText("");
+        await onSendMessage(currentMessage);
       } catch (error) {
         console.error("Error sending message:", error);
+        setMessageText(currentMessage);
       } finally {
         setIsSending(false);
       }
@@ -88,13 +122,12 @@ const ChatWindow = ({
   };
 
   const canSendMessage = () => {
-    if (selectedUser.status === "banned" && !isAdmin) {
-      console.error("This user has been banned and cannot receive messages.");
+    if (isSending) return false;
+    if (selectedUser?.status === "banned" && !isAdmin) {
       toast.error("This user has been banned and cannot receive messages.");
       return false;
     }
-    if (selectedUser.status === "blocked" && !isAdmin) {
-      console.error("This user has been blocked and cannot receive messages.");
+    if (selectedUser?.status === "blocked" && !isAdmin) {
       toast.error("This user has been blocked and cannot receive messages.");
       return false;
     }
@@ -270,10 +303,10 @@ const ChatWindow = ({
     return (
       <div className="space-y-6">
         {renderStatusNotification()}
-        {messages.map((message) =>
+        {messages.map((message, index) =>
           message.isSystemMessage
-            ? renderSystemMessage(message)
-            : renderChatMessage(message)
+            ? renderSystemMessage(message, index)
+            : renderChatMessage(message, index)
         )}
       </div>
     );
@@ -328,9 +361,12 @@ const ChatWindow = ({
     return null;
   }
 
-  function renderSystemMessage(message) {
+  function renderSystemMessage(message, index) {
     return (
-      <div key={message.id} className="flex justify-center">
+      <div
+        key={`system-${message.id || message._id || index}`}
+        className="flex justify-center"
+      >
         <div className="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg text-sm max-w-md text-center shadow-sm">
           <i className="fas fa-info-circle mr-2"></i>
           {message.text}
@@ -339,7 +375,7 @@ const ChatWindow = ({
     );
   }
 
-  function renderChatMessage(message) {
+  function renderChatMessage(message, index) {
     const senderId = message.sender?._id || message.sender || message.from;
     const currentUserId = loggedInUser?._id;
     const isMe =
@@ -357,9 +393,13 @@ const ChatWindow = ({
       message.sender?.name ||
       selectedUser?.participants?.find((p) => p._id === senderId)?.name;
 
+    const uniqueKey = `message-${message._id || message.id || index}-${
+      message.createdAt || Date.now()
+    }-${senderId}`;
+
     return (
       <div
-        key={message._id || message.id}
+        key={uniqueKey}
         className={`flex ${
           isMe ? "justify-end" : "justify-start"
         } group relative`}
@@ -451,13 +491,15 @@ const ChatWindow = ({
                   className="text-gray-400 hover:text-gray-700 focus:outline-none"
                   onClick={() =>
                     setDropdownOpen(
-                      dropdownOpen === message._id ? null : message._id
+                      dropdownOpen === (message._id || message.id)
+                        ? null
+                        : message._id || message.id
                     )
                   }
                 >
                   <i className="fas fa-ellipsis-v h-14"></i>
                 </button>
-                {dropdownOpen === message._id && (
+                {dropdownOpen === (message._id || message.id) && (
                   <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg border border-gray-200 z-50">
                     {isMe ? (
                       <button
@@ -576,6 +618,48 @@ const ChatWindow = ({
     );
   };
 
+  const renderTypingIndicator = () => {
+    if (!typingUsers || typingUsers.length === 0) return null;
+
+    const typingUserNames = typingUsers
+      .map((userId) => {
+        if (selectedUser?.isGroupChat) {
+          const participant = selectedUser.participants?.find(
+            (p) => p._id === userId
+          );
+          return participant?.name || "Someone";
+        } else {
+          if (userId === selectedUser._id) return selectedUser.name;
+          return "Someone";
+        }
+      })
+      .filter(Boolean);
+
+    if (typingUserNames.length === 0) return null;
+
+    return (
+      <div className="px-4 py-2 text-sm text-gray-500 italic">
+        <div className="flex items-center space-x-1">
+          <div className="flex space-x-1">
+            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+            <div
+              className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+              style={{ animationDelay: "0.1s" }}
+            ></div>
+            <div
+              className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+              style={{ animationDelay: "0.2s" }}
+            ></div>
+          </div>
+          <span>
+            {typingUserNames.join(", ")}{" "}
+            {typingUserNames.length === 1 ? "is" : "are"} typing...
+          </span>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="flex-1 flex flex-col bg-white/90 rounded-br-3xl shadow-inner overflow-hidden">
       {isGroupChat ? (
@@ -683,6 +767,7 @@ const ChatWindow = ({
         }}
       >
         {renderMessages()}
+        {renderTypingIndicator()}
         <div ref={messagesEndRef} className="h-4" />
       </div>
       <form
@@ -692,7 +777,7 @@ const ChatWindow = ({
         <div className="flex-1 relative items-center">
           <textarea
             value={messageText}
-            onChange={(e) => setMessageText(e.target.value)}
+            onChange={handleInputChange}
             placeholder={getInputPlaceholder()}
             className={`w-full p-3 md:p-4 pr-12 bg-gray-100 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-100 border border-transparent focus:border-blue-200 transition-all ${
               isMessageDisabled || isChatDisabled
@@ -708,7 +793,7 @@ const ChatWindow = ({
             }}
             rows={1}
             disabled={isMessageDisabled || isChatDisabled}
-          ></textarea>
+          />
           {isRecording && (
             <div className="absolute right-12 bottom-3 flex items-center text-red-500">
               <div className="mr-2 h-2 w-2 bg-red-500 rounded-full animate-ping"></div>

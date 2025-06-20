@@ -35,6 +35,7 @@ const ChatInterface = ({ adminMode }) => {
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedMember, setSelectedMember] = useState(null);
   const [profileUser, setProfileUser] = useState(null);
+  const [typingUsers, setTypingUsers] = useState([]);
   const socketRef = useRef(null);
   const heartbeatRef = useRef(null);
   const SOCKET_URL = "http://localhost:4000";
@@ -72,15 +73,18 @@ const ChatInterface = ({ adminMode }) => {
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
         timeout: 20000,
+        transports: ["websocket", "polling"],
       });
 
       socketRef.current.on("connect", () => {
         setSocketConnected(true);
         setReconnectAttempt(0);
 
+        socketRef.current.emit("authenticate", user._id);
+
         if (heartbeatRef.current) clearInterval(heartbeatRef.current);
         heartbeatRef.current = setInterval(() => {
-          if (socketRef.current) {
+          if (socketRef.current && socketRef.current.connected) {
             socketRef.current.emit("heartbeat", { userId: user._id });
           }
         }, 15000);
@@ -88,35 +92,115 @@ const ChatInterface = ({ adminMode }) => {
 
       socketRef.current.on("disconnect", () => {
         setSocketConnected(false);
-
         if (heartbeatRef.current) {
           clearInterval(heartbeatRef.current);
         }
       });
 
       socketRef.current.on("connect_error", (error) => {
+        console.error("Socket connection error:", error);
         setSocketConnected(false);
 
         if (reconnectAttempt < 5) {
           setTimeout(() => {
             setReconnectAttempt((prev) => prev + 1);
             setupSocket();
-          }, 2000);
+          }, 2000 * (reconnectAttempt + 1));
         } else {
-          console.error(
-            "Unable to connect to chat server. Please check your connection and refresh the page."
-          );
           toast.error(
-            "Unable to connect to chat server. Please check your connection and refresh the page."
+            "Unable to connect to chat server. Please refresh the page."
           );
         }
       });
 
-      socketRef.current.on("error", (error) => {
-        console.error("Server error.");
-        toast.error("Server error: " + (error.message || "Unknown error"));
+      // Remove duplicate event handlers and consolidate
+      socketRef.current.on("user-typing", (data) => {
+        if (
+          selectedChat &&
+          data.chatId === selectedChat.chat._id &&
+          data.userId !== user._id
+        ) {
+          setTypingUsers((prev) => {
+            if (data.isTyping) {
+              return [...prev.filter((id) => id !== data.userId), data.userId];
+            } else {
+              return prev.filter((id) => id !== data.userId);
+            }
+          });
+        }
       });
 
+      socketRef.current.on("new-message", (message) => {
+        console.log("Received new message:", message);
+
+        if (selectedChat && message.chat === selectedChat.chat._id) {
+          setMessages((prev) => {
+            const isDuplicate = prev.find(
+              (m) =>
+                m._id === message._id ||
+                (m.content === message.content &&
+                  m.sender._id === message.sender._id &&
+                  Math.abs(
+                    new Date(m.createdAt) - new Date(message.createdAt)
+                  ) < 1000)
+            );
+
+            if (isDuplicate) return prev;
+
+            const filteredPrev = prev.filter(
+              (m) =>
+                !(
+                  m.isOptimistic &&
+                  m.content === message.content &&
+                  m.sender._id === message.sender._id
+                )
+            );
+
+            return [...filteredPrev, message];
+          });
+
+          if (message.sender._id !== user._id) {
+            socketRef.current.emit("message-received", {
+              chatId: selectedChat.chat._id,
+              messageId: message._id,
+            });
+          }
+        } else if (message.sender._id !== user._id) {
+          setNotifications((prev) => {
+            const isDuplicate = prev.find(
+              (n) =>
+                n.sender._id === message.sender._id &&
+                n.content === message.content &&
+                Math.abs(new Date(n.createdAt) - new Date(message.createdAt)) <
+                  1000
+            );
+
+            if (isDuplicate) return prev;
+
+            return [
+              {
+                chatId: message.chat,
+                sender: message.sender,
+                content: message.content,
+                createdAt: message.createdAt,
+              },
+              ...prev,
+            ];
+          });
+
+          toast.info(`New message from ${message.sender.name}`, {
+            autoClose: 3000,
+            onClick: () => {
+              const senderUser = allUsers.find(
+                (u) => u._id === message.sender._id
+              );
+              if (senderUser) handleUserSelect(senderUser);
+            },
+          });
+        }
+      });
+
+      // Add other event handlers without duplication
       socketRef.current.on("admin-message-deleted", ({ messageId }) => {
         setMessages((prev) =>
           prev.map((msg) =>
@@ -129,10 +213,30 @@ const ChatInterface = ({ adminMode }) => {
               : msg
           )
         );
-        console.log("Message deleted by admin.");
         toast.info("A message was deleted by an admin.");
       });
 
+      socketRef.current.on("message-read", ({ messageId, userId }) => {
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg._id === messageId
+              ? { ...msg, status: "read", readBy: userId }
+              : msg
+          )
+        );
+      });
+
+      socketRef.current.on("message-delivered", ({ messageId }) => {
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg._id === messageId && msg.status === "sent"
+              ? { ...msg, status: "delivered" }
+              : msg
+          )
+        );
+      });
+
+      // Handle other admin events
       socketRef.current.on("admin-user-blocked", (notification) => {
         if (notification && notification.type === "block") {
           setUser((prev) => ({
@@ -141,7 +245,6 @@ const ChatInterface = ({ adminMode }) => {
             blockReason: notification.reason,
             notifications: [notification, ...(prev.notifications || [])],
           }));
-          console.log(`You have been blocked by an admin.`);
           toast.warning(
             notification.message || "You have been blocked by an admin."
           );
@@ -156,161 +259,9 @@ const ChatInterface = ({ adminMode }) => {
             bannedReason: notification.reason,
             notifications: [notification, ...(prev.notifications || [])],
           }));
-          console.log(`You have been banned by an admin.`);
           toast.error(
             notification.message || "You have been banned by an admin."
           );
-        }
-      });
-
-      socketRef.current.on("admin-notification", (notification) => {
-        setUser((prev) => ({
-          ...prev,
-          notifications: [notification, ...(prev.notifications || [])],
-        }));
-        console.log("New admin notification");
-        toast.info(
-          notification.message || "You have a new notification from admin."
-        );
-      });
-
-      socketRef.current.on("user-profile-updated", (updatedUserData) => {
-        setAllUsers((prevUsers) =>
-          prevUsers.map((u) => {
-            if (u._id === updatedUserData.userId) {
-              let updatedAvatar =
-                typeof updatedUserData.avatar === "string" &&
-                updatedUserData.avatar
-                  ? updatedUserData.avatar
-                  : u.avatar;
-              if (updatedAvatar && !updatedAvatar.startsWith("data:")) {
-                const timestamp = new Date().getTime();
-                updatedAvatar = updatedAvatar.includes("?")
-                  ? `${updatedAvatar}&t=${timestamp}`
-                  : `${updatedAvatar}?t=${timestamp}`;
-              }
-
-              return {
-                ...u,
-                name: updatedUserData.name || u.name,
-                bio:
-                  updatedUserData.bio !== undefined
-                    ? updatedUserData.bio
-                    : u.bio,
-                location:
-                  updatedUserData.location !== undefined
-                    ? updatedUserData.location
-                    : u.location,
-                interests: updatedUserData.interests || u.interests,
-                avatar: updatedAvatar,
-              };
-            }
-            return u;
-          })
-        );
-
-        if (selectedUser && selectedUser._id === updatedUserData.userId) {
-          let updatedAvatar =
-            typeof updatedUserData.avatar === "string" && updatedUserData.avatar
-              ? updatedUserData.avatar
-              : selectedUser.avatar;
-          if (updatedAvatar && !updatedAvatar.startsWith("data:")) {
-            const timestamp = new Date().getTime();
-            updatedAvatar = updatedAvatar.includes("?")
-              ? `${updatedAvatar}&t=${timestamp}`
-              : `${updatedAvatar}?t=${timestamp}`;
-          }
-
-          setSelectedUser((prev) => ({
-            ...prev,
-            name: updatedUserData.name || prev.name,
-            bio:
-              updatedUserData.bio !== undefined
-                ? updatedUserData.bio
-                : prev.bio,
-            location:
-              updatedUserData.location !== undefined
-                ? updatedUserData.location
-                : prev.location,
-            interests: updatedUserData.interests || prev.interests,
-            avatar: updatedAvatar,
-          }));
-        }
-
-        if (user && updatedUserData.userId === user._id) {
-          let updatedAvatar =
-            typeof updatedUserData.avatar === "string" && updatedUserData.avatar
-              ? updatedUserData.avatar
-              : user.avatar;
-          if (updatedAvatar && !updatedAvatar.startsWith("data:")) {
-            const timestamp = new Date().getTime();
-            updatedAvatar = updatedAvatar.includes("?")
-              ? `${updatedAvatar}&t=${timestamp}`
-              : `${updatedAvatar}?t=${timestamp}`;
-          }
-          const updatedUser = {
-            ...user,
-            name: updatedUserData.name || user.name,
-            bio:
-              updatedUserData.bio !== undefined
-                ? updatedUserData.bio
-                : user.bio,
-            location:
-              updatedUserData.location !== undefined
-                ? updatedUserData.location
-                : user.location,
-            interests: updatedUserData.interests || user.interests,
-            avatar: updatedAvatar,
-          };
-          setUser(updatedUser);
-          try {
-            localStorage.setItem("user", JSON.stringify(updatedUser));
-          } catch (err) {}
-        }
-      });
-
-      socketRef.current.on("message-deleted", ({ messageId, permanent }) => {
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg._id === messageId
-              ? {
-                  ...msg,
-                  isDeleted: !permanent,
-                  permanentlyDeleted: permanent,
-                  content: permanent
-                    ? "This message has been permanently deleted"
-                    : "This message has been deleted",
-                }
-              : msg
-          )
-        );
-      });
-
-      socketRef.current.on("new-message", (message) => {
-        if (selectedChat && message.chat === selectedChat.chat._id) {
-          setMessages((prev) => {
-            if (prev.find((m) => m._id === message._id)) {
-              return prev;
-            }
-            return [...prev, message];
-          });
-
-          if (message.sender._id !== user._id) {
-            socketRef.current.emit("message-received", {
-              chatId: selectedChat.chat._id,
-              messageId: message._id,
-            });
-          }
-        } else if (message.sender._id !== user._id) {
-          setNotifications((prev) => [
-            {
-              chatId: message.chat,
-              sender: message.sender,
-              content: message.content,
-              createdAt: message.createdAt,
-            },
-            ...prev,
-          ]);
         }
       });
     };
@@ -322,13 +273,12 @@ const ChatInterface = ({ adminMode }) => {
         socketRef.current.disconnect();
         socketRef.current = null;
       }
-
       if (heartbeatRef.current) {
         clearInterval(heartbeatRef.current);
         heartbeatRef.current = null;
       }
     };
-  }, [user, reconnectAttempt]);
+  }, [user, reconnectAttempt, selectedChat, allUsers]);
 
   useEffect(() => {
     if (!socketRef.current) return;
@@ -633,6 +583,7 @@ const ChatInterface = ({ adminMode }) => {
 
   const handleSendMessage = async (messageText, isVoice = false) => {
     if (!messageText.trim() || !selectedChat) return;
+
     if (containsInappropriateContent(messageText)) {
       const flaggedWords = extractInappropriateWords(messageText);
       if (flaggedWords.length > 0 && !isAdmin) {
@@ -655,28 +606,13 @@ const ChatInterface = ({ adminMode }) => {
     }
 
     try {
-      const optimisticMessage = {
-        _id: `temp-${Date.now()}`,
-        content: messageText,
-        sender: {
-          _id: user._id,
-          name: user.name,
-          avatar: getAvatarByRole(user),
-        },
-        createdAt: new Date().toISOString(),
-        chat: selectedChat.chat._id,
-        isOptimistic: true,
-        isVoice,
-      };
-
-      setMessages((prev) => [...prev, optimisticMessage]);
-
-      if (isVoice) {
-        toast.info("Processing voice message...", { autoClose: 2000 });
+      if (socketRef.current) {
+        socketRef.current.emit("typing-stop", {
+          chatId: selectedChat.chat._id,
+        });
       }
 
       let res;
-
       if (isVoice) {
         const formData = new FormData();
         formData.append("chatId", selectedChat.chat._id);
@@ -709,19 +645,12 @@ const ChatInterface = ({ adminMode }) => {
         );
       }
 
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg._id === optimisticMessage._id ? res.data.message : msg
-        )
-      );
-
       if (isVoice) {
         toast.success("Voice message sent successfully");
       }
     } catch (err) {
       console.error("Failed to send message:", err);
       toast.error(err.response?.data?.message || "Failed to send message");
-      setMessages((prev) => prev.filter((msg) => !msg.isOptimistic));
     }
   };
 
@@ -871,6 +800,24 @@ const ChatInterface = ({ adminMode }) => {
     }
   };
 
+  const handleTypingStart = () => {
+    if (socketRef.current && selectedChat?.chat?._id) {
+      socketRef.current.emit("typing-start", {
+        chatId: selectedChat.chat._id,
+        userId: user._id,
+      });
+    }
+  };
+
+  const handleTypingStop = () => {
+    if (socketRef.current && selectedChat?.chat?._id) {
+      socketRef.current.emit("typing-stop", {
+        chatId: selectedChat.chat._id,
+        userId: user._id,
+      });
+    }
+  };
+
   if (isAuthLoading) {
     return <LoadingScreen />;
   }
@@ -998,6 +945,9 @@ const ChatInterface = ({ adminMode }) => {
                     onDeleteOwnMessage={handleDeleteOwnMessage}
                     onBanUser={isAdmin ? handleBanUser : null}
                     onCloseChat={clearSelectedChat}
+                    typingUsers={typingUsers}
+                    onTypingStart={handleTypingStart}
+                    onTypingStop={handleTypingStop}
                   />
                   {showProfileSidebar &&
                     (selectedUser || selectedMember || profileUser) && (
