@@ -113,7 +113,6 @@ const ChatInterface = ({ adminMode }) => {
         }
       });
 
-      // Remove duplicate event handlers and consolidate
       socketRef.current.on("user-typing", (data) => {
         if (
           selectedChat &&
@@ -200,7 +199,6 @@ const ChatInterface = ({ adminMode }) => {
         }
       });
 
-      // Add other event handlers without duplication
       socketRef.current.on("admin-message-deleted", ({ messageId }) => {
         setMessages((prev) =>
           prev.map((msg) =>
@@ -236,7 +234,6 @@ const ChatInterface = ({ adminMode }) => {
         );
       });
 
-      // Handle other admin events
       socketRef.current.on("admin-user-blocked", (notification) => {
         if (notification && notification.type === "block") {
           setUser((prev) => ({
