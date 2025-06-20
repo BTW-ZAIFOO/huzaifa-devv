@@ -40,9 +40,11 @@ const ChatSidebar = ({
         setSearchResults(
           res.data.users.filter(
             (u) =>
-              u.accountVerified &&
+              u.accountVerified === true &&
               u.name &&
-              u.name.toLowerCase().includes(searchTerm.trim().toLowerCase())
+              u.name.toLowerCase().includes(searchTerm.trim().toLowerCase()) &&
+              u.status !== "banned" &&
+              u.status !== "blocked"
           )
         );
       } catch {

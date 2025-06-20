@@ -31,7 +31,11 @@ const AddUserToGroupModal = ({ group, isOpen, onClose, onAddUser }) => {
         const data = await response.json();
         const existingUserIds = group.participants?.map((p) => p._id) || [];
         const filteredUsers = (data.users || []).filter(
-          (user) => !existingUserIds.includes(user._id)
+          (user) =>
+            !existingUserIds.includes(user._id) &&
+            user.accountVerified === true &&
+            user.status !== "banned" &&
+            user.status !== "blocked"
         );
         setSearchResults(filteredUsers);
       }
@@ -58,7 +62,7 @@ const AddUserToGroupModal = ({ group, isOpen, onClose, onAddUser }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:4000/api/v1/chat/group/add-users`,
+        `http://localhost:4000/api/v1/chat/group/add-multiple-users`,
         {
           method: "PUT",
           headers: {
@@ -73,14 +77,27 @@ const AddUserToGroupModal = ({ group, isOpen, onClose, onAddUser }) => {
       );
 
       if (response.ok) {
-        const updatedGroup = await response.json();
-        onAddUser(updatedGroup);
+        const result = await response.json();
+        onAddUser(result);
         setSelectedUsers([]);
         setSearchTerm("");
         onClose();
+
+        // Show success message
+        if (window.toast) {
+          window.toast.success(result.message || "Users added successfully");
+        }
+      } else {
+        const error = await response.json();
+        if (window.toast) {
+          window.toast.error(error.message || "Failed to add users");
+        }
       }
     } catch (error) {
       console.error("Error adding users to group:", error);
+      if (window.toast) {
+        window.toast.error("Failed to add users to group");
+      }
     }
   };
 

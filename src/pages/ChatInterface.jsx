@@ -912,6 +912,21 @@ const ChatInterface = ({ adminMode }) => {
     }
   };
 
+  const handleGroupUpdate = (updatedGroup) => {
+    if (selectedChat && selectedChat.chat._id === updatedGroup._id) {
+      setSelectedChat((prev) => ({
+        ...prev,
+        chat: updatedGroup,
+        otherUser: {
+          ...prev.otherUser,
+          participants: updatedGroup.participants,
+        },
+      }));
+    }
+
+    fetchUsers(false);
+  };
+
   if (isAuthLoading) {
     return <LoadingScreen />;
   }
@@ -1065,12 +1080,14 @@ const ChatInterface = ({ adminMode }) => {
                         group={selectedGroup}
                         onClose={() => setShowGroupProfileSidebar(false)}
                         onViewUserProfile={handleViewGroupMemberProfile}
+                        onGroupUpdate={handleGroupUpdate}
                       />
                     ) : (
                       <GroupProfileSidebar
                         group={selectedChat.chat}
                         onClose={() => setShowGroupProfileSidebar(false)}
                         onViewUserProfile={handleViewGroupMemberProfile}
+                        onGroupUpdate={handleGroupUpdate}
                       />
                     ))}
                 </>

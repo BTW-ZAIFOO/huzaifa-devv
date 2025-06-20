@@ -16,7 +16,9 @@ const UserSuggestion = ({ users = [] }) => {
       );
 
       if (currentUser?.following) {
-        currentUser.following.push(userId);
+        if (!currentUser.following.includes(userId)) {
+          currentUser.following.push(userId);
+        }
       }
 
       if (window.io && window.io.connected) {

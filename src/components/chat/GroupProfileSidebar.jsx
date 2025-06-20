@@ -28,8 +28,9 @@ const GroupProfileSidebar = ({
 
   const handleAddUser = (updatedGroup) => {
     if (onGroupUpdate) {
-      onGroupUpdate(updatedGroup);
+      onGroupUpdate(updatedGroup.chat || updatedGroup);
     }
+    setShowAddUserModal(false);
   };
 
   const isCurrentUserAdmin = () => {

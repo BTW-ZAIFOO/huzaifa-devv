@@ -611,7 +611,7 @@ const UserProfile = ({
             <div className="absolute -top-20 left-1/2 transform -translate-x-1/2">
               <div className="relative group">
                 <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-400 to-purple-600 blur-md opacity-75 group-hover:opacity-100 transition-opacity duration-300 scale-110"></div>
-                {() => {
+                {(() => {
                   const avatar = getAvatarByRole(displayedUser);
                   return (
                     <div className="relative">
@@ -640,7 +640,7 @@ const UserProfile = ({
                       </div>
                     </div>
                   );
-                }}
+                })()}
               </div>
             </div>
             <h1 className="text-3xl font-bold mt-2 text-gray-800 tracking-tight">

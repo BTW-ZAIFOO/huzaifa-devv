@@ -586,6 +586,9 @@ const ChatWindow = ({
 
     const group = selectedUser;
     const memberCount = group.participants ? group.participants.length : 0;
+    const onlineCount = group.participants
+      ? group.participants.filter((p) => p.status === "online").length
+      : 0;
 
     return (
       <div className="py-3 md:py-5 px-4 md:px-8 flex justify-between items-center bg-gradient-to-r from-blue-50 to-indigo-50">
@@ -602,12 +605,9 @@ const ChatWindow = ({
             </h3>
             <span className="text-xs md:text-sm text-gray-500">
               {memberCount} {memberCount === 1 ? "member" : "members"}
-              {group.groupAdmin && (
-                <span className="ml-2">
-                  • Admin:{" "}
-                  {typeof group.groupAdmin === "object"
-                    ? group.groupAdmin.name
-                    : "Unknown"}
+              {onlineCount > 0 && (
+                <span className="ml-2 text-green-600">
+                  • {onlineCount} online
                 </span>
               )}
             </span>

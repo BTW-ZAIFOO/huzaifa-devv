@@ -17,7 +17,13 @@ const GroupChatModal = ({ isOpen, onClose, onGroupCreated }) => {
         .then((res) => {
           const currentUserId = JSON.parse(localStorage.getItem("user"))?._id;
           setAllUsers(
-            (res.data.users || []).filter((u) => u._id !== currentUserId)
+            (res.data.users || []).filter(
+              (u) =>
+                u._id !== currentUserId &&
+                u.accountVerified === true &&
+                u.status !== "banned" &&
+                u.status !== "blocked"
+            )
           );
         })
         .catch(() => setAllUsers([]));
