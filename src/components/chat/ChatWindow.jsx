@@ -388,9 +388,15 @@ const ChatWindow = ({
       containsInappropriateContent(messageText, flaggedWords);
     const isDeleted = message.isDeleted;
     const isPermanentlyDeleted = message.permanentlyDeleted;
-    const senderName =
-      message.sender?.name ||
-      selectedUser?.participants?.find((p) => p._id === senderId)?.name;
+
+    let senderName = message.sender?.name;
+    if (isGroupChat && !isMe && !senderName) {
+      const participant = selectedUser?.participants?.find(
+        (p) => p._id === senderId
+      );
+      senderName = participant?.name || "Unknown User";
+    }
+
     const uniqueKey = `message-${message._id || message.id || index}-${
       message.createdAt || Date.now()
     }-${senderId}`;
@@ -406,9 +412,15 @@ const ChatWindow = ({
           {!isMe && (
             <div
               className="w-10 h-10 rounded-full mt-1 mr-2 border-2 border-white shadow-sm flex items-center justify-center text-white text-sm font-medium"
-              style={{ backgroundColor: avatar.color }}
+              style={{
+                backgroundColor: isGroupChat
+                  ? `hsl(${
+                      senderId ? senderId.charCodeAt(0) * 10 : 200
+                    }, 70%, 50%)`
+                  : avatar.color,
+              }}
             >
-              {avatar.initials}
+              {isGroupChat ? senderName?.charAt(0) || "?" : avatar.initials}
             </div>
           )}
 
@@ -423,9 +435,9 @@ const ChatWindow = ({
                 : "bg-gray-100 text-gray-800 rounded-tl-none shadow"
             }`}
           >
-            {!isMe && (
+            {!isMe && isGroupChat && (
               <div className="text-xs font-semibold text-blue-600 mb-1">
-                {senderName}
+                {senderName || "Unknown User"}
               </div>
             )}
 
@@ -576,9 +588,7 @@ const ChatWindow = ({
     const memberCount = group.participants ? group.participants.length : 0;
 
     return (
-      <div
-        className={`py-3 md:py-5 px-4 md:px-8 flex justify-between items-center bg-gradient-to-r from-blue-50 to-indigo-50`}
-      >
+      <div className="py-3 md:py-5 px-4 md:px-8 flex justify-between items-center bg-gradient-to-r from-blue-50 to-indigo-50">
         <div className="flex items-center">
           <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center mr-3 shadow-md text-white">
             <i className="fas fa-users"></i>
@@ -592,6 +602,14 @@ const ChatWindow = ({
             </h3>
             <span className="text-xs md:text-sm text-gray-500">
               {memberCount} {memberCount === 1 ? "member" : "members"}
+              {group.groupAdmin && (
+                <span className="ml-2">
+                  • Admin:{" "}
+                  {typeof group.groupAdmin === "object"
+                    ? group.groupAdmin.name
+                    : "Unknown"}
+                </span>
+              )}
             </span>
           </div>
         </div>

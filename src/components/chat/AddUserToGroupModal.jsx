@@ -18,22 +18,19 @@ const AddUserToGroupModal = ({ group, isOpen, onClose, onAddUser }) => {
   const searchUsers = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:5000/api/users/search?q=${encodeURIComponent(
+        `http://localhost:4000/api/v1/user/search?q=${encodeURIComponent(
           searchTerm
         )}`,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          credentials: "include",
         }
       );
 
       if (response.ok) {
-        const users = await response.json();
+        const data = await response.json();
         const existingUserIds = group.participants?.map((p) => p._id) || [];
-        const filteredUsers = users.filter(
+        const filteredUsers = (data.users || []).filter(
           (user) => !existingUserIds.includes(user._id)
         );
         setSearchResults(filteredUsers);
@@ -60,15 +57,14 @@ const AddUserToGroupModal = ({ group, isOpen, onClose, onAddUser }) => {
     if (selectedUsers.length === 0) return;
 
     try {
-      const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:5000/api/chat/group/add-users`,
+        `http://localhost:4000/api/v1/chat/group/add-users`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
+          credentials: "include",
           body: JSON.stringify({
             chatId: group._id,
             userIds: selectedUsers.map((u) => u._id),

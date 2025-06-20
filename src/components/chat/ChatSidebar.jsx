@@ -409,7 +409,10 @@ const ChatSidebar = ({
                     <ul>
                       {groupChats.map((group) => {
                         const isSelected =
-                          selectedUser && selectedUser._id === group._id;
+                          selectedUser &&
+                          (selectedUser._id === group._id ||
+                            (selectedUser.isGroupChat &&
+                              selectedUser.groupName === group.groupName));
 
                         return (
                           <li key={group._id} className="mb-1">
@@ -422,21 +425,27 @@ const ChatSidebar = ({
                               onClick={() => {
                                 const groupFormatted = {
                                   ...group,
+                                  _id: group._id,
                                   isGroupChat: true,
-                                  name: group.groupName,
+                                  name: group.groupName || group.name,
+                                  groupName: group.groupName || group.name,
+                                  participants: group.participants || [],
+                                  groupAdmin: group.groupAdmin,
                                 };
                                 onSelectUser(groupFormatted);
                               }}
                             >
                               <div className="relative">
-                                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white font-medium">
-                                  {group.groupName?.charAt(0) || "G"}
+                                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-white font-medium shadow-sm">
+                                  <i className="fas fa-users"></i>
                                 </div>
                               </div>
                               <div className="ml-3 flex-1 text-left">
                                 <div className="flex justify-between items-center">
                                   <h3 className="font-medium text-gray-800 flex items-center">
-                                    {group.groupName}
+                                    {group.groupName ||
+                                      group.name ||
+                                      "Group Chat"}
                                     <span className="ml-1.5 bg-blue-100 text-blue-800 text-xs px-1.5 py-0.5 rounded-full">
                                       Group
                                     </span>
@@ -445,6 +454,18 @@ const ChatSidebar = ({
                                 <p className="text-xs text-gray-500 mt-0.5">
                                   {group.participants?.length || 0} members
                                 </p>
+                                {group.lastMessage &&
+                                  typeof group.lastMessage === "string" && (
+                                    <p className="text-xs text-gray-600 mt-1 truncate">
+                                      <i className="fas fa-comment text-xs mr-1"></i>
+                                      {group.lastMessage.length > 30
+                                        ? `${group.lastMessage.substring(
+                                            0,
+                                            30
+                                          )}...`
+                                        : group.lastMessage}
+                                    </p>
+                                  )}
                               </div>
                             </button>
                           </li>

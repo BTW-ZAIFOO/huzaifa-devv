@@ -561,6 +561,8 @@ const ChatInterface = ({ adminMode }) => {
               _id: otherUser._id,
               isGroupChat: true,
               groupName: otherUser.groupName || otherUser.name,
+              participants: otherUser.participants || [],
+              groupAdmin: otherUser.groupAdmin,
             },
           },
         };
@@ -599,16 +601,29 @@ const ChatInterface = ({ adminMode }) => {
         prev.filter((n) => n.chatId !== chatRes.data.chat._id)
       );
 
-      const msgRes = await axios.get(
-        `http://localhost:4000/api/v1/message/${chatRes.data.chat._id}`,
-        { withCredentials: true }
-      );
+      if (otherUser.isGroupChat) {
+        try {
+          const msgRes = await axios.get(
+            `http://localhost:4000/api/v1/message/${chatRes.data.chat._id}`,
+            { withCredentials: true }
+          );
+          setMessages(msgRes.data.messages || []);
+        } catch (err) {
+          console.error("Failed to load group messages:", err);
+          setMessages([]);
+        }
+      } else {
+        const msgRes = await axios.get(
+          `http://localhost:4000/api/v1/message/${chatRes.data.chat._id}`,
+          { withCredentials: true }
+        );
+        setMessages(msgRes.data.messages);
+      }
 
-      setMessages(msgRes.data.messages);
       setSelectedUser(otherUser);
       setShowProfileSidebar(false);
     } catch (err) {
-      console.error("Failed to load conversation");
+      console.error("Failed to load conversation:", err);
       toast.error("Failed to load conversation");
     }
   };
