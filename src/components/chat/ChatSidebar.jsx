@@ -193,7 +193,7 @@ const ChatSidebar = ({
 
             {hasUnreadMessages && (
               <div className="absolute -top-1 -right-1 flex">
-                <span className="bg-blue-500 text-white text-xs rounded-full h-5 min-w-5 px-1 flex items-center justify-center animate-pulse">
+                <span className="bg-blue-500 text-white text-xs rounded-full h-6 min-w-6 px-1 flex items-center justify-center animate-pulse shadow-lg">
                   {userNotifications.length > 9
                     ? "9+"
                     : userNotifications.length}
@@ -254,6 +254,7 @@ const ChatSidebar = ({
 
             {hasUnreadMessages && (
               <p className="text-xs text-blue-700 mt-0.5 truncate font-medium">
+                <i className="fas fa-comment text-xs mr-1"></i>
                 {userNotifications[0].content?.substring(0, 30)}
                 {userNotifications[0].content?.length > 30 ? "..." : ""}
               </p>

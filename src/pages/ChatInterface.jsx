@@ -165,37 +165,71 @@ const ChatInterface = ({ adminMode }) => {
             });
           }
         } else if (message.sender._id !== user._id) {
+          const newNotification = {
+            chatId: message.chat,
+            sender: message.sender,
+            content: message.content,
+            createdAt: message.createdAt,
+            messageId: message._id,
+            type: "message",
+          };
+
           setNotifications((prev) => {
             const isDuplicate = prev.find(
               (n) =>
-                n.sender._id === message.sender._id &&
-                n.content === message.content &&
-                Math.abs(new Date(n.createdAt) - new Date(message.createdAt)) <
-                  1000
+                n.messageId === message._id ||
+                (n.sender._id === message.sender._id &&
+                  n.content === message.content &&
+                  Math.abs(
+                    new Date(n.createdAt) - new Date(message.createdAt)
+                  ) < 1000)
             );
 
             if (isDuplicate) return prev;
 
-            return [
-              {
-                chatId: message.chat,
-                sender: message.sender,
-                content: message.content,
-                createdAt: message.createdAt,
-              },
-              ...prev,
-            ];
+            return [newNotification, ...prev];
           });
 
-          toast.info(`New message from ${message.sender.name}`, {
-            autoClose: 3000,
-            onClick: () => {
-              const senderUser = allUsers.find(
-                (u) => u._id === message.sender._id
-              );
-              if (senderUser) handleUserSelect(senderUser);
-            },
-          });
+          toast.info(
+            <div className="flex items-center">
+              <div className="mr-3">
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm"
+                  style={{
+                    backgroundColor:
+                      getAvatarByRole(message.sender)?.color || "#4f46e5",
+                  }}
+                >
+                  {getAvatarByRole(message.sender)?.initials ||
+                    message.sender.name?.charAt(0) ||
+                    "?"}
+                </div>
+              </div>
+              <div>
+                <div className="font-medium">{message.sender.name}</div>
+                <div className="text-sm opacity-90">
+                  {message.content.length > 40
+                    ? `${message.content.substring(0, 40)}...`
+                    : message.content}
+                </div>
+              </div>
+            </div>,
+            {
+              autoClose: 5000,
+              onClick: () => {
+                const senderUser = allUsers.find(
+                  (u) => u._id === message.sender._id
+                );
+                if (senderUser) {
+                  handleUserSelect(senderUser);
+                  setNotifications((prev) =>
+                    prev.filter((n) => n.messageId !== message._id)
+                  );
+                }
+              },
+              className: "cursor-pointer",
+            }
+          );
         }
       });
 
@@ -236,28 +270,76 @@ const ChatInterface = ({ adminMode }) => {
 
       socketRef.current.on("admin-user-blocked", (notification) => {
         if (notification && notification.type === "block") {
+          const enhancedNotification = {
+            id: `block-${Date.now()}`,
+            type: "block",
+            title: "Account Blocked",
+            message:
+              notification.message || "You have been blocked by an admin.",
+            reason: notification.reason,
+            createdAt: new Date().toISOString(),
+            read: false,
+            severity: "high",
+            adminName: notification.adminName,
+            adminAction: true,
+          };
+
           setUser((prev) => ({
             ...prev,
             status: "blocked",
             blockReason: notification.reason,
-            notifications: [notification, ...(prev.notifications || [])],
+            notifications: [
+              enhancedNotification,
+              ...(prev.notifications || []),
+            ],
           }));
+
           toast.warning(
-            notification.message || "You have been blocked by an admin."
+            <div>
+              <div className="font-semibold">Account Blocked</div>
+              <div className="text-sm">
+                {notification.message || "You have been blocked by an admin."}
+              </div>
+            </div>,
+            { autoClose: 8000 }
           );
         }
       });
 
       socketRef.current.on("admin-user-banned", (notification) => {
         if (notification && notification.type === "ban") {
+          const enhancedNotification = {
+            id: `ban-${Date.now()}`,
+            type: "ban",
+            title: "Account Banned",
+            message:
+              notification.message || "You have been banned by an admin.",
+            reason: notification.reason,
+            createdAt: new Date().toISOString(),
+            read: false,
+            severity: "critical",
+            adminName: notification.adminName,
+            adminAction: true,
+          };
+
           setUser((prev) => ({
             ...prev,
             status: "banned",
             bannedReason: notification.reason,
-            notifications: [notification, ...(prev.notifications || [])],
+            notifications: [
+              enhancedNotification,
+              ...(prev.notifications || []),
+            ],
           }));
+
           toast.error(
-            notification.message || "You have been banned by an admin."
+            <div>
+              <div className="font-semibold">Account Banned</div>
+              <div className="text-sm">
+                {notification.message || "You have been banned by an admin."}
+              </div>
+            </div>,
+            { autoClose: 10000 }
           );
         }
       });
