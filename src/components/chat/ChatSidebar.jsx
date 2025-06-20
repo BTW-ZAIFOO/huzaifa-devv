@@ -473,14 +473,22 @@ const ChatSidebar = ({
                 } catch (statusError) {
                   console.error("Failed to update status:", statusError);
                 }
-                const logoutResponse = await axios.get(
-                  "http://localhost:4000/api/v1/user/logout",
-                  { withCredentials: true }
-                );
-                console.log("Logout successful:", logoutResponse.data);
+
+                try {
+                  const logoutResponse = await axios.post(
+                    "http://localhost:4000/api/v1/user/logout",
+                    {},
+                    { withCredentials: true }
+                  );
+                  console.log("Logout successful:", logoutResponse.data);
+                } catch (logoutError) {
+                  console.error("Logout API failed:", logoutError);
+                }
+
                 window.location.href = "/auth";
               } catch (error) {
-                console.error("Logout failed:", error);
+                console.error("Logout process failed:", error);
+                window.location.href = "/auth";
               }
             }}
             className="w-full flex items-center justify-center gap-2 py-2.5 bg-white hover:bg-red-50 text-gray-700 hover:text-red-600 rounded-xl border border-gray-200 shadow-sm transition-colors"
