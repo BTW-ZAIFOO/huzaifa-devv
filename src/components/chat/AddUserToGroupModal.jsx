@@ -83,7 +83,6 @@ const AddUserToGroupModal = ({ group, isOpen, onClose, onAddUser }) => {
         setSearchTerm("");
         onClose();
 
-        // Show success message
         if (window.toast) {
           window.toast.success(result.message || "Users added successfully");
         }
