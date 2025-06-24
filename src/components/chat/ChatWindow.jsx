@@ -101,7 +101,6 @@ const ChatWindow = ({
     if (messageText.trim()) {
       setIsTyping(false);
       if (onTypingStop) onTypingStop();
-
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
       }
@@ -580,7 +579,6 @@ const ChatWindow = ({
   }
 
   const isGroupChat = selectedUser?.isGroupChat;
-
   const renderGroupHeader = () => {
     if (!isGroupChat) return null;
 

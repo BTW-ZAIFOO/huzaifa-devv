@@ -74,7 +74,6 @@ const AdminDashboard = ({
         };
 
         if (!filterConditions[filter]) return false;
-
         if (searchTerm) {
           const term = searchTerm.toLowerCase();
           return (
@@ -88,7 +87,6 @@ const AdminDashboard = ({
     : [];
 
   if (!Array.isArray(filteredUsers)) filteredUsers = [];
-
   if (Array.isArray(filteredUsers)) {
     filteredUsers.sort((a, b) => {
       let compareA, compareB;

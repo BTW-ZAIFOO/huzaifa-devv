@@ -20,10 +20,8 @@ const ChatHeader = ({
   const unreadSystemNotifications = systemNotifications.filter((n) => !n.read);
   const hasNotifications =
     incomingNotifications.length > 0 || unreadSystemNotifications.length > 0;
-
   const markNotificationAsRead = (notificationId) => {
     if (!currentUser || !currentUser.notifications) return;
-
     const updatedNotifications = currentUser.notifications.map((n) =>
       n.id === notificationId ? { ...n, read: true } : n
     );
@@ -33,10 +31,8 @@ const ChatHeader = ({
       notifications: updatedNotifications,
     }));
   };
-
   const markAllNotificationsAsRead = () => {
     if (!currentUser || !currentUser.notifications) return;
-
     const updatedNotifications = currentUser.notifications.map((n) => ({
       ...n,
       read: true,
@@ -47,7 +43,6 @@ const ChatHeader = ({
       notifications: updatedNotifications,
     }));
   };
-
   const handleNotificationClick = (notification) => {
     markNotificationAsRead(notification.id);
 
@@ -76,12 +71,10 @@ const ChatHeader = ({
     }
     setShowNotifications(false);
   };
-
   const handleMessageNotificationClick = (messageNotification) => {
     toast.info(`Opening chat with ${messageNotification.sender.name}`);
     setShowNotifications(false);
   };
-
   const formatNotificationTime = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -95,7 +88,6 @@ const ChatHeader = ({
 
     return date.toLocaleDateString();
   };
-
   const getNotificationIcon = (type) => {
     switch (type) {
       case "report":
@@ -112,7 +104,6 @@ const ChatHeader = ({
         return "fa-bell";
     }
   };
-
   const getNotificationBadgeClass = (type) => {
     switch (type) {
       case "report":

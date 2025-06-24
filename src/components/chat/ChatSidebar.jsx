@@ -84,7 +84,6 @@ const ChatSidebar = ({
         currentUser?._id?.toString() || currentUser?.id?.toString();
       const isOnlineUser = user.status === "online";
       if (showOnlineOnly && !isOnlineUser) return false;
-
       if (isAdmin) return true;
       return userId !== currentId;
     });
