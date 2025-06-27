@@ -21,6 +21,7 @@ import AuthVerification from "./pages/AuthVerification";
 import { Toaster } from "react-hot-toast";
 import "./App.css";
 import UserProfile from "./components/UserProfile";
+import LandingPage from "./pages/LandingPage";
 
 const AdminRoute = ({ children }) => {
   const { isAuthenticated, isAdmin, isAuthLoading } = useContext(Context);
@@ -98,6 +99,7 @@ const App = () => {
     <Router>
       <div>
         <Routes>
+          <Route path="/" element={<LandingPage />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/admin/auth" element={<AdminAuth />} />
           <Route path="/password/forgot" element={<ForgotPassword />} />
