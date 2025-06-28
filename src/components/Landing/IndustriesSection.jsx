@@ -31,17 +31,15 @@ const industries = [
 ];
 
 const IndustriesSection = ({ SectionIcons }) => (
-  <Section
-    title="Industries We Serve"
-    id="industries"
-    className="bg-white/60 rounded-2xl shadow-lg my-16"
-    data-aos="fade-up"
-  >
+  <Section id="industries" data-aos="fade-up">
+    <h1 className="text-5xl font-extrabold pb-12 text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 font-sans drop-shadow-lg">
+      Industries We Serve
+    </h1>
     <div className="flex flex-wrap justify-center gap-10">
       {industries.map(({ key, title, description, aosDelay }) => (
         <div
           key={key}
-          className="bg-white rounded-2xl shadow-lg p-8 w-64 text-center transition-all duration-700"
+          className="p-10 w-64 text-center transition-all duration-700"
           data-aos="flip-up"
           data-aos-delay={aosDelay}
         >

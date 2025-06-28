@@ -22,11 +22,11 @@ const Footer = () => (
     <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-8">
       <div className="flex flex-col items-center md:items-start gap-2">
         <div className="flex items-center gap-2">
-          <span className="text-3xl" aria-label="AI Chatbot Logo">
+          <span className="text-3xl" aria-label="// AICHATBOT // Logo">
             🤖
           </span>
           <span className="text-2xl font-extrabold tracking-tight">
-            AIChatBOT
+            // AICHATBOT //
           </span>
         </div>
         <span className="text-base font-medium text-indigo-100">
@@ -66,7 +66,7 @@ const Footer = () => (
       </div>
     </div>
     <div className="mt-8 text-center text-indigo-100 text-sm font-medium tracking-wide">
-      &copy; {new Date().getFullYear()} AIChatBOT. All rights reserved.
+      &copy; {new Date().getFullYear()} // AICHATBOT //. All rights reserved.
     </div>
   </footer>
 );

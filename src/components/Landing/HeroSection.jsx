@@ -44,7 +44,7 @@ const HeroSection = () => {
     <section
       id="hero"
       ref={ref}
-      className="relative flex flex-col md:flex-row items-center justify-between px-16 pt-16 pb-36 md:pb-48 bg-gradient-to-br from-blue-200 via-indigo-100 to-purple-100 shadow-2xl rounded-b-[4rem] opacity-0 translate-y-8 font-sans overflow-hidden"
+      className="relative flex flex-col md:flex-row items-center justify-between px-16 pt-44 pb-6 opacity-0 translate-y-8 font-sans overflow-hidden"
     >
       <div className="max-w-2xl z-10">
         <div className="flex items-center gap-3 mb-8">
@@ -54,7 +54,7 @@ const HeroSection = () => {
           </span>
         </div>
         <h1 className="text-3xl md:text-4xl font-extrabold mb-10 text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 leading-tight transition-all duration-700 font-sans drop-shadow-2xl">
-          Unleash the power of AI Chat Moderation
+          Unleash the power of AICHATBOT
         </h1>
         <p className="text-xl md:text-2xl text-gray-700 mb-12 font-normal transition-all duration-700 font-sans max-w-xl drop-shadow">
           <span className="font-semibold text-blue-700">Real-time</span>,{" "}

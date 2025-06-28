@@ -53,8 +53,8 @@ const Navbar = () => {
           <span className="text-2xl font-extrabold text-blue-800 tracking-tight select-none font-sans flex items-center gap-2">
             <span role="img" aria-label="robot">
               🤖
-            </span>{" "}
-            AIChatBOT
+            </span>
+            // AICHATBOT //
           </span>
         </div>
         <div className="flex-1 flex justify-center">
@@ -93,7 +93,7 @@ const Navbar = () => {
           className="ml-4 px-6 py-2 bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 text-white rounded-full font-bold shadow-lg hover:scale-110 hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 font-sans border-2 border-indigo-200"
           style={{ fontSize: "1.05rem" }}
         >
-          🚀 Request Demo
+          Login/Signup
         </Link>
       </div>
     </nav>

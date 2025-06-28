@@ -23,18 +23,16 @@ function ContactSection() {
   };
 
   return (
-    <Section
-      title="Contact & FAQs"
-      id="contact"
-      className="my-16"
-      data-aos="fade-up"
-    >
+    <Section id="contact" data-aos="fade-up">
+      <h1 className="text-5xl font-extrabold pb-12 text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 font-sans drop-shadow-lg">
+        Contact & FAQs
+      </h1>
       <div className="mb-12 transition-all duration-700" data-aos="fade-right">
-        <h3 className="text-xl font-semibold text-blue-700 mb-4">
+        <h3 className="text-2xl text-center font-semibold text-blue-700 mb-4">
           Frequently Asked Questions
         </h3>
         <div className="bg-white rounded-2xl shadow-lg p-8 max-w-2xl mx-auto mb-8">
-          <h4 className="font-bold mb-4">What makes AIChatBOT unique?</h4>
+          <h4 className="font-bold mb-4">What makes // AICHATBOT // unique?</h4>
           <p className="text-gray-600 mb-6">
             Our platform combines state-of-the-art AI, enterprise-grade
             security, and regulatory expertise to deliver unmatched moderation
@@ -48,7 +46,7 @@ function ContactSection() {
         </div>
       </div>
       <div className="transition-all duration-700" data-aos="fade-left">
-        <h3 className="text-xl font-semibold text-blue-700 mb-4">
+        <h3 className="text-2xl text-center font-semibold text-blue-700 mb-4">
           Connect with Our Team
         </h3>
         <div className="bg-white rounded-2xl shadow-lg p-8 max-w-2xl mx-auto">

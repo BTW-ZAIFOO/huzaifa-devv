@@ -37,9 +37,9 @@ const frameworkSteps = [
 ];
 
 const ModerationFrameworkSection = () => (
-  <section className="mb-16">
+  <div className="my-8">
     <h3
-      className="text-2xl font-bold text-blue-700 mb-6 transition-all duration-700"
+      className="text-3xl font-bold text-center text-blue-700 pb-9 transition-all duration-700"
       data-aos="fade-right"
     >
       Moderation Framework
@@ -60,7 +60,7 @@ const ModerationFrameworkSection = () => (
         </div>
       ))}
     </div>
-  </section>
+  </div>
 );
 
 ModerationFrameworkSection.propTypes = {

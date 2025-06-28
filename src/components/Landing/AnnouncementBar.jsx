@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 
 const ANNOUNCEMENT =
-  "🚀 New: AIChatBOT is now SOC 2 Type II Certified! Learn more.";
+  "🚀 New: // AICHATBOT // This Area is only for Announcements.";
 const ANNOUNCEMENT_HEIGHT = 40;
 
 const barStyles = {
@@ -15,7 +15,7 @@ const AnnouncementBar = ({ message }) => (
     style={barStyles}
     aria-label="Announcement"
   >
-    <span role="status" aria-live="polite">
+    <span role="status" aria-live="polite" className="animate-pulse">
       {message}
     </span>
   </div>

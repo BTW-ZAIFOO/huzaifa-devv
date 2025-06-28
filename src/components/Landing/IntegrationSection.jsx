@@ -5,12 +5,10 @@ import { Link } from "react-router-dom";
 
 function IntegrationSection({ children }) {
   return (
-    <Section
-      title="Integration & Resources"
-      id="integration"
-      className="my-16"
-      data-aos="fade-up"
-    >
+    <Section id="integration" data-aos="fade-up">
+      <h1 className="text-5xl font-extrabold pb-12 text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 font-sans drop-shadow-lg">
+        Integration & Resources
+      </h1>
       <div className="mb-12 transition-all duration-700" data-aos="fade-right">
         <h3 className="text-xl font-semibold text-blue-700 mb-4">
           Seamless Integration & Customization
@@ -25,7 +23,7 @@ function IntegrationSection({ children }) {
           to="/chat"
           className="inline-block px-8 py-3 bg-blue-700 text-white rounded-xl font-bold shadow hover:bg-blue-800"
         >
-          Connect with Our Experts
+          Login/Signup
         </Link>
       </div>
       {children}

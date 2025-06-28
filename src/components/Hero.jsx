@@ -14,7 +14,7 @@ const Hero = () => {
           AI-Powered Chat Platform
         </span>
         <h1 className="text-5xl font-bold mb-5 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent leading-tight">
-          AI Chat Moderation System
+          // AICHATBOT //
         </h1>
         <p className="text-xl text-gray-600 max-w-3xl mx-auto text-center leading-relaxed mb-8">
           A powerful platform that uses artificial intelligence to moderate and

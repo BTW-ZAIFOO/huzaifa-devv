@@ -59,7 +59,7 @@ const Home = () => {
               to="/"
               className="text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600"
             >
-              AI Chat Moderation System
+              // AICHATBOT //
             </Link>
             <div className="flex gap-5 items-center">
               <Link

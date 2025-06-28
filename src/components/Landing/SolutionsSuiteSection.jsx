@@ -2,15 +2,15 @@ import React from "react";
 import PropTypes from "prop-types";
 
 const SolutionsSuiteSection = ({ SectionIcons }) => (
-  <section>
+  <div className="my-8">
     <h3
-      className="text-2xl font-bold text-purple-700 mb-6 transition-all duration-700"
+      className="text-3xl font-bold text-center text-blue-700 pb-9 transition-all duration-700"
       data-aos="fade-right"
     >
       Comprehensive Solutions Suite
     </h3>
     <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
-      <article
+      <div
         data-aos="zoom-in-up"
         data-aos-delay="100"
         className="transition-all duration-700"
@@ -20,8 +20,8 @@ const SolutionsSuiteSection = ({ SectionIcons }) => (
         <p className="text-gray-600">
           Automated, adaptive moderation and threat detection at scale.
         </p>
-      </article>
-      <article
+      </div>
+      <div
         data-aos="zoom-in-up"
         data-aos-delay="250"
         className="transition-all duration-700"
@@ -31,8 +31,8 @@ const SolutionsSuiteSection = ({ SectionIcons }) => (
         <p className="text-gray-600">
           Instant, intelligent resolution of flagged issues.
         </p>
-      </article>
-      <article
+      </div>
+      <div
         data-aos="zoom-in-up"
         data-aos-delay="400"
         className="transition-all duration-700"
@@ -42,9 +42,9 @@ const SolutionsSuiteSection = ({ SectionIcons }) => (
         <p className="text-gray-600">
           Unified oversight across web, mobile, and enterprise platforms.
         </p>
-      </article>
+      </div>
     </div>
-  </section>
+  </div>
 );
 
 SolutionsSuiteSection.propTypes = {

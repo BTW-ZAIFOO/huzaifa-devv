@@ -35,7 +35,7 @@ const Section = ({ title, children, id, className = "" }) => {
       id={id}
       ref={ref}
       className={classNames(
-        "py-20 px-4 max-w-7xl mx-auto scroll-mt-32 opacity-0 translate-y-8 font-sans",
+        "py-16 px-4 max-w-7xl mx-auto opacity-0 translate-y-8 font-sans",
         className
       )}
       tabIndex={-1}

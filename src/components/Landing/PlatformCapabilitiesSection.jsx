@@ -26,9 +26,9 @@ const capabilities = [
 ];
 
 const PlatformCapabilitiesSection = ({ SectionIcons }) => (
-  <section className="mb-16">
+  <div className="my-8">
     <h3
-      className="text-2xl font-bold text-indigo-700 mb-6 transition-all duration-700"
+      className="text-3xl font-bold text-center text-blue-700 pb-9 transition-all duration-700"
       data-aos="fade-left"
     >
       Platform Capabilities
@@ -47,7 +47,7 @@ const PlatformCapabilitiesSection = ({ SectionIcons }) => (
         </div>
       ))}
     </div>
-  </section>
+  </div>
 );
 
 PlatformCapabilitiesSection.propTypes = {

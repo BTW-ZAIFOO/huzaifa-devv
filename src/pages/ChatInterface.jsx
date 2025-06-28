@@ -1109,7 +1109,7 @@ const AdminHeader = ({ user }) => (
         to="/"
         className="text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600"
       >
-        AI Chat Moderation
+        // AICHATBOT //
       </Link>
       <span className="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-1 rounded-full">
         Admin Mode

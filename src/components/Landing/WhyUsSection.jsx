@@ -27,13 +27,11 @@ const FEATURES = [
 ];
 
 const WhyUsSection = ({ SectionIcons }) => (
-  <Section
-    title="Why Leading Organizations Choose AIChatBOT"
-    id="why-us"
-    className="bg-white/60 rounded-2xl shadow-lg my-16"
-    data-aos="fade-up"
-  >
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
+  <Section id="why-us" data-aos="fade-up">
+    <h1 className="text-5xl font-extrabold pb-12 text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 font-sans drop-shadow-lg">
+      Why Leading Organizations Choose AICHATBOT
+    </h1>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center mt-4">
       {FEATURES.map(({ key, title, description, delay }) => (
         <div
           key={key}

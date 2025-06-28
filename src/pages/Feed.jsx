@@ -378,7 +378,7 @@ const Feed = () => {
       <div className="fixed top-0 left-0 right-0 bg-white shadow z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
           <Link to="/" className="flex items-center">
-            <h1 className="text-xl font-bold text-blue-600">SocialFeed</h1>
+            <h1 className="text-xl font-bold text-blue-600">// AICHATBOT //</h1>
           </Link>
           <div className="flex-1 max-w-xl mx-4">
             <SearchBar onSearch={handleSearchChange} />
