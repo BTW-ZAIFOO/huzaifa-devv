@@ -79,34 +79,36 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <div
-      className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen"
-      style={{ fontFamily: "Roboto, sans-serif" }}
-    >
-      <AnnouncementBar />
-      <Navbar />
-      <div>
-        <HeroSection />
-        <WhyUsSection SectionIcons={SectionIcons} />
-        <Section id="solutions" data-aos="fade-up">
-          <h1 className="text-5xl font-extrabold pb-12 text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 font-sans drop-shadow-lg">
-            Our Solutions
-          </h1>
-          <ModerationFrameworkSection />
-          <PlatformCapabilitiesSection SectionIcons={SectionIcons} />
-          <SolutionsSuiteSection SectionIcons={SectionIcons} />
-        </Section>
-        <IndustriesSection SectionIcons={SectionIcons} />
-        <IntegrationSection>
-          <PartnersSection />
-          <ResourcesSection />
-        </IntegrationSection>
-        <TestimonialsSection />
-        <ContactSection />
-        <Footer />
+    <>
+      <div
+        className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen"
+        style={{ fontFamily: "Roboto, sans-serif" }}
+      >
+        <AnnouncementBar />
+        <Navbar />
+        <div>
+          <HeroSection />
+          <WhyUsSection SectionIcons={SectionIcons} />
+          <Section id="solutions" data-aos="fade-up">
+            <h1 className="text-5xl font-extrabold pb-12 text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 font-sans drop-shadow-lg">
+              Our Solutions
+            </h1>
+            <ModerationFrameworkSection />
+            <PlatformCapabilitiesSection SectionIcons={SectionIcons} />
+            <SolutionsSuiteSection SectionIcons={SectionIcons} />
+          </Section>
+          <IndustriesSection SectionIcons={SectionIcons} />
+          <IntegrationSection>
+            <PartnersSection />
+            <ResourcesSection />
+          </IntegrationSection>
+          <TestimonialsSection />
+          <ContactSection />
+          <Footer />
+        </div>
+        <ScrollToTop />
       </div>
-      <ScrollToTop />
-    </div>
+    </>
   );
 };
 
