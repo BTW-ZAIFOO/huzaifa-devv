@@ -67,30 +67,33 @@ const OtpVerification = () => {
       otp: enteredOtp,
     };
 
-    await axios
-      .post("http://localhost:4000/api/v1/user/otp-verification", data, {
-        withCredentials: true,
-        headers: { "Content-Type": "application/json" },
-      })
-      .then((res) => {
-        toast.success(res.data.message);
-        setIsAuthenticated(true);
-        setUser(res.data.user);
-
-        if (role === "admin" || res.data.user.role === "admin") {
-          window.location.href = "/admin";
-        } else {
-          window.location.href = "/chat";
+    try {
+      const res = await axios.post(
+        "http://localhost:4000/api/v1/user/otp-verification",
+        data,
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
         }
-      })
-      .catch((err) => {
-        toast.error(err.response.data.message);
-        setIsAuthenticated(false);
-        setUser(null);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      );
+      toast.success(res.data.message || "Account verified successfully");
+      setIsAuthenticated(true);
+      setUser(res.data.user);
+
+      if (role === "admin" || res.data.user.role === "admin") {
+        window.location.href = "/admin";
+      } else {
+        window.location.href = "/chat";
+      }
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message || "OTP verification failed"
+      );
+      setIsAuthenticated(false);
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isAuthenticated) {
