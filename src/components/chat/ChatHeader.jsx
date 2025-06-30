@@ -135,7 +135,7 @@ const ChatHeader = ({
             to="/"
             className="text-xl md:text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 truncate"
           >
-            AI Chat Moderation
+            // AICHATBOT //
           </Link>
         </div>
         <div className="flex items-center gap-2 md:gap-5">
